@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */; };
-		AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* ContentView.swift */; };
+		AC98AE022BC0872E00879A25 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* MapView.swift */; };
 		AC98AE042BC0873000879A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE032BC0873000879A25 /* Assets.xcassets */; };
 		AC98AE072BC0873000879A25 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE062BC0873000879A25 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -16,7 +16,7 @@
 /* Begin PBXFileReference section */
 		AC98ADFC2BC0872E00879A25 /* Radius.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Radius.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusApp.swift; sourceTree = "<group>"; };
-		AC98AE012BC0872E00879A25 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AC98AE012BC0872E00879A25 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		AC98AE032BC0873000879A25 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC98AE062BC0873000879A25 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,7 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */,
-				AC98AE012BC0872E00879A25 /* ContentView.swift */,
+				AC98AE012BC0872E00879A25 /* MapView.swift */,
 				AC98AE032BC0873000879A25 /* Assets.xcassets */,
 				AC98AE052BC0873000879A25 /* Preview Content */,
 			);
@@ -137,7 +137,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
+				AC98AE022BC0872E00879A25 /* MapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -280,6 +280,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -309,6 +310,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
