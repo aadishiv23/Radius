@@ -7,64 +7,10 @@
 
 import SwiftUI
 import MapKit
+import Foundation
+import CoreLocationUI
 
-final class MapViewModel: ObservableObject {
-    
-    var locationManager: CLLocationManager? // Optional, as user can turn off location service for their whole phone - have to make sure its on
-    
-    func checkIfLocationServiceEnabled() {
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager = CLLocationManager()
-            locationManager?.desiredAccuracy = kCLLocationAccuracyBest
-        }
-        else {
-            print("Show user alert and ask to turn on")
-        }
-    }
-    
-    func checkLocationAuthorization() {
-        // sue location manager in this scope
-        guard let locationManager = locationManager else { return }
-        
-        // check for cases
-        
-        switch locationManager.authorizationStatus {
-        
-            case .notDetermined: // Ask for permission
-                locationManager.requestAlwaysAuthorization()
-            case .restricted:
-                print("Your locatoin suage is likely restricted due to parental control") // sometimes location restricted due to personal
-            case .denied:
-                print("You have denied the usage of locatoin. Please go into locations and fix")
-            case .authorizedAlways, .authorizedWhenInUse:
-                break
-            @unknown default:
-                break
-        }
-        
-        
-    }
-    
-    
-    
-}
 
-struct ContentView: View {
-    /*var body: some View {
-        VStack {
-            NavigationView {
-                MapCardView()
-            }
-        }
-    }*/
-    @StateObject private var viewModel = MapViewModel()
-    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.33516, longitude: -121.891054), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
-    
-    var body: some View {
-        Map(coordinateRegion: $region, showsUserLocation: true)
-            .ignoresSafeArea() // remove top and bottom white bar
-    }
-}
 
 /*struct MapCardView: View {
     @State private var region = MKCoordinateRegion(
@@ -99,6 +45,62 @@ struct FullScreenMapView: View {
     }
 }*/
 
+struct ContentView: View {
+    
+    @StateObject private var viewModel = ContentViewModel()
+    
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            Map(coordinateRegion: $viewModel.region, showsUserLocation: true)
+                .ignoresSafeArea()
+                .tint(.purple)
+                        
+            LocationButton(.currentLocation) {
+                viewModel.requestAllowOnceLocationPermission()
+            }
+            .foregroundStyle(.white)
+            .cornerRadius(8)
+            .labelStyle(.titleAndIcon)
+            .symbolVariant(.fill)
+            .padding(.bottom, 10)
+        }
+    }
+}
+
+final class ContentViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+    @Published var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 37.8199, longitude: -122.4783),
+        span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+    )
+    
+    let locationManager = CLLocationManager()
+    
+    override init() {
+        super.init()
+        locationManager.delegate = self
+    }
+    
+    func requestAllowOnceLocationPermission() {
+        // locationManager.requestLocation()
+        locationManager.requestAlwaysAuthorization()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let lastLocation = locations.first else { return }
+        
+        
+        // update ui so make sure back on main thread
+        DispatchQueue.main.async {
+            self.region = MKCoordinateRegion(center: lastLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        print(error.localizedDescription)
+    }
+    
+    
+}
 
 #Preview {
     ContentView()
