@@ -64,13 +64,16 @@ struct ContentView: View {
             .symbolVariant(.fill)
             .padding(.bottom, 10)
         }
+        .onAppear {
+            viewModel.checkLocationAuthorizationStatus()
+        }
     }
 }
 
 final class ContentViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.8199, longitude: -122.4783),
-        span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+        center: CLLocationCoordinate2D(latitude: 40, longitude: 120),
+        span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
     )
     
     let locationManager = CLLocationManager()
@@ -80,18 +83,24 @@ final class ContentViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
         locationManager.delegate = self
     }
     
+    func checkLocationAuthorizationStatus() {
+            locationManager.requestAlwaysAuthorization()
+        }
+    
+    
     func requestAllowOnceLocationPermission() {
         // locationManager.requestLocation()
         locationManager.requestAlwaysAuthorization()
+        locationManager.startUpdatingLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let lastLocation = locations.first else { return }
+        guard let latestLocation = locations.first else { return }
         
         
         // update ui so make sure back on main thread
         DispatchQueue.main.async {
-            self.region = MKCoordinateRegion(center: lastLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            self.region = MKCoordinateRegion(center: latestLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
         }
     }
     
