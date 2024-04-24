@@ -51,12 +51,13 @@ struct ContentView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Map(coordinateRegion: $viewModel.region, showsUserLocation: true)
+            AreaMap(region: $viewModel.region)
+            /*Map(coordinateRegion: $viewModel.region, showsUserLocation: true)
                 .ignoresSafeArea()
-                .tint(.purple)
+                .tint(.purple)*/
                         
             LocationButton(.currentLocation) {
-                viewModel.requestAllowOnceLocationPermission()
+                viewModel.initiateLocationUpdates()
             }
             .foregroundStyle(.white)
             .cornerRadius(8)
@@ -70,45 +71,60 @@ struct ContentView: View {
     }
 }
 
+
+struct AreaMap: View {
+    @Binding var region: MKCoordinateRegion
+
+    var body: some View {
+        let binding = Binding(
+            get: { self.region },
+            set: { newValue in
+                DispatchQueue.main.async {
+                    self.region = newValue
+                }
+            }
+        )
+        return Map(coordinateRegion: binding, showsUserLocation: true)
+            .ignoresSafeArea()
+    }
+}
+
+
 final class ContentViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 40, longitude: 120),
         span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
     )
-    
+
     let locationManager = CLLocationManager()
-    
+
     override init() {
         super.init()
         locationManager.delegate = self
     }
-    
+
     func checkLocationAuthorizationStatus() {
-            locationManager.requestAlwaysAuthorization()
-        }
-    
-    
-    func requestAllowOnceLocationPermission() {
-        // locationManager.requestLocation()
         locationManager.requestAlwaysAuthorization()
+    }
+
+    func initiateLocationUpdates() {
         locationManager.startUpdatingLocation()
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let latestLocation = locations.first else { return }
-        
-        
-        // update ui so make sure back on main thread
         DispatchQueue.main.async {
-            self.region = MKCoordinateRegion(center: latestLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            self.updateRegion(center: latestLocation.coordinate)
         }
     }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+
+    func updateRegion(center: CLLocationCoordinate2D) {
+        region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error.localizedDescription)
     }
-    
-    
 }
 
 #Preview {
