@@ -16,6 +16,11 @@ struct RadiusApp: App {
                     .tabItem {
                         Label("Home", systemImage: "house.fill")
                     }
+                
+                InfoView()
+                    .tabItem {
+                        Label("Person", systemImage: "person.fill")
+                    }
             }
         }
     }
