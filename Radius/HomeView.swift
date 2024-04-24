@@ -23,6 +23,12 @@ struct HomeView: View {
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
     
+//    @StateObject private var mapRegionObserver: MapRegionObserver
+//
+//    init() {
+//        _mapRegionObserver = StateObject(wrappedValue: MapRegionObserver(initialCenter: initialCenter))
+//    }
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -93,7 +99,8 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showFullScreenMap) {
             // Present the FullScreenMapView here
-            FullScreenMapView(region: $region)
+            FullScreenMapView(region: $region, selectedFriend: $selectedFriend)
+                    .environmentObject(friendData)
         }
     }
     
@@ -262,10 +269,21 @@ struct FriendDetailView: View {
 
 struct FullScreenMapView: View {
     @Binding var region: MKCoordinateRegion
-    
+    @EnvironmentObject var friendData: FriendData
+    @Binding var selectedFriend: FriendLocation?
+
     var body: some View {
-        Map(coordinateRegion: $region, showsUserLocation: true)
-            .ignoresSafeArea()
+        Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendData.friendsLocations) { friendLocation in
+            MapAnnotation(coordinate: friendLocation.coordinate) {
+                Circle()
+                    .fill(friendLocation.color)
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        selectedFriend = friendLocation
+                    }
+            }
+        }
+        .ignoresSafeArea()
     }
 }
 
