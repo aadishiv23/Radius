@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
+		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
 		AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */; };
 		AC98AE022BC0872E00879A25 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* MapView.swift */; };
 		AC98AE042BC0873000879A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE032BC0873000879A25 /* Assets.xcassets */; };
@@ -20,6 +21,7 @@
 /* Begin PBXFileReference section */
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
+		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
 		AC98ADFC2BC0872E00879A25 /* Radius.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Radius.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusApp.swift; sourceTree = "<group>"; };
 		AC98AE012BC0872E00879A25 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 				AC6A55282BD98D4200706E01 /* HomeView.swift */,
 				AC6A552A2BD99B1700706E01 /* InfoView.swift */,
 				AC98AE012BC0872E00879A25 /* MapView.swift */,
+				AC6A552C2BD9A32F00706E01 /* Friends.swift */,
 				AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */,
 				ACCFF2C52BC22AF400D9265B /* LocationManager.swift */,
 				AC98AE032BC0873000879A25 /* Assets.xcassets */,
@@ -152,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */,
+				AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */,
 				AC98AE022BC0872E00879A25 /* MapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
@@ -296,6 +300,8 @@
 				INFOPLIST_FILE = Radius/Info.plist;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This apps needs your location to share it on the map";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This apps needs your location to share it on the map";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -329,6 +335,8 @@
 				INFOPLIST_FILE = Radius/Info.plist;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This apps needs your location to share it on the map";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This apps needs your location to share it on the map";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

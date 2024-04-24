@@ -11,16 +11,18 @@ import MapKit
 
 // InfoView that lists all friends and navigates to their detail view
 struct InfoView: View {
-    let friendsLocations: [FriendLocation] = [
-        FriendLocation(name: "Alice", color: .red, coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),
-        FriendLocation(name: "Bob", color: .blue, coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080)),
-        FriendLocation(name: "Charlie", color: .green, coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100)),
-        FriendLocation(name: "David", color: .yellow, coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120))
-    ]
+    @EnvironmentObject var friendData: FriendData  // Access the shared data
+
+//    let friendsLocations: [FriendLocation] = [
+//        FriendLocation(name: "Alice", color: .red, coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),
+//        FriendLocation(name: "Bob", color: .blue, coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080)),
+//        FriendLocation(name: "Charlie", color: .green, coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100)),
+//        FriendLocation(name: "David", color: .yellow, coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120))
+//    ]
     
     var body: some View {
         NavigationView {
-            List(friendsLocations) { friend in
+            List(friendData.friendsLocations) { friend in
                 NavigationLink(destination: FriendProfileView(friend: friend)) {
                     HStack {
                         Circle()

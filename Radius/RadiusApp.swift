@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct RadiusApp: App {
+    @StateObject var friendData = FriendData()  // Create an instance of your data model
+
     var body: some Scene {
         WindowGroup {
             TabView {
@@ -21,7 +23,13 @@ struct RadiusApp: App {
                     .tabItem {
                         Label("Person", systemImage: "person.fill")
                     }
+                
+                ContentView()
+                    .tabItem {
+                        Label("Map", systemImage: "map")
+                    }
             }
+            .environmentObject(friendData)  // Provide the EnvironmentObject to all views
         }
     }
 }
