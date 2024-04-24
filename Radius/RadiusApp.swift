@@ -13,7 +13,9 @@ struct RadiusApp: App {
         WindowGroup {
             TabView {
                 HomeView()
-  
+                    .tabItem {
+                        Label("Home", systemImage: "house.fill")
+                    }
             }
         }
     }
