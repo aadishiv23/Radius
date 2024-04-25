@@ -16,10 +16,12 @@ struct FriendDetailView: View {
         center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
         span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
     )
+    @State private var buttonScale: CGFloat = 1.0
+
     
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topLeading) {
             Map(coordinateRegion: .constant(MKCoordinateRegion(
                 center: friend.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
@@ -34,16 +36,44 @@ struct FriendDetailView: View {
             
             
             
-            Button(action: {
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title)
-                    .foregroundColor(.black)
-            }
-            .padding()
+//                Button(action: recenterMap) {
+//                    Image(systemName: "arrow.circlepath")
+//                        .circularButtonStyle()
+//                }
+//                .padding(.leading, 20)
+//                .padding(.top, 20)
+//                .onAppear {
+//                    buttonScale = 1.0
+//                }
+//                
+//                Spacer()
+                
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .circularButtonStyle()
+                }
+                .padding()
+
+           
         }
     }
+    
+    private  func recenterMap() {
+        withAnimation(.easeInOut(duration: 0.5)) {
+            region.center = friend.coordinate
+            region.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            buttonScale = 0.8
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            withAnimation(.spring()) {
+                buttonScale = 1.0
+            }
+        }
+    }
+    
+
 }
 
 //

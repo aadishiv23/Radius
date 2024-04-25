@@ -20,6 +20,7 @@ struct HomeView: View {
     @State private var selectedFriend: FriendLocation?
     @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
+    @State private var buttonScale: CGFloat = 1.0
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
     
@@ -70,31 +71,28 @@ struct HomeView: View {
             .background(Color.gray.opacity(0.2))
             
             HStack {
+                if showRecenterButton {
+                    Button(action: recenterMap) {
+                        Image(systemName: "arrow.circlepath")
+                            .circularButtonStyle()
+                            .scaleEffect(buttonScale)
+                            .animation(.easeInOut(duration: 0.5), value: buttonScale)
+                    }
+                    .padding(.leading, 20)
+                    .padding(.top, 20)
+                }
+               
+                
+                Spacer()
+                
                 Button(action: {
                     showFullScreenMap.toggle()
                 }) {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
-                        .padding()
-                        .background(Color.white.opacity(0.7))
-                        .clipShape(Circle())
-                        .shadow(radius: 3)
+                        .circularButtonStyle()
                 }
-                .padding(.leading, 20)
+                .padding(.trailing, 20)
                 .padding(.top, 20)
-                
-                Spacer()
-                
-                if showRecenterButton {
-                    Button(action: recenterMap) {
-                        Image(systemName: "arrow.circlepath")
-                            .padding()
-                            .background(Color.white)
-                            .clipShape(Circle())
-                            .shadow(radius: 3)
-                    }
-                    .padding(.trailing, 20)
-                    .padding(.top, 20)
-                }
             }
         }
         .sheet(isPresented: $showFullScreenMap) {
