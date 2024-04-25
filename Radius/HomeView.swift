@@ -110,7 +110,7 @@ struct HomeView: View {
                 friendRow(friend)
             }
             if let userLocation = locationViewModel.userLocation {
-                friendRow(FriendLocation(name: "You", color: .purple, coordinate: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)))
+                friendRow(FriendLocation(name: "You", color: .purple, coordinate: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), zones: []))
             }
         }
     }
@@ -163,7 +163,7 @@ struct HomeView: View {
 //    showRecenterButton = distance > 500
 //}
 //}
-
+//
 //
 //struct ContentView: View {
 //    @State private var region = MKCoordinateRegion(
@@ -221,14 +221,84 @@ struct HomeView: View {
 //    }
 //}
 
-struct FriendLocation: Identifiable {
-    let id = UUID()
-    let name: String
-    let color: Color
-    let coordinate: CLLocationCoordinate2D
-}
 
 
+
+//
+//struct FriendDetailView: View {
+//    var friend: FriendLocation
+//    @EnvironmentObject var friendData: FriendData
+//    @Environment(\.presentationMode) var presentationMode
+//    @State private var region: MKCoordinateRegion
+//    @State private var showingZoneEditor = false
+//    @State private var newZoneRadius: Double = 100.0  // Default radius value for new zones
+//
+//    init(friend: FriendLocation) {
+//        self.friend = friend
+//        _region = State(initialValue: MKCoordinateRegion(
+//            center: friend.coordinate,
+//            span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+//        ))
+//    }
+//
+//    var body: some View {
+//        ZStack {
+//            Map(coordinateRegion: $region, annotationItems: [friend]) { friendLocation in
+//                MapAnnotation(coordinate: friendLocation.coordinate) {
+//                    VStack {
+//                        Circle()
+//                            .fill(friendLocation.color)
+//                            .frame(width: 20, height: 20)
+//                        ForEach(friendLocation.zones) { zone in
+//                            Circle()
+//                                .stroke(Color.blue.opacity(0.5), lineWidth: 2)
+//                                .frame(width: zone.radius * 2, height: zone.radius * 2) // Displaying the zone
+//                        }
+//                    }
+//                }
+//            }
+//            .ignoresSafeArea()
+//
+//            VStack {
+//                Spacer()
+//                Button(action: {
+//                    showingZoneEditor.toggle()
+//                }) {
+//                    Text(showingZoneEditor ? "Done" : "Edit Zones")
+//                        .foregroundColor(.white)
+//                        .padding()
+//                        .background(Color.blue)
+//                        .clipShape(RoundedRectangle(cornerRadius: 10))
+//                }
+//                .padding()
+//            }
+//
+//            if showingZoneEditor {
+//                VStack {
+//                    Slider(value: $newZoneRadius, in: 50...500, step: 10)
+//                        .padding()
+//                    Button("Add Zone") {
+//                        let newZone = Zone(coordinate: friend.coordinate, radius: newZoneRadius)
+//                        if let index = friendData.friendsLocations.firstIndex(where: { $0.id == friend.id }) {
+//                            friendData.friendsLocations[index].zones.append(newZone)
+//                        }
+//                        showingZoneEditor = false
+//                    }
+//                    Button("Cancel") {
+//                        showingZoneEditor = false
+//                    }
+//                }
+//                .padding()
+//                .background(Color.white)
+//                .cornerRadius(10)
+//                .shadow(radius: 5)
+//            }
+//        }
+//        .navigationBarItems(trailing: Button("Close") {
+//            presentationMode.wrappedValue.dismiss()
+//        })
+//    }
+//}
 
 struct FriendDetailView: View {
     var friend: FriendLocation
@@ -266,6 +336,7 @@ struct FriendDetailView: View {
         }
     }
 }
+
 
 struct FullScreenMapView: View {
     @Binding var region: MKCoordinateRegion
