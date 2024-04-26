@@ -18,24 +18,52 @@ struct FriendDetailView: View {
     )
     @State private var buttonScale: CGFloat = 1.0
 
-    
+    private func makeZoneOverlay() -> [MKCircle] {
+        friend.zones.map { zone in
+            MKCircle(center: zone.coordinate, radius: zone.radius)
+        }
+    }
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            Map(coordinateRegion: .constant(MKCoordinateRegion(
-                center: friend.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-            )), annotationItems: [friend]) { _ in
-                MapAnnotation(coordinate: friend.coordinate) {
-                    Circle()
-                        .fill(friend.color)
-                        .frame(width: 20, height: 20)
+        ZStack(alignment: .topTrailing) {
+                    MapKitView(friend: friend)
+                        .ignoresSafeArea()
+                        .onAppear {
+                            // Additional setup if needed
+                        }
+                    
+                    // VStack {
+                        Spacer()
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            Image(systemName: "xmark")
+                                .circularButtonStyle()
+                                /*.font(.title)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.black.opacity(0.7))
+                                .clipShape(Circle())*/
+                        }
+                        
+                        .padding()
+                    //}
                 }
-            }
-            .ignoresSafeArea()
-            
-            
-            
+//        ZStack(alignment: .topLeading) {
+//            Map(coordinateRegion: .constant(MKCoordinateRegion(
+//                center: friend.coordinate,
+//                span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+//            )), annotationItems: [friend]) { _ in
+//                MapAnnotation(coordinate: friend.coordinate) {
+////                    Circle()
+////                        .fill(friend.color)
+////                        .frame(width: 20, height: 20)
+//                }
+//            }
+//            .ignoresSafeArea()
+//            
+//            
+//            
 //                Button(action: recenterMap) {
 //                    Image(systemName: "arrow.circlepath")
 //                        .circularButtonStyle()
@@ -47,17 +75,17 @@ struct FriendDetailView: View {
 //                }
 //                
 //                Spacer()
-                
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "xmark")
-                        .circularButtonStyle()
-                }
-                .padding()
-
-           
-        }
+//                
+//                Button(action: {
+//                    presentationMode.wrappedValue.dismiss()
+//                }) {
+//                    Image(systemName: "xmark")
+//                        .circularButtonStyle()
+//                }
+//                .padding()
+//
+//           
+//        }
     }
     
     private  func recenterMap() {
@@ -152,3 +180,15 @@ struct FriendDetailView: View {
 //    }
 //}
 
+
+//Map(coordinateRegion: .constant(MKCoordinateRegion(
+//    center: friend.coordinate,
+//    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+//)), annotationItems: [friend]) { _ in
+//    MapAnnotation(coordinate: friend.coordinate) {
+//        Circle()
+//            .fill(friend.color)
+//            .frame(width: 20, height: 20)
+//    }
+//}
+//.ignoresSafeArea()
