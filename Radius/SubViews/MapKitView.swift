@@ -37,8 +37,7 @@ struct MapKitView: UIViewRepresentable {
         }
         
         // Ensure the friend's location is marked
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = friend.coordinate
+        let annotation = ColorAnnotation(coordinate: friend.coordinate, color: friend.color)
         mapView.addAnnotation(annotation)
     }
     
@@ -63,5 +62,38 @@ struct MapKitView: UIViewRepresentable {
             }
             return MKOverlayRenderer(overlay: overlay)
         }
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: any MKAnnotation) -> MKAnnotationView? {
+            guard let colorAnnotation = annotation as? ColorAnnotation else {
+                return nil
+            }
+            
+            let identifier = "ColorAnnotation"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+            if annotationView == nil {
+                annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                annotationView?.canShowCallout = false
+            }
+            else {
+                annotationView?.annotation = annotation
+            }
+            
+            annotationView?.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            annotationView?.layer.cornerRadius = 10
+            annotationView?.backgroundColor = UIColor(colorAnnotation.color)
+            
+            return annotationView
+        }
+    }
+}
+
+// Custom annotation
+class ColorAnnotation: NSObject, MKAnnotation {
+    dynamic var coordinate: CLLocationCoordinate2D
+    var color: Color
+    
+    init(coordinate: CLLocationCoordinate2D, color: Color) {
+        self.coordinate = coordinate
+        self.color = color
     }
 }
