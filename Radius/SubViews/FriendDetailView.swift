@@ -32,6 +32,7 @@ struct FriendDetailView: View {
                             // Additional setup if needed
                         }
                     
+            
                     // VStack {
                         Spacer()
                         Button(action: {
@@ -49,43 +50,6 @@ struct FriendDetailView: View {
                         .padding()
                     //}
                 }
-//        ZStack(alignment: .topLeading) {
-//            Map(coordinateRegion: .constant(MKCoordinateRegion(
-//                center: friend.coordinate,
-//                span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-//            )), annotationItems: [friend]) { _ in
-//                MapAnnotation(coordinate: friend.coordinate) {
-////                    Circle()
-////                        .fill(friend.color)
-////                        .frame(width: 20, height: 20)
-//                }
-//            }
-//            .ignoresSafeArea()
-//            
-//            
-//            
-//                Button(action: recenterMap) {
-//                    Image(systemName: "arrow.circlepath")
-//                        .circularButtonStyle()
-//                }
-//                .padding(.leading, 20)
-//                .padding(.top, 20)
-//                .onAppear {
-//                    buttonScale = 1.0
-//                }
-//                
-//                Spacer()
-//                
-//                Button(action: {
-//                    presentationMode.wrappedValue.dismiss()
-//                }) {
-//                    Image(systemName: "xmark")
-//                        .circularButtonStyle()
-//                }
-//                .padding()
-//
-//           
-//        }
     }
     
     private  func recenterMap() {

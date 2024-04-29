@@ -13,11 +13,14 @@
 		AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */; };
 		AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */; };
 		AC0AC70C2BDB1FD0000418B8 /* MapKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC70B2BDB1FD0000418B8 /* MapKitView.swift */; };
+		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
+		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
+		AC5856002BDF1925009C490B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FF2BDF1925009C490B /* MapView.swift */; };
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
 		AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */; };
-		AC98AE022BC0872E00879A25 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* MapView.swift */; };
+		AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* ContentView.swift */; };
 		AC98AE042BC0873000879A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE032BC0873000879A25 /* Assets.xcassets */; };
 		AC98AE072BC0873000879A25 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE062BC0873000879A25 /* Preview Assets.xcassets */; };
 		AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */; };
@@ -31,12 +34,15 @@
 		AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendProfileView.swift; sourceTree = "<group>"; };
 		AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModifiers.swift; sourceTree = "<group>"; };
 		AC0AC70B2BDB1FD0000418B8 /* MapKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapKitView.swift; sourceTree = "<group>"; };
+		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
+		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
+		AC5855FF2BDF1925009C490B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
 		AC98ADFC2BC0872E00879A25 /* Radius.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Radius.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusApp.swift; sourceTree = "<group>"; };
-		AC98AE012BC0872E00879A25 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		AC98AE012BC0872E00879A25 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AC98AE032BC0873000879A25 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC98AE062BC0873000879A25 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
@@ -60,7 +66,7 @@
 			children = (
 				AC6A55282BD98D4200706E01 /* HomeView.swift */,
 				AC6A552A2BD99B1700706E01 /* InfoView.swift */,
-				AC98AE012BC0872E00879A25 /* MapView.swift */,
+				AC98AE012BC0872E00879A25 /* ContentView.swift */,
 			);
 			path = MainViews;
 			sourceTree = "<group>";
@@ -72,6 +78,9 @@
 				AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */,
 				AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */,
 				AC0AC70B2BDB1FD0000418B8 /* MapKitView.swift */,
+				AC5855FB2BDF1391009C490B /* AddressEntryView.swift */,
+				AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */,
+				AC5855FF2BDF1925009C490B /* MapView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -205,17 +214,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */,
+				AC5856002BDF1925009C490B /* MapView.swift in Sources */,
 				AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */,
-				AC98AE022BC0872E00879A25 /* MapView.swift in Sources */,
+				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
 				AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
+				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* MapKitView.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
+				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

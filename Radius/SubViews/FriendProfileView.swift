@@ -19,6 +19,19 @@ struct FriendProfileView: View {
             Text("Coordinates: \(friend.coordinate.latitude), \(friend.coordinate.longitude)")
                 .font(.subheadline)
             Spacer()
+//            NavigationLink(destination: ZoneEditorView()) {
+//                HStack {
+//                    VStack {
+//                        Text("Name: \(friend.name)")
+//                            .font(.title)
+//                        Text("Edit")
+//                            .font(.subheadline)
+//                    }
+//                    Spacer()
+//                    Text("See More")
+//                        .font(.caption)
+//                }
+//            }
         }
         .padding()
         .navigationTitle(friend.name)
