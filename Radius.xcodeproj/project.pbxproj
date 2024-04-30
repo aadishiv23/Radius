@@ -19,11 +19,18 @@
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
+		AC79CD982BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */; };
+		AC79CDA32BE0B63300B49E90 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC79CDA22BE0B63300B49E90 /* DataController.swift */; };
 		AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */; };
 		AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* ContentView.swift */; };
 		AC98AE042BC0873000879A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE032BC0873000879A25 /* Assets.xcassets */; };
 		AC98AE072BC0873000879A25 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE062BC0873000879A25 /* Preview Assets.xcassets */; };
 		AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */; };
+		ACA021452BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021412BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift */; };
+		ACA021462BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021422BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift */; };
+		ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */; };
+		ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */; };
+		ACA0214B2BE0B7D500E98DA4 /* CoordinateTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CoordinateTransformer.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,12 +47,19 @@
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
+		AC79CD972BE0B4F800B49E90 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
+		AC79CDA22BE0B63300B49E90 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		AC98ADFC2BC0872E00879A25 /* Radius.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Radius.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusApp.swift; sourceTree = "<group>"; };
 		AC98AE012BC0872E00879A25 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AC98AE032BC0873000879A25 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC98AE062BC0873000879A25 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
+		ACA021412BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ACA021422BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ACA0214A2BE0B7D500E98DA4 /* CoordinateTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateTransformer.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -104,6 +118,19 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		AC79CDA12BE0B60400B49E90 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */,
+				AC79CDA22BE0B63300B49E90 /* DataController.swift */,
+				ACA021412BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift */,
+				ACA021422BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift */,
+				ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */,
+				ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		AC98ADF32BC0872E00879A25 = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +150,8 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				ACA021492BE0B7C100E98DA4 /* Utility */,
+				AC79CDA12BE0B60400B49E90 /* Data */,
 				AC0AC7002BDB0EFC000418B8 /* Models */,
 				AC0AC6FF2BDB0EF5000418B8 /* Components */,
 				AC0AC6FE2BDB0EE4000418B8 /* SubViews */,
@@ -141,6 +170,14 @@
 				AC98AE062BC0873000879A25 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		ACA021492BE0B7C100E98DA4 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				ACA0214A2BE0B7D500E98DA4 /* CoordinateTransformer.swift */,
+			);
+			path = Utility;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,13 +251,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */,
+				ACA0214B2BE0B7D500E98DA4 /* CoordinateTransformer.swift in Sources */,
 				AC5856002BDF1925009C490B /* MapView.swift in Sources */,
 				AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */,
 				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
+				AC79CDA32BE0B63300B49E90 /* DataController.swift in Sources */,
 				AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
+				AC79CD982BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld in Sources */,
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* MapKitView.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
@@ -229,6 +269,10 @@
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
 				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,
+				ACA021452BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift in Sources */,
+				ACA021462BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift in Sources */,
+				ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */,
+				ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,6 +490,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				AC79CD972BE0B4F800B49E90 /* CoreDataModel.xcdatamodel */,
+			);
+			currentVersion = AC79CD972BE0B4F800B49E90 /* CoreDataModel.xcdatamodel */;
+			path = CoreDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = AC98ADF42BC0872E00879A25 /* Project object */;
 }
