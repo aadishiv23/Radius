@@ -19,6 +19,9 @@ struct FriendProfileView: View {
             Text("Coordinates: \(friend.coordinate.latitude), \(friend.coordinate.longitude)")
                 .font(.subheadline)
             Spacer()
+//            if friend.name == "user" {
+//                ZoneEditorView(isPresenting: , userZones: <#T##Binding<[Zone]>#>)
+//            }
 //            NavigationLink(destination: ZoneEditorView()) {
 //                HStack {
 //                    VStack {

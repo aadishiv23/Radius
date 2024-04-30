@@ -11,6 +11,7 @@ import Combine
 
 struct HomeView: View {
     @EnvironmentObject var friendData: FriendData  // Assuming this contains your friendsLocations
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var locationViewModel = LocationViewModel()
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
@@ -50,6 +51,9 @@ struct HomeView: View {
         .onAppear {
             locationViewModel.checkIfLocationServicesIsEnabled()
             locationViewModel.plsInitiateLocationUpdates()
+            for friendsLocation in friendData.friendsLocations {
+                print(friendsLocation.name)
+            }
         }
     }
     
@@ -130,7 +134,7 @@ struct HomeView: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(colorScheme == .dark ? .black : .white)
         .cornerRadius(10)
         .shadow(radius: 2)
         .padding(.horizontal)
