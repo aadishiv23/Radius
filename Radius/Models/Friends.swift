@@ -10,7 +10,7 @@ import MapKit
 import CoreLocation
 import SwiftUI
 
-/*
+
 struct Zone: Identifiable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
@@ -29,7 +29,7 @@ struct UserLocation: Identifiable {
     let id = UUID()
     var coordinate: CLLocationCoordinate2D
     var zones: [Zone]  // Zones specific to the user
-}*/
+}
 
 class FriendData: ObservableObject {
 //    @Published var friendsLocations: [FriendLocation] = [
