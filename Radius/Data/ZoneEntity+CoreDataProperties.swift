@@ -16,7 +16,7 @@ extension ZoneEntity {
         return NSFetchRequest<ZoneEntity>(entityName: "ZoneEntity")
     }
 
-    @NSManaged public var coordinate: UUID?
+    @NSManaged public var coordinate: NSObject?
     @NSManaged public var id: UUID?
     @NSManaged public var radius: Double
     @NSManaged public var friendLocation: FriendLocationEntity?

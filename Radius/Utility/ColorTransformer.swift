@@ -43,3 +43,11 @@ class ColorTransformer: ValueTransformer {
         }
     }
 }
+
+// Register the transformer
+extension ColorTransformer {
+    static func register() {
+        let transformer = ColorTransformer()
+        ValueTransformer.setValueTransformer(transformer, forName: NSValueTransformerName("ColorTransformer"))
+    }
+}

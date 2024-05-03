@@ -38,3 +38,11 @@ class CLLocationCoordinate2DTransformer: ValueTransformer {
         return CLLocationCoordinate2D(latitude: lat, longitude: lon)
     }
 }
+
+// Register the transformer
+extension CLLocationCoordinate2DTransformer {
+    static func register() {
+        let transformer = CLLocationCoordinate2DTransformer()
+        ValueTransformer.setValueTransformer(transformer, forName: NSValueTransformerName("CLLocationCoordinate2DTransformer"))
+    }
+}

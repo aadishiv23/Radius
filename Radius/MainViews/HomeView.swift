@@ -10,7 +10,7 @@ import MapKit
 import Combine
 
 struct HomeView: View {
-    @EnvironmentObject var friendData: FriendData  // Assuming this contains your friendsLocations
+    @EnvironmentObject var friendsDataManager: FriendsDataManager  // Assuming this contains your friendsLocations
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var locationViewModel = LocationViewModel()
     @State private var region = MKCoordinateRegion(
