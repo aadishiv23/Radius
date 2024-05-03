@@ -13,6 +13,7 @@ import SwiftUI
 
 struct Zone: Identifiable {
     let id = UUID()
+    let name: String
     let coordinate: CLLocationCoordinate2D
     var radius: Double // Radius in meters
 }

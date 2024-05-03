@@ -11,6 +11,14 @@ import CoreLocation
 import SwiftUI
 
 
+/*
+ rather than load friends can also call swift fr directly in view
+ @FetchRequest(
+        entity: FriendLocationEntity.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \FriendLocationEntity.name, ascending: true)]
+    ) var friends: FetchedResults<FriendLocationEntity>
+ */
+
 class FriendsDataManager: ObservableObject {
     private let dataController: DataController
     
@@ -24,21 +32,23 @@ class FriendsDataManager: ObservableObject {
         let context = dataController.container.viewContext
         let request: NSFetchRequest<FriendLocationEntity> = FriendLocationEntity.fetchRequest()
         do {
-                let friendsEntities = try context.fetch(request)
-                self.friends = friendsEntities.map { entity in
-                    let transformer = CLLocationCoordinate2DTransformer()
-                    let coordinate = (transformer.reverseTransformedValue(entity.coordinate as? Data) as? CLLocationCoordinate2D) ?? CLLocationCoordinate2D()
-                    
-                    return FriendLocation(
-                        name: entity.name ?? "Unknown",
-                        color: Color(entity.color as? UIColor ?? UIColor.systemTeal),  // Handling color conversion
-                        coordinate: coordinate,
-                        zones: [] // Assuming you have a mechanism to transform zone entities as well
-                    )
-                }
-            } catch {
-                print("Failed to fetch friends: \(error)")
+            let friendsEntities = try context.fetch(request)
+            self.friends = friendsEntities.map { entity in
+                let zones = (entity.zones as? Set<ZoneEntity>)?.map { zoneEntity -> Zone in
+                    let coordinate = CLLocationCoordinate2DTransformer().reverseTransformedValue(zoneEntity.coordinate) as? CLLocationCoordinate2D ?? CLLocationCoordinate2D()
+                    return Zone(name: zoneEntity.name ?? "", coordinate: coordinate, radius: zoneEntity.radius)
+                } ?? []
+                
+                return FriendLocation(
+                    name: entity.name ?? "Unknown",
+                    color: Color(entity.color as? UIColor ?? UIColor.systemTeal),
+                    coordinate: CLLocationCoordinate2DTransformer().reverseTransformedValue(entity.coordinate) as? CLLocationCoordinate2D ?? CLLocationCoordinate2D(),
+                    zones: zones
+                )
             }
+        } catch {
+            print("Failed to fetch friends: \(error)")
+        }
         
     }
     
@@ -54,6 +64,7 @@ class FriendsDataManager: ObservableObject {
         for zone in zones {
             let zoneEntity = ZoneEntity(context: context)
             zoneEntity.id = zone.id
+            zoneEntity.name = zone.name
             zoneEntity.radius = zone.radius
             zoneEntity.coordinate = CLLocationCoordinate2DTransformer().transformedValue(zone.coordinate) as? Data as NSObject?
             zoneEntity.radius = zone.radius
@@ -74,16 +85,19 @@ class FriendsDataManager: ObservableObject {
         do {
             let friends = try context.fetch(request)
             return friends.map { friend in
-                let zones = friend.zones?.allObjects as? [ZoneEntity] ?? []
+                let zones = (friend.zones as? Set<ZoneEntity>)?.map { zoneEntity -> Zone in
+                    let coordinateTransformer = CLLocationCoordinate2DTransformer()
+                    let coordinate = CLLocationCoordinate2DTransformer().reverseTransformedValue(zoneEntity.coordinate) as? CLLocationCoordinate2D ?? CLLocationCoordinate2D()
+                    return Zone(name: zoneEntity.name ?? "", coordinate: coordinate, radius: zoneEntity.radius)
+                } ?? []
                 
-                return FriendLocation(name: friend.name ?? "",
-                                      color: Color(UIColor(cgColor: (friend.color as? UIColor)?.cgColor ?? UIColor.clear.cgColor)), // Convert back from stored UIColor
-                                      coordinate: NSKeyedUnarchiver.unarchiveObject(with: friend.coordinate as! Data) as? CLLocationCoordinate2D ?? CLLocationCoordinate2D(),
-                                      zones: zones.map { Zone(coordinate: NSKeyedUnarchiver.unarchiveObject(with: $0.coordinate as! Data) as? CLLocationCoordinate2D ?? CLLocationCoordinate2D(),
-                                                              radius: $0.radius) })
+                return FriendLocation(name: friend.name ?? "Unknown",
+                                      color: Color(friend.color as! UIColor),
+                                      coordinate: CLLocationCoordinate2DTransformer().reverseTransformedValue(friend.coordinate) as? CLLocationCoordinate2D ?? CLLocationCoordinate2D(),
+                                      zones: zones)
             }
         } catch {
-            print("Failed to fetch friends: \(error.localizedDescription)")
+            print("Failed to retrieve all friends: \(error.localizedDescription)")
             return []
         }
     }

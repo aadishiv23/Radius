@@ -28,8 +28,8 @@
 		AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */; };
 		AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */; };
 		AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */; };
-		ACA021452BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021412BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift */; };
-		ACA021462BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021422BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift */; };
+		AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */; };
+		AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */; };
 		ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */; };
 		ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */; };
 		ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */; };
@@ -59,8 +59,8 @@
 		AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsDataManager.swift; sourceTree = "<group>"; };
 		AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTransformer.swift; sourceTree = "<group>"; };
-		ACA021412BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		ACA021422BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DTransformer.swift; sourceTree = "<group>"; };
@@ -127,8 +127,8 @@
 			children = (
 				AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */,
 				AC79CDA22BE0B63300B49E90 /* DataController.swift */,
-				ACA021412BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift */,
-				ACA021422BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift */,
+				AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */,
+				AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */,
 				ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */,
 				ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */,
 				AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */,
@@ -272,13 +272,13 @@
 				AC0AC70C2BDB1FD0000418B8 /* MapKitView.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
+				AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */,
+				AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
 				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,
 				AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */,
-				ACA021452BE0B77200E98DA4 /* ZoneEntity+CoreDataClass.swift in Sources */,
-				ACA021462BE0B77200E98DA4 /* ZoneEntity+CoreDataProperties.swift in Sources */,
 				ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */,
 				ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */,
 			);
