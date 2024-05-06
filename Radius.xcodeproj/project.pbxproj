@@ -30,6 +30,7 @@
 		AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */; };
 		AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */; };
 		AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */; };
+		AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */; };
 		ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */; };
 		ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */; };
 		ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */; };
@@ -61,6 +62,7 @@
 		AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTransformer.swift; sourceTree = "<group>"; };
 		AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFriendView.swift; sourceTree = "<group>"; };
 		ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DTransformer.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				AC5855FB2BDF1391009C490B /* AddressEntryView.swift */,
 				AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */,
 				AC5855FF2BDF1925009C490B /* MapView.swift */,
+				AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -264,6 +267,7 @@
 				AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
 				AC79CDA32BE0B63300B49E90 /* DataController.swift in Sources */,
+				AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */,
 				AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,

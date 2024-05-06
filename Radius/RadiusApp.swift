@@ -39,7 +39,7 @@ struct RadiusApp: App {
                         Label("Map", systemImage: "map")
                     }
             }
-            .environmentObject(friendData)  // Provide the EnvironmentObject to all views
+            .environmentObject(friendsDataManager)  // Provide the EnvironmentObject to all views
         }
     }
 }

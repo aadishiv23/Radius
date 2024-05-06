@@ -48,10 +48,19 @@ struct HomeView: View {
                 checkDistance()
             }
         }
+        .toolbar(content: {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    
+                }, label: {
+                    Image(systemName: "plus")
+                })
+            }
+        })
         .onAppear {
             locationViewModel.checkIfLocationServicesIsEnabled()
             locationViewModel.plsInitiateLocationUpdates()
-            for friendsLocation in friendData.friendsLocations {
+            for friendsLocation in friendsDataManager.friends {
                 print(friendsLocation.name)
             }
         }
@@ -59,7 +68,7 @@ struct HomeView: View {
     
     private var mapSection: some View {
         ZStack(alignment: .top/*Alignment(horizontal: .leading, vertical: .top)*/) {
-            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendData.friendsLocations) { friendLocation in
+            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends) { friendLocation in
                 MapAnnotation(coordinate: friendLocation.coordinate) {
                     Circle()
                         .fill(friendLocation.color)
@@ -102,13 +111,13 @@ struct HomeView: View {
         .sheet(isPresented: $showFullScreenMap) {
             // Present the FullScreenMapView here
             FullScreenMapView(region: $region, selectedFriend: $selectedFriend)
-                    .environmentObject(friendData)
+                    .environmentObject(friendsDataManager)
         }
     }
     
     private var friendListSection: some View {
         VStack {  // This will also ensure all paths return a consistent type
-            ForEach(friendData.friendsLocations, id: \.id) { friend in
+            ForEach(friendsDataManager.friends, id: \.id) { friend in
                 friendRow(friend)
             }
             if let userLocation = locationViewModel.userLocation {

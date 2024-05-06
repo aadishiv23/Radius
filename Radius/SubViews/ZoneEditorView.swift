@@ -31,7 +31,7 @@ struct ZoneEditorView: View {
 
                 Button("Save Zone") {
                     if let location = newZoneLocation {
-                        let newZone = Zone(coordinate: location, radius: newZoneRadius)
+                        let newZone = Zone(name: "test", coordinate: location, radius: newZoneRadius)
                         self.userZones.append(newZone)
                         self.isPresenting = false
                     }

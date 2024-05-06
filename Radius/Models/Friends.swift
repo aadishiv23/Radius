@@ -32,75 +32,75 @@ struct UserLocation: Identifiable {
     var zones: [Zone]  // Zones specific to the user
 }
 
-class FriendData: ObservableObject {
+//class FriendData: ObservableObject {
+////    @Published var friendsLocations: [FriendLocation] = [
+////        FriendLocation(name: "Alice", color: .red, coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),
+////        FriendLocation(name: "Bob", color: .blue, coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080)),
+////        FriendLocation(name: "Charlie", color: .green, coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100)),
+////        FriendLocation(name: "David", color: .yellow, coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120))
+////    ]
 //    @Published var friendsLocations: [FriendLocation] = [
-//        FriendLocation(name: "Alice", color: .red, coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),
-//        FriendLocation(name: "Bob", color: .blue, coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080)),
-//        FriendLocation(name: "Charlie", color: .green, coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100)),
-//        FriendLocation(name: "David", color: .yellow, coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120))
-//    ]
-    @Published var friendsLocations: [FriendLocation] = [
-            // Initial friends data with zones
-        ]
-    @Published var userLocation: UserLocation?
-    
-    init() {
-            friendsLocations = [
-                FriendLocation(
-                    name: "Alice",
-                    color: .red,
-                    coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
-                    zones: [
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060), radius: 150.0),
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7125, longitude: -74.0065), radius: 250.0)
-                    ]
-                ),
-                FriendLocation(
-                    name: "Bob",
-                    color: .blue,
-                    coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080),
-                    zones: [
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080), radius: 100.0),
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7160, longitude: -74.0085), radius: 200.0)
-                    ]
-                ),
-                FriendLocation(
-                    name: "Charlie",
-                    color: .green,
-                    coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100),
-                    zones: [
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100), radius: 120.0),
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7105, longitude: -74.0105), radius: 300.0)
-                    ]
-                ),
-                FriendLocation(
-                    name: "David",
-                    color: .yellow,
-                    coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120),
-                    zones: [
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120), radius: 180.0),
-                        Zone(coordinate: CLLocationCoordinate2D(latitude: 40.7140, longitude: -74.0125), radius: 280.0)
-                    ]
-                )
-            ]
-        }
-    
-    func addZone(to friendID: UUID, with radius: Double, at coordinate: CLLocationCoordinate2D) {
-        if let index = friendsLocations.firstIndex(where: { $0.id == friendID }) {
-            let newZone = Zone(coordinate: coordinate, radius: radius)
-            friendsLocations[index].zones.append(newZone)
-        }
-    }
-
-    func addUserZone(with radius: Double, at coordinate: CLLocationCoordinate2D) {
-        if userLocation == nil {
-            userLocation = UserLocation(coordinate: coordinate, zones: [])
-        }
-        let newZone = Zone(coordinate: coordinate, radius: radius)
-        userLocation?.zones.append(newZone)
-    }
-    
-}
+//            // Initial friends data with zones
+//        ]
+//    @Published var userLocation: UserLocation?
+//    
+//    init() {
+//            friendsLocations = [
+//                FriendLocation(
+//                    name: "Alice",
+//                    color: .red,
+//                    coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
+//                    zones: [
+//                        Zone(name: "Home", coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060), radius: 150.0),
+//                        Zone(name: "Work", coordinate: CLLocationCoordinate2D(latitude: 40.7125, longitude: -74.0065), radius: 250.0)
+//                    ]
+//                ),
+//                FriendLocation(
+//                    name: "Bob",
+//                    color: .blue,
+//                    coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080),
+//                    zones: [
+//                        Zone(name: "Gym", coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080), radius: 100.0),
+//                        Zone(name: "Zoo", coordinate: CLLocationCoordinate2D(latitude: 40.7160, longitude: -74.0085), radius: 200.0)
+//                    ]
+//                ),
+//                FriendLocation(
+//                    name: "Charlie",
+//                    color: .green,
+//                    coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100),
+//                    zones: [
+//                        Zone(name: <#String#>, coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100), radius: 120.0),
+//                        Zone(name: <#String#>, coordinate: CLLocationCoordinate2D(latitude: 40.7105, longitude: -74.0105), radius: 300.0)
+//                    ]
+//                ),
+//                FriendLocation(
+//                    name: "David",
+//                    color: .yellow,
+//                    coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120),
+//                    zones: [
+//                        Zone(name: <#String#>, coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120), radius: 180.0),
+//                        Zone(name: <#String#>, coordinate: CLLocationCoordinate2D(latitude: 40.7140, longitude: -74.0125), radius: 280.0)
+//                    ]
+//                )
+//            ]
+//        }
+//    
+//    func addZone(to friendID: UUID, with radius: Double, at coordinate: CLLocationCoordinate2D) {
+//        if let index = friendsLocations.firstIndex(where: { $0.id == friendID }) {
+//            let newZone = Zone(coordinate: coordinate, radius: radius)
+//            friendsLocations[index].zones.append(newZone)
+//        }
+//    }
+//
+//    func addUserZone(with radius: Double, at coordinate: CLLocationCoordinate2D) {
+//        if userLocation == nil {
+//            userLocation = UserLocation(coordinate: coordinate, zones: [])
+//        }
+//        let newZone = Zone(coordinate: coordinate, radius: radius)
+//        userLocation?.zones.append(newZone)
+//    }
+//    
+//}
 //
 //class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
 //    private var locationManager: CLLocationManager?

@@ -11,11 +11,11 @@ import MapKit
 
 // InfoView that lists all friends and navigates to their detail view
 struct InfoView: View {
-    @EnvironmentObject var friendData: FriendData  // Access the shared data
+    @EnvironmentObject var friendsDataManager: FriendsDataManager  // Access the shared data
     
     var body: some View {
         NavigationView {
-            List(friendData.friendsLocations) { friend in
+            List(friendsDataManager.friends) { friend in
                 NavigationLink(destination: FriendProfileView(friend: friend)) {
                     HStack {
                         Circle()
