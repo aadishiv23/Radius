@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct RadiusApp: App {
     //@StateObject var friendData = FriendData()  // Create an instance of your data model
+    @State var isAuthenticated = false
     let dataController = DataController() // Initialize your Core Data controller
     let friendsDataManager: FriendsDataManager
     
@@ -22,24 +23,33 @@ struct RadiusApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                HomeView()
-                    .environmentObject(friendsDataManager)
-                    .tabItem {
-                        Label("Home", systemImage: "house.fill")
-                    }
-                
-                InfoView()
-                    .tabItem {
-                        Label("Person", systemImage: "person.fill")
-                    }
-                
-                ContentView()
-                    .tabItem {
-                        Label("Map", systemImage: "map")
-                    }
+            if isAuthenticated {
+                SupabaseProfileView()
+
+//                Group {
+//                    TabView {
+//                        HomeView()
+//                            .tabItem {
+//                                Label("Home", systemImage: "house.fill")
+//                            }
+//                        
+//                        InfoView()
+//                            .tabItem {
+//                                Label("Person", systemImage: "person.fill")
+//                            }
+//                        
+//                        ContentView()
+//                            .tabItem {
+//                                Label("Map", systemImage: "map")
+//                            }
+//                    }
+//                    .environmentObject(friendsDataManager)  // Provide the EnvironmentObject to all views
+                //}
             }
-            .environmentObject(friendsDataManager)  // Provide the EnvironmentObject to all views
+            else {
+                AuthView()
+            }
         }
+        
     }
 }

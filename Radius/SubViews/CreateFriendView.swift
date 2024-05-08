@@ -50,7 +50,4 @@ struct CreateFriendView: View {
         }
     }
     
-    func addFriend(name: String, color: UIColor, coordinate: CLLocationCoordinate2D, completion: @escaping (UUID?) -> (Void)) {
-       // let context = friendDataManager.data
-    }
 }

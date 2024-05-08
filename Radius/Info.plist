@@ -2,15 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.aadi.radius</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.supabase.user-management</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
 	</array>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This apps needs your location to share it on the map</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This apps needs your location to share it on the map</string>
-	<key>NSLocationUsageDescription</key>
-	<string>This apps needs your location to share it on the map</string>
 </dict>
 </plist>
