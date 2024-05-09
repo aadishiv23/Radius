@@ -1,47 +1,53 @@
-////
-////  AppView.swift
-////  Radius
-////
-////  Created by Aadi Shiv Malhotra on 5/8/24.
-////
 //
-//import Foundation
-//import SwiftUI
+//  AppView.swift
+//  Radius
 //
-//struct AppView: View {
-//  @State var isAuthenticated = false
+//  Created by Aadi Shiv Malhotra on 5/8/24.
 //
-//  var body: some View {
-//    Group {
-//      if isAuthenticated {
-//          Group {
-//              TabView {
-//                  HomeView()
-//                      .tabItem {
-//                          Label("Home", systemImage: "house.fill")
-//                      }
-//                  
-//                  InfoView()
-//                      .tabItem {
-//                          Label("Person", systemImage: "person.fill")
-//                      }
-//                  
-//                  ContentView()
-//                      .tabItem {
-//                          Label("Map", systemImage: "map")
-//                      }
-//              }
-//              .environmentObject(friendsDataManager)  // Provide the EnvironmentObject to all views
-//      } else {
-//        AuthView()
-//      }
-//    }
-//    .task {
-//      for await state in await supabase.auth.authStateChanges {
-//        if [.initialSession, .signedIn, .signedOut].contains(state.event) {
-//          isAuthenticated = state.session != nil
-//        }
-//      }
-//    }
-//  }
-//}
+
+import Foundation
+import SwiftUI
+
+struct AppView: View {
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @State private var isAuthenticated = false
+    
+    var body: some View {
+        Group {
+            if isAuthenticated {
+                MainTabView()
+            } else {
+                AuthView(isAuthenticated: $isAuthenticated)
+            }
+        }
+        .task {
+            for await state in await supabase.auth.authStateChanges {
+                if [.initialSession, .signedIn, .signedOut].contains(state.event) {
+                    isAuthenticated = state.session != nil
+                }
+            }
+        }
+    }
+}
+
+
+
+
+struct MainTabView: View {
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+            InfoView()
+                .tabItem {
+                    Label("Info", systemImage: "info.circle")
+                }
+            SupabaseProfileView()
+                .tabItem {
+                    Label("Profile", systemImage: "person.crop.circle")
+                }
+        }
+    }
+}

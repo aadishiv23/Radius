@@ -7,12 +7,14 @@
 
 import Foundation
 import SwiftUI
-
+import Supabase
 
 struct AuthView: View {
     @State var email: String = ""
     @State var isLoading = false
     @State var result: Result<Void, Error>?
+    @Binding var isAuthenticated: Bool
+
 
     var body: some View {
         Form {
@@ -64,6 +66,7 @@ struct AuthView: View {
             do {
                 try await supabase.auth.signInWithOTP(email: email,
                                                 redirectTo: URL(string:"io.supabase.user-management://radius-login-callback"))
+                isAuthenticated = true
                 result = .success(())
             } catch {
                 result = .failure(error)
