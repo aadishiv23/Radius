@@ -79,6 +79,7 @@
 		AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileView.swift; sourceTree = "<group>"; };
 		AC9BD1D62BEB3CF500D23123 /* SupabaseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseModels.swift; sourceTree = "<group>"; };
 		AC9BD1D82BEB3EB000D23123 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
+		AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Radius.entitlements; sourceTree = "<group>"; };
 		ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DTransformer.swift; sourceTree = "<group>"; };
@@ -185,6 +186,7 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */,
 				AC9BD1CA2BEB0E6B00D23123 /* Helpers */,
 				ACA021492BE0B7C100E98DA4 /* Utility */,
 				AC79CDA12BE0B60400B49E90 /* Data */,
@@ -474,6 +476,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Radius/Radius.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Radius/Preview Content\"";
@@ -509,6 +512,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Radius/Radius.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Radius/Preview Content\"";

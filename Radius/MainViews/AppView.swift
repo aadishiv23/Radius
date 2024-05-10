@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+
+
 struct AppView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var isAuthenticated = false
