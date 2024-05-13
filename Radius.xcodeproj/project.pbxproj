@@ -36,7 +36,7 @@
 		AC9BD1C52BEB0E5E00D23123 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1C42BEB0E5E00D23123 /* PostgREST */; };
 		AC9BD1C72BEB0E5E00D23123 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1C62BEB0E5E00D23123 /* Realtime */; };
 		AC9BD1C92BEB0E5E00D23123 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1C82BEB0E5E00D23123 /* Storage */; };
-		AC9BD1CC2BEB0E7100D23123 /* Supabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1CB2BEB0E7100D23123 /* Supabase.swift */; };
+		AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */; };
 		AC9BD1D12BEB0F6800D23123 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1D02BEB0F6800D23123 /* Supabase */; };
 		AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D22BEB101B00D23123 /* AuthView.swift */; };
 		AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */; };
@@ -74,7 +74,7 @@
 		AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFriendView.swift; sourceTree = "<group>"; };
-		AC9BD1CB2BEB0E7100D23123 /* Supabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Supabase.swift; sourceTree = "<group>"; };
+		AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Supabase+Helpers.swift"; sourceTree = "<group>"; };
 		AC9BD1D22BEB101B00D23123 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileView.swift; sourceTree = "<group>"; };
 		AC9BD1D62BEB3CF500D23123 /* SupabaseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseModels.swift; sourceTree = "<group>"; };
@@ -213,7 +213,7 @@
 		AC9BD1CA2BEB0E6B00D23123 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				AC9BD1CB2BEB0E7100D23123 /* Supabase.swift */,
+				AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -328,7 +328,7 @@
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
 				AC79CD982BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld in Sources */,
-				AC9BD1CC2BEB0E7100D23123 /* Supabase.swift in Sources */,
+				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
