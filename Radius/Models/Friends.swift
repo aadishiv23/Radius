@@ -11,19 +11,29 @@ import CoreLocation
 import SwiftUI
 
 
-struct Zone: Identifiable {
-    let id = UUID()
+struct Group: Codable {
+    let id: UUID
     let name: String
-    let coordinate: CLLocationCoordinate2D
-    var radius: Double // Radius in meters
+    let description: String?
+    let password: String
 }
 
-struct FriendLocation: Identifiable {
-    let id = UUID()
+struct Zone: Codable, Identifiable {
+    let id: UUID
     let name: String
-    let color: Color
-    let coordinate: CLLocationCoordinate2D
-    var zones: [Zone]  // Each friend can have multiple zones
+    let latitude: Double
+    let longitude: Double
+    let radius: Double
+    let friend_id: UUID
+}
+
+struct FriendLocation: Codable, Identifiable {
+    let id: UUID
+    let name: String
+    let color: String
+    let latitude: Double
+    let longitude: Double
+    var zones: [Zone]
 }
 
 struct UserLocation: Identifiable {
