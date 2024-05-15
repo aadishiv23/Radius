@@ -48,18 +48,19 @@ struct HomeView: View {
                 checkDistance()
             }
         }
-        .toolbar(content: {
+        .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    
-                }, label: {
-                    Image(systemName: "plus")
-                })
-            }
-        })
+                            NavigationLink(destination: AddZoneView(friendId: selectedFriend?.id ?? UUID())) {
+                                Image(systemName: "plus")
+                            }
+                        }
+        }
         .onAppear {
             locationViewModel.checkIfLocationServicesIsEnabled()
             locationViewModel.plsInitiateLocationUpdates()
+            Task {
+                await friendsDataManager.fetchFriends()
+            }
             for friendsLocation in friendsDataManager.friends {
                 print(friendsLocation.name)
             }
@@ -69,9 +70,9 @@ struct HomeView: View {
     private var mapSection: some View {
         ZStack(alignment: .top/*Alignment(horizontal: .leading, vertical: .top)*/) {
             Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends) { friendLocation in
-                MapAnnotation(coordinate: friendLocation.coordinate) {
+                MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
                     Circle()
-                        .fill(friendLocation.color)
+                        .fill(Color(friendLocation.color))
                         .frame(width: 20, height: 20)
                         .onTapGesture {
                             selectedFriend = friendLocation
@@ -116,27 +117,27 @@ struct HomeView: View {
     }
     
     private var friendListSection: some View {
-        VStack {  // This will also ensure all paths return a consistent type
-            ForEach(friendsDataManager.friends, id: \.id) { friend in
-                friendRow(friend)
-            }
-            if let userLocation = locationViewModel.userLocation {
-                friendRow(FriendLocation(name: "You", color: .purple, coordinate: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), zones: []))
-            }
-        }
-    }
+           VStack {
+               ForEach(friendsDataManager.friends, id: \.id) { friend in
+                   friendRow(friend)
+               }
+//               if let userLocation = locationViewModel.userLocation {
+//                   friendRow(FriendLocation(name: "You", color: .purple, coordinate: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), zones: []))
+//               }
+           }
+       }
     
     @ViewBuilder
     func friendRow(_ friend: FriendLocation) -> some View {
         HStack {
             Circle()
-                .fill(friend.color)
+                .fill(Color(friend.color))
                 .frame(width: 30, height: 30)
             VStack(alignment: .leading) {
                 Text(friend.name)
                     .font(.headline)
                     .foregroundColor(.primary)
-                Text("\(friend.coordinate.latitude), \(friend.coordinate.longitude)")
+                Text("\(friend.latitude), \(friend.longitude)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -244,4 +245,7 @@ struct HomeView_Previews: PreviewProvider {
         HomeView()
     }
 }
+
+
+
 
