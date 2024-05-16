@@ -22,7 +22,7 @@ struct MapKitView: UIViewRepresentable {
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
         let region = MKCoordinateRegion(
-            center: friend.coordinate,
+            center: CLLocationCoordinate2D(latitude: friend.latitude, longitude: friend.longitude),
             span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
         )
         mapView.setRegion(region, animated: true)
@@ -32,12 +32,12 @@ struct MapKitView: UIViewRepresentable {
         
         // Add new overlays for each zone
         for zone in friend.zones {
-            let circle = MKCircle(center: zone.coordinate, radius: zone.radius)
+            let circle = MKCircle(center: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
             mapView.addOverlay(circle)
         }
         
         // Ensure the friend's location is marked
-        let annotation = ColorAnnotation(coordinate: friend.coordinate, color: friend.color)
+        let annotation = ColorAnnotation(coordinate: CLLocationCoordinate2D(latitude: friend.latitude, longitude: friend.longitude), color: Color(friend.color))
         mapView.addAnnotation(annotation)
     }
     

@@ -62,7 +62,8 @@ struct ChangePasswordView: View {
 }
 
 struct AuthView: View {
-    @Binding var isAuthenticated: Bool
+    //@Binding var isAuthenticated: Bool
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var isSignUp = false // Toggle between sign up and sign in
@@ -164,7 +165,8 @@ struct AuthView: View {
             defer { isLoading = false }
             do {
                 try await supabase.auth.signIn(email: email, password: password)
-                isAuthenticated = true
+                //isAuthenticated = true
+                await friendsDataManager.fetchCurrentUserProfile()
                 result = .success(())
             } catch {
                 result = .failure(error)

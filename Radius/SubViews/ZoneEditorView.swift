@@ -12,6 +12,7 @@ import MapKit
 struct ZoneEditorView: View {
     @Binding var isPresenting: Bool
     @Binding var userZones: [Zone]
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var newZoneLocation: CLLocationCoordinate2D?
     @State private var newZoneRadius: Double = 100.0
     @State private var showAddressEntry: Bool = false
@@ -30,8 +31,8 @@ struct ZoneEditorView: View {
                     .padding()
 
                 Button("Save Zone") {
-                    if let location = newZoneLocation {
-                        let newZone = Zone(name: "test", coordinate: location, radius: newZoneRadius)
+                if let location = newZoneLocation, let currentUserFriendLocation = friendsDataManager.currentUser {
+                    let newZone = Zone(id: UUID(), name: "New Zone", latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, friend_id: currentUserFriendLocation.id)
                         self.userZones.append(newZone)
                         self.isPresenting = false
                     }

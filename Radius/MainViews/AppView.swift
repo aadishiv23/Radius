@@ -9,30 +9,22 @@ import Foundation
 import SwiftUI
 
 
+import SwiftUI
+import Supabase
 
 struct AppView: View {
-    @EnvironmentObject var friendsDataManager: FriendsDataManager
-    @State private var isAuthenticated = false
-    
+    @StateObject private var authViewModel = AuthViewModel()
+
     var body: some View {
-        Group {
-            if isAuthenticated {
-                MainTabView()
+        NavigationStack {
+            if authViewModel.isAuthenticated {
+                MainTabView()  // View for authenticated users
             } else {
-                AuthView(isAuthenticated: $isAuthenticated)
-            }
-        }
-        .task {
-            for await state in await supabase.auth.authStateChanges {
-                if [.initialSession, .signedIn, .signedOut].contains(state.event) {
-                    isAuthenticated = state.session != nil
-                }
+                AuthView()  // View for authentication
             }
         }
     }
 }
-
-
 
 
 struct MainTabView: View {

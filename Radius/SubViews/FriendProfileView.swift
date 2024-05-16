@@ -16,7 +16,7 @@ struct FriendProfileView: View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Name: \(friend.name)")
                 .font(.title)
-            Text("Coordinates: \(friend.coordinate.latitude), \(friend.coordinate.longitude)")
+            Text("Coordinates: \(friend.latitude), \(friend.longitude)")
                 .font(.subheadline)
             Spacer()
 //            if friend.name == "user" {

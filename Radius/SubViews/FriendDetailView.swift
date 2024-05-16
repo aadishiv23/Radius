@@ -20,7 +20,7 @@ struct FriendDetailView: View {
 
     private func makeZoneOverlay() -> [MKCircle] {
         friend.zones.map { zone in
-            MKCircle(center: zone.coordinate, radius: zone.radius)
+            MKCircle(center: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
         }
     }
     
@@ -54,7 +54,7 @@ struct FriendDetailView: View {
     
     private  func recenterMap() {
         withAnimation(.easeInOut(duration: 0.5)) {
-            region.center = friend.coordinate
+            region.center = CLLocationCoordinate2D(latitude: friend.latitude, longitude: friend.longitude)
             region.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             buttonScale = 0.8
         }

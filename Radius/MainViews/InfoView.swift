@@ -19,7 +19,7 @@ struct InfoView: View {
                 NavigationLink(destination: FriendProfileView(friend: friend)) {
                     HStack {
                         Circle()
-                            .fill(friend.color)
+                            .fill(Color(friend.color))
                             .frame(width: 30, height: 30)
                         Text(friend.name)
                             .foregroundColor(.primary)

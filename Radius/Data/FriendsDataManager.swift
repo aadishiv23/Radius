@@ -25,6 +25,11 @@ class FriendsDataManager: ObservableObject {
     private var supabaseClient: SupabaseClient
     
     @Published var friends: [FriendLocation] = []
+    @Published var currentUser: FriendLocation?
+    
+    private var userId: UUID?
+
+
     
     init(dataController: DataController, supabaseClient: SupabaseClient) {
         self.dataController = dataController
@@ -45,13 +50,57 @@ class FriendsDataManager: ObservableObject {
     }
     
     
+    func fetchCurrentUserProfile() async {
+        do {
+            let user = try await supabaseClient.auth.session.user
+            self.userId = user.id
+
+            
+            if let userId = self.userId {
+                let profile: Profile? = try await supabaseClient
+                    .from("profiles")
+                    .select("*")
+                    .eq("id", value: userId)
+                    .single()
+                    .execute()
+                    .value
+                
+                if let profile = profile {
+                    await fetchFriends(for: userId)
+                }
+                print(profile?.fullName)
+                print(profile?.username)
+                print(profile?.website)
+                print(user.email)
+                // currentUser = FriendLocation(id: <#T##UUID#>, name: profile?.fullName, color: <#T##String#>, latitude: <#T##Double#>, longitude: <#T##Double#>, zones: <#T##[Zone]#>)
+            }
+        } catch {
+            print("Failed to fetch current user profile: \(error)")
+        }
+    }
+    
+//    func checkUserDate(userId: UUID) async -> Bool {
+//        do {
+//            let result: [FriendLocation] = try await supabaseClient
+//                .from("friends")
+//                .select("*")
+//                .eq("id", value: userId)
+//                .single()
+//                .execute()
+//            
+//            
+//        } catch {
+//            
+//        }
+//    }
     
     // Fetches all friends from friends table
-    func fetchFriends() async {
+    func fetchFriends(for userId: UUID) async {
         do {
             let friends: [FriendLocation] = try await supabaseClient
                 .from("friends")
                 .select("*")
+                .eq("id", value: userId)
                 .execute()
                 .value
             
@@ -63,6 +112,7 @@ class FriendsDataManager: ObservableObject {
             
             DispatchQueue.main.async {
                 self.friends = fetchedFriends // Reference to captured var 'fetchedFriends' in concurrently-executing code; this is an error in Swift 6
+                self.currentUser = fetchedFriends.first { $0.id == self.userId }
                 // waht
             }
             
@@ -176,6 +226,13 @@ class FriendsDataManager: ObservableObject {
             .from("zones")
             .insert(zone)
             .execute()
+    }
+    
+// Add zones to a friend
+    func addZones(to friendId: UUID, zones: [Zone]) async throws {
+        for zone in zones {
+            try await insertZone(for: friendId, zone: zone)
+        }
     }
     
     func deleteZone(zoneId: UUID) async throws {

@@ -22,6 +22,8 @@ struct HomeView: View {
     @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
     @State private var buttonScale: CGFloat = 1.0
+    @State private var isPresentingZoneEditor = false
+    @State private var userZones: [Zone] = []
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
     
@@ -50,16 +52,33 @@ struct HomeView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                            NavigationLink(destination: AddZoneView(friendId: selectedFriend?.id ?? UUID())) {
-                                Image(systemName: "plus")
+                Button(action: {
+                   isPresentingZoneEditor.toggle()
+                }) {
+                   Image(systemName: "plus")
+               }
+                .sheet(isPresented: $isPresentingZoneEditor) {
+                    if let friend = selectedFriend {
+                        ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
+                            .onDisappear {
+                                Task {
+                                    try await friendsDataManager.addZones(to: friend.id, zones: userZones)
+                                }
                             }
-                        }
+                    }
+                }
+            }
         }
         .onAppear {
             locationViewModel.checkIfLocationServicesIsEnabled()
             locationViewModel.plsInitiateLocationUpdates()
             Task {
-                await friendsDataManager.fetchFriends()
+                if let userId = friendsDataManager.currentUser?.id {
+                    await friendsDataManager.fetchFriends(for: userId)
+                    print("Current user is: \(userId)")
+                } else {
+                    print("Current user id is nil")
+                }
             }
             for friendsLocation in friendsDataManager.friends {
                 print(friendsLocation.name)

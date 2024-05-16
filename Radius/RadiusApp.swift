@@ -12,9 +12,10 @@ import Supabase
 struct RadiusApp: App {
     let dataController = DataController()
     let friendsDataManager: FriendsDataManager
+    let supabaseClient = supabase
     
     init() {
-        friendsDataManager = FriendsDataManager(dataController: dataController)
+        friendsDataManager = FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient)
         CLLocationCoordinate2DTransformer.register()
         ColorTransformer.register()
     }
@@ -23,7 +24,7 @@ struct RadiusApp: App {
         WindowGroup {
             AppView()
                 .environment(\.managedObjectContext, dataController.container.viewContext)
-                .environmentObject(FriendsDataManager(dataController: dataController))
+                .environmentObject(FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient))
         }
     }
     

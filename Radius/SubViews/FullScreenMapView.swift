@@ -17,9 +17,9 @@ struct FullScreenMapView: View {
 
     var body: some View {
         Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendDataManager.friends) { friendLocation in
-            MapAnnotation(coordinate: friendLocation.coordinate) {
+            MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
                 Circle()
-                    .fill(friendLocation.color)
+                    .fill(Color(friendLocation.color))
                     .frame(width: 20, height: 20)
                     .onTapGesture {
                         selectedFriend = friendLocation
