@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import SwiftUI
 
 
 struct Group: Codable {
@@ -23,6 +23,7 @@ struct Zone: Codable, Identifiable {
     let longitude: Double
     let radius: Double
     let profile_id: UUID
+    
 }
 
 struct Profile: Decodable, Identifiable {
@@ -54,6 +55,12 @@ struct Profile: Decodable, Identifiable {
         longitude = try container.decodeIfPresent(Double.self, forKey: .longitude) ?? 0.0
         zones = try container.decodeIfPresent([Zone].self, forKey: .zones) ?? []
     }
+    
+    var swiftUIColor: Color {
+        Color(hex: color) ?? .black // .black
+    }
+    
+    
 }
 
 //struct Profile: Decodable, Identifiable {

@@ -91,7 +91,7 @@ struct HomeView: View {
             Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends) { friendLocation in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
                     Circle()
-                        .fill(Color(friendLocation.color))
+                        .fill(Color(hex: friendLocation.color) ?? .blue)
                         .frame(width: 20, height: 20)
                         .onTapGesture {
                             selectedFriend = friendLocation
@@ -130,7 +130,7 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showFullScreenMap) {
             // Present the FullScreenMapView here
-            FullScreenMapView(region: $region, selectedFriend: $selectedFriend)
+            FullScreenMapView(region: $region, selectedFriend: $selectedFriend, isPresented: $showFullScreenMap)
                     .environmentObject(friendsDataManager)
         }
     }
@@ -150,7 +150,7 @@ struct HomeView: View {
     func friendRow(_ friend: Profile) -> some View {
         HStack {
             Circle()
-                .fill(Color(friend.color))
+                .fill(Color(hex: friend.color) ?? .black)
                 .frame(width: 30, height: 30)
             VStack(alignment: .leading) {
                 Text(friend.full_name)
