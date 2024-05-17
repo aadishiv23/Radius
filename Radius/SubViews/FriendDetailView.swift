@@ -10,7 +10,7 @@ import SwiftUI
 import MapKit
 
 struct FriendDetailView: View {
-    var friend: FriendLocation
+    var friend: Profile
     @Environment(\.presentationMode) var presentationMode
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),

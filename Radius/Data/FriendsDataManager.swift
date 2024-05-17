@@ -24,8 +24,8 @@ class FriendsDataManager: ObservableObject {
     private let dataController: DataController
     private var supabaseClient: SupabaseClient
     
-    @Published var friends: [FriendLocation] = []
-    @Published var currentUser: FriendLocation?
+    @Published var friends: [Profile] = []
+    @Published var currentUser: Profile?
     
     private var userId: UUID?
 
@@ -54,12 +54,11 @@ class FriendsDataManager: ObservableObject {
         do {
             let user = try await supabaseClient.auth.session.user
             self.userId = user.id
-
             
             if let userId = self.userId {
                 let profile: Profile? = try await supabaseClient
                     .from("profiles")
-                    .select("*")
+                    .select("*, zones(*)") // Ensure zones are included in the query
                     .eq("id", value: userId)
                     .single()
                     .execute()
@@ -67,39 +66,23 @@ class FriendsDataManager: ObservableObject {
                 
                 if let profile = profile {
                     await fetchFriends(for: userId)
+                    print(profile.full_name)
+                    print(profile.username)
+                    print(user.email ?? "N/A")
+                    
+                    self.currentUser = profile
                 }
-                print(profile?.fullName)
-                print(profile?.username)
-                print(profile?.website)
-                print(user.email)
-                // currentUser = FriendLocation(id: <#T##UUID#>, name: profile?.fullName, color: <#T##String#>, latitude: <#T##Double#>, longitude: <#T##Double#>, zones: <#T##[Zone]#>)
             }
         } catch {
             print("Failed to fetch current user profile: \(error)")
         }
     }
-    
-//    func checkUserDate(userId: UUID) async -> Bool {
-//        do {
-//            let result: [FriendLocation] = try await supabaseClient
-//                .from("friends")
-//                .select("*")
-//                .eq("id", value: userId)
-//                .single()
-//                .execute()
-//            
-//            
-//        } catch {
-//            
-//        }
-//    }
-    
-    // Fetches all friends from friends table
+        
     func fetchFriends(for userId: UUID) async {
         do {
-            let friends: [FriendLocation] = try await supabaseClient
-                .from("friends")
-                .select("*")
+            let friends: [Profile] = try await supabaseClient
+                .from("profiles")
+                .select("*, zones(*)")
                 .eq("id", value: userId)
                 .execute()
                 .value
@@ -107,20 +90,19 @@ class FriendsDataManager: ObservableObject {
             var fetchedFriends = friends
             
             for i in 0..<fetchedFriends.count {
-               fetchedFriends[i].zones = try await fetchZones(for: fetchedFriends[i].id)
+                fetchedFriends[i].zones = try await fetchZones(for: fetchedFriends[i].id)
             }
             
             DispatchQueue.main.async {
-                self.friends = fetchedFriends // Reference to captured var 'fetchedFriends' in concurrently-executing code; this is an error in Swift 6
+                self.friends = fetchedFriends
                 self.currentUser = fetchedFriends.first { $0.id == self.userId }
-                // waht
             }
             
         } catch {
             print("Failed to fetch friends: \(error)")
         }
     }
-    
+
     
     func createGroup(name: String, description: String?, password: String) async {
         let hashedPassword = hashPassword(password)
@@ -178,7 +160,7 @@ class FriendsDataManager: ObservableObject {
         let result = try await supabaseClient
             .from("group")
             .select("""
-            friend_id,
+            profile_id,
             friends!inner(*)
             """)
             .eq("groupId", value: groupId)
@@ -209,11 +191,11 @@ class FriendsDataManager: ObservableObject {
     
     
     // Fetch the given zones for a friend
-    func fetchZones(for friendId: UUID) async throws -> [Zone] {
+    func fetchZones(for profile_id: UUID) async throws -> [Zone] {
         let zones: [Zone] = try await supabaseClient
             .from("zones")
             .select("*")
-            .eq("friendId", value: friendId.uuidString)
+            .eq("profile_id", value: profile_id.uuidString)
             .execute()
             .value
         

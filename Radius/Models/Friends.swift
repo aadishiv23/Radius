@@ -11,36 +11,20 @@ import CoreLocation
 import SwiftUI
 
 
-struct Group: Codable {
-    let id: UUID
-    let name: String
-    let description: String?
-    let password: String
-}
+//struct FriendLocation: Codable, Identifiable {
+//    let id: UUID
+//    let name: String
+//    let color: String
+//    let latitude: Double
+//    let longitude: Double
+//    var zones: [Zone]
+//}
 
-struct Zone: Codable, Identifiable {
-    let id: UUID
-    let name: String
-    let latitude: Double
-    let longitude: Double
-    let radius: Double
-    let friend_id: UUID
-}
-
-struct FriendLocation: Codable, Identifiable {
-    let id: UUID
-    let name: String
-    let color: String
-    let latitude: Double
-    let longitude: Double
-    var zones: [Zone]
-}
-
-struct UserLocation: Identifiable {
-    let id = UUID()
-    var coordinate: CLLocationCoordinate2D
-    var zones: [Zone]  // Zones specific to the user
-}
+//struct UserLocation: Identifiable {
+//    let id = UUID()
+//    var coordinate: CLLocationCoordinate2D
+//    var zones: [Zone]  // Zones specific to the user
+//}
 
 //class FriendData: ObservableObject {
 ////    @Published var friendsLocations: [FriendLocation] = [

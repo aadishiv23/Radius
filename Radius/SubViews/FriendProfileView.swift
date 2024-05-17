@@ -10,11 +10,11 @@ import SwiftUI
 
 // Define a simple profile view for displaying friend details
 struct FriendProfileView: View {
-    var friend: FriendLocation
+    var friend: Profile
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Name: \(friend.name)")
+            Text("Name: \(friend.full_name)")
                 .font(.title)
             Text("Coordinates: \(friend.latitude), \(friend.longitude)")
                 .font(.subheadline)
@@ -37,6 +37,6 @@ struct FriendProfileView: View {
 //            }
         }
         .padding()
-        .navigationTitle(friend.name)
+        .navigationTitle(friend.full_name)
     }
 }

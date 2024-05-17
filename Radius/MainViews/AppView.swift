@@ -13,14 +13,20 @@ import SwiftUI
 import Supabase
 
 struct AppView: View {
-    @StateObject private var authViewModel = AuthViewModel()
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
 
     var body: some View {
         NavigationStack {
             if authViewModel.isAuthenticated {
                 MainTabView()  // View for authenticated users
+                    .onAppear {
+                        Task {
+                            await friendsDataManager.fetchCurrentUserProfile()
+                        }
+                    }
             } else {
-                AuthView()  // View for authentication
+                AuthView()
             }
         }
     }

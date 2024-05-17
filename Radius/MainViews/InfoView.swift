@@ -21,7 +21,7 @@ struct InfoView: View {
                         Circle()
                             .fill(Color(friend.color))
                             .frame(width: 30, height: 30)
-                        Text(friend.name)
+                        Text(friend.full_name)
                             .foregroundColor(.primary)
                     }
                 }

@@ -13,7 +13,7 @@ import MapKit
 struct FullScreenMapView: View {
     @Binding var region: MKCoordinateRegion
     @EnvironmentObject var friendDataManager: FriendsDataManager
-    @Binding var selectedFriend: FriendLocation?
+    @Binding var selectedFriend: Profile?
 
     var body: some View {
         Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendDataManager.friends) { friendLocation in

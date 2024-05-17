@@ -18,7 +18,7 @@ struct HomeView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
-    @State private var selectedFriend: FriendLocation?
+    @State private var selectedFriend: Profile?
     @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
     @State private var buttonScale: CGFloat = 1.0
@@ -81,7 +81,7 @@ struct HomeView: View {
                 }
             }
             for friendsLocation in friendsDataManager.friends {
-                print(friendsLocation.name)
+                print(friendsLocation.full_name)
             }
         }
     }
@@ -147,13 +147,13 @@ struct HomeView: View {
        }
     
     @ViewBuilder
-    func friendRow(_ friend: FriendLocation) -> some View {
+    func friendRow(_ friend: Profile) -> some View {
         HStack {
             Circle()
                 .fill(Color(friend.color))
                 .frame(width: 30, height: 30)
             VStack(alignment: .leading) {
-                Text(friend.name)
+                Text(friend.full_name)
                     .font(.headline)
                     .foregroundColor(.primary)
                 Text("\(friend.latitude), \(friend.longitude)")

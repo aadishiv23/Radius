@@ -11,24 +11,49 @@ import Supabase
 @main
 struct RadiusApp: App {
     let dataController = DataController()
-    let friendsDataManager: FriendsDataManager
     let supabaseClient = supabase
-    
+    @StateObject private var friendsDataManager: FriendsDataManager
+    @StateObject private var authViewModel: AuthViewModel
+
     init() {
-        friendsDataManager = FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient)
+        let friendsDataManager = FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient)
+        _friendsDataManager = StateObject(wrappedValue: friendsDataManager)
+        _authViewModel = StateObject(wrappedValue: AuthViewModel(friendsDataManager: friendsDataManager))
         CLLocationCoordinate2DTransformer.register()
         ColorTransformer.register()
     }
-    
+
     var body: some Scene {
         WindowGroup {
             AppView()
                 .environment(\.managedObjectContext, dataController.container.viewContext)
-                .environmentObject(FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient))
+                .environmentObject(friendsDataManager)
+                .environmentObject(authViewModel)
         }
     }
-    
 }
+
+//@main
+//struct RadiusApp: App {
+//    let dataController = DataController()
+//    let friendsDataManager: FriendsDataManager
+//    let supabaseClient = supabase
+//    
+//    init() {
+//        friendsDataManager = FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient)
+//        CLLocationCoordinate2DTransformer.register()
+//        ColorTransformer.register()
+//    }
+//    
+//    var body: some Scene {
+//        WindowGroup {
+//            AppView()
+//                .environment(\.managedObjectContext, dataController.container.viewContext)
+//                .environmentObject(FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient))
+//        }
+//    }
+//    
+//}
 
 
 //struct RadiusApp: App {

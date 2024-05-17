@@ -10,7 +10,7 @@ import SwiftUI
 import MapKit
 
 struct MapKitView: UIViewRepresentable {
-    var friend: FriendLocation
+    var friend: Profile
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()

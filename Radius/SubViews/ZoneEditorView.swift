@@ -32,7 +32,7 @@ struct ZoneEditorView: View {
 
                 Button("Save Zone") {
                 if let location = newZoneLocation, let currentUserFriendLocation = friendsDataManager.currentUser {
-                    let newZone = Zone(id: UUID(), name: "New Zone", latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, friend_id: currentUserFriendLocation.id)
+                    let newZone = Zone(id: UUID(), name: "New Zone", latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUserFriendLocation.id)
                         self.userZones.append(newZone)
                         self.isPresenting = false
                     }

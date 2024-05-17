@@ -68,9 +68,8 @@ struct SupabaseProfileView: View {
                 .execute()
                 .value
             
-            self.username = profile.username ?? ""
-            self.fullName = profile.fullName ?? ""
-            self.website = profile.website ?? ""
+            self.username = profile.username
+            self.fullName = profile.full_name
 
           } catch {
             debugPrint(error)

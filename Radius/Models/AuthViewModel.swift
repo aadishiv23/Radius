@@ -13,8 +13,10 @@ import SwiftUI
 class AuthViewModel: ObservableObject {
     @Published var isAuthenticated = false
     private var cancellables = Set<AnyCancellable>()
+    var friendsDataManager: FriendsDataManager?
 
-    init() {
+    init(friendsDataManager: FriendsDataManager) {
+        self.friendsDataManager = friendsDataManager
         setupAuthListener()
     }
 
@@ -24,6 +26,11 @@ class AuthViewModel: ObservableObject {
                 if [.initialSession, .signedIn, .signedOut].contains(state.event) {
                     DispatchQueue.main.async {
                         self.isAuthenticated = state.session != nil
+                        if self.isAuthenticated {
+                            Task {
+                                await self.friendsDataManager?.fetchCurrentUserProfile()
+                            }
+                        }
                     }
                 }
             }
