@@ -70,7 +70,9 @@ class FriendsDataManager: ObservableObject {
                     print(profile.username)
                     print(user.email ?? "N/A")
                     
-                    self.currentUser = profile
+                    DispatchQueue.main.async {
+                       self.currentUser = profile
+                   }
                 }
             }
         } catch {
