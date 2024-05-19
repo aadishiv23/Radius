@@ -13,7 +13,7 @@ struct HomeView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Assuming this contains your friendsLocations
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var locationViewModel = LocationViewModel()
-    @State private var region = MKCoordinateRegion(
+    @State private var region =  MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
@@ -72,6 +72,10 @@ struct HomeView: View {
         .onAppear {
             locationViewModel.checkIfLocationServicesIsEnabled()
             locationViewModel.plsInitiateLocationUpdates()
+            region = MKCoordinateRegion(center:
+                                            CLLocationCoordinate2D(latitude: friendsDataManager.currentUser?.latitude ?? 40.7128,
+                                                                   longitude: friendsDataManager.currentUser?.longitude ?? -74.0060),
+                                                                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             Task {
                 if let userId = friendsDataManager.currentUser?.id {
                     await friendsDataManager.fetchFriends(for: userId)
