@@ -43,30 +43,30 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Home")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        isPresentingZoneEditor.toggle()
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                    .sheet(isPresented: $isPresentingZoneEditor) {
+                        if let friend = selectedFriend {
+                            ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
+                                .onDisappear {
+                                    Task {
+                                        try await friendsDataManager.addZones(to: friend.id, zones: userZones)
+                                    }
+                                }
+                        }
+                    }
+                }
+            }
             .sheet(item: $selectedFriend) { friend in
                 FriendDetailView(friend: friend)
             }
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                   isPresentingZoneEditor.toggle()
-                }) {
-                   Image(systemName: "plus")
-               }
-                .sheet(isPresented: $isPresentingZoneEditor) {
-                    if let friend = selectedFriend {
-                        ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
-                            .onDisappear {
-                                Task {
-                                    try await friendsDataManager.addZones(to: friend.id, zones: userZones)
-                                }
-                            }
-                    }
-                }
             }
         }
         .onAppear {

@@ -5,16 +5,24 @@
 //  Created by Aadi Shiv Malhotra on 4/6/24.
 
 import CoreLocation
+import Supabase
 
 final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var locationManager = CLLocationManager()
+    private let supabaseClient = supabase
+    private let userId: UUID
+    private var lastUploadedLocation: CLLocation?
+    private let locationUpdateInterval: TimeInterval = 60 // Set the interval to 60 seconds
+    private let minimumDistance: CLLocationDistance = 50 // Set the minimum distance to 50 meters
+
     @Published var userLocation: CLLocation?
     
-    override init() {
+    init(supabaseClient: SupabaseClient, userId: UUID) {
+        self.userId = userId
         super.init()
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        checkLocationAuthorization()
+        self.checkLocationAuthorization()
     }
     
     func checkLocationAuthorization() {

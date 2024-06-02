@@ -7,13 +7,16 @@
 
 import Foundation
 import SwiftUI
+import Supabase
 
 struct SupabaseProfileView: View {
     @State var username = ""
     @State var fullName = ""
     @State var website = ""
     
+    
     @State var isLoading = false
+    
     
     var body: some View {
         NavigationStack {
@@ -41,15 +44,16 @@ struct SupabaseProfileView: View {
                 }
             }
             .navigationTitle("Profile")
-            .toolbar(content: {
-                ToolbarItem(placement: .topBarLeading) {
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Sign Out", role: .destructive) {
                         Task {
                             try? await supabase.auth.signOut()
                         }
                     }
                 }
-            })
+            }
+
         }
         .task {
             await getInitialProfile()
@@ -60,7 +64,7 @@ struct SupabaseProfileView: View {
         do {
             let currentUser = try await supabase.auth.session.user
             
-            let profile: Profile = try await supabase.database
+            let profile: Profile = try await supabase
                 .from("profiles")
                 .select()
                 .eq("id", value: currentUser.id)
@@ -83,7 +87,7 @@ struct SupabaseProfileView: View {
             do {
                 let currentUser = try await supabase.auth.session.user
                 
-                try await supabase.database
+                try await supabase
                     .from("profiles")
                     .update(
                         UpdateProfileParams(username: username, fullName: fullName, website: website)
