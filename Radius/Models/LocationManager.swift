@@ -45,7 +45,31 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.userLocation = locations.last
+        if let newLocation = locations.last {
+            self.userLocation = newLocation
+            if shouldUploadLocation(newLocation) {
+                uploadLocation(newLocation)
+            }
+        }
+    }
+    
+    private func shouldUploadLocation(_ newLocation: CLLocation) -> Bool {
+        guard let lastLocation = lastUploadedLocation else {
+            return true
+        }
+        
+        let timeInterval = newLocation.timestamp.timeIntervalSince(lastLocation.timestamp)
+        let distance = newLocation.distance(from: lastLocation)
+        return timeInterval >= locationUpdateInterval || distance >= minimumDistance
+    }
+    
+    private func uploadLocation(_ newLocation: CLLocation) {
+//        Task {
+//            do {
+//                try await SupabaseClient
+//                    .from("")
+//            }
+//        }
     }
     
     func plsInitiateLocationUpdates() {
