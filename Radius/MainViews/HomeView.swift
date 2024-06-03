@@ -92,7 +92,7 @@ struct HomeView: View {
     
     private var mapSection: some View {
         ZStack(alignment: .top/*Alignment(horizontal: .leading, vertical: .top)*/) {
-            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends) { friendLocation in
+            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id} ) { friendLocation in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
                     Circle()
                         .fill(Color(hex: friendLocation.color) ?? .blue)

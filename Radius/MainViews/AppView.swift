@@ -15,6 +15,7 @@ import Supabase
 struct AppView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @EnvironmentObject private var locationManager: LocationManager
 
     var body: some View {
         NavigationStack {
@@ -23,7 +24,13 @@ struct AppView: View {
                     .onAppear {
                         Task {
                             await friendsDataManager.fetchCurrentUserProfile()
+                            if let userId = friendsDataManager.currentUser?.id {
+                                locationManager.startUpdatingLocation()
+                            }
                         }
+                    }
+                    .onDisappear {
+                        locationManager.stopUpdatingLocation()
                     }
             } else {
                 AuthView()

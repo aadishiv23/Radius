@@ -10,15 +10,16 @@ import Supabase
 final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var locationManager = CLLocationManager()
     private let supabaseClient = supabase
-    private let userId: UUID
     private var lastUploadedLocation: CLLocation?
     private let locationUpdateInterval: TimeInterval = 60 // Set the interval to 60 seconds
     private let minimumDistance: CLLocationDistance = 50 // Set the minimum distance to 50 meters
+    private let fdm = FriendsDataManager(supabaseClient: supabase)
+    
+
 
     @Published var userLocation: CLLocation?
     
-    init(supabaseClient: SupabaseClient, userId: UUID) {
-        self.userId = userId
+    init(supabaseClient: SupabaseClient) {
         super.init()
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -64,16 +65,38 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
     
     private func uploadLocation(_ newLocation: CLLocation) {
-//        Task {
-//            do {
-//                try await SupabaseClient
-//                    .from("")
-//            }
-//        }
+        let locationArr = [
+            "latitude": newLocation.coordinate.latitude,
+            "longitude": newLocation.coordinate.longitude
+        ]
+        Task {
+            do {
+                await fdm.fetchCurrentUserProfile()
+                try await supabaseClient
+                    .from("profiles")
+                    .update(locationArr)
+                    .eq("id", value: fdm.currentUser?.id.uuidString)
+                    .execute()
+                
+                DispatchQueue.main.async {
+                    self.lastUploadedLocation = newLocation
+                }
+            } catch {
+                print("Failed to update location: \(error)")
+            }
+        }
     }
     
     func plsInitiateLocationUpdates() {
         locationManager.startUpdatingLocation()
+    }
+    
+    func startUpdatingLocation() {
+       locationManager.startUpdatingLocation()
+    }
+
+    func stopUpdatingLocation() {
+       locationManager.stopUpdatingLocation()
     }
 }
 

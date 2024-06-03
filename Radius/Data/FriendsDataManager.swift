@@ -21,7 +21,6 @@ import Supabase
  */
 
 class FriendsDataManager: ObservableObject {
-    private let dataController: DataController
     private var supabaseClient: SupabaseClient
     
     @Published var friends: [Profile] = []
@@ -31,8 +30,7 @@ class FriendsDataManager: ObservableObject {
 
 
     
-    init(dataController: DataController, supabaseClient: SupabaseClient) {
-        self.dataController = dataController
+    init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
     }
     

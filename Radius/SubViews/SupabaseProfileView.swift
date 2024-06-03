@@ -27,9 +27,6 @@ struct SupabaseProfileView: View {
                         .textInputAutocapitalization(.never)
                     TextField("Full Name", text: $fullName)
                         .textContentType(.name)
-                    TextField("Website", text: $website)
-                        .textContentType(.URL)
-                        .textInputAutocapitalization(.never)
                 }
                 
                 Section {
@@ -90,7 +87,7 @@ struct SupabaseProfileView: View {
                 try await supabase
                     .from("profiles")
                     .update(
-                        UpdateProfileParams(username: username, fullName: fullName, website: website)
+                        UpdateProfileParams(username: username, fullName: fullName)
                     )
                     .eq("id", value: currentUser.id)
                     .execute()
