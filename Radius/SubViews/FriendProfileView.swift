@@ -18,6 +18,15 @@ struct FriendProfileView: View {
                 .font(.title)
             Text("Coordinates: \(friend.latitude), \(friend.longitude)")
                 .font(.subheadline)
+            ForEach(friend.zones) { zone in
+                VStack {
+                    Text(zone.name)
+                    Text(String(zone.latitude))
+                    Text(String(zone.longitude))
+                    Text(String(zone.radius))
+                }
+                .background(Rectangle().foregroundStyle(.blue).opacity(0.3))
+            }
             Spacer()
 //            if friend.name == "user" {
 //                ZoneEditorView(isPresenting: , userZones: <#T##Binding<[Zone]>#>)

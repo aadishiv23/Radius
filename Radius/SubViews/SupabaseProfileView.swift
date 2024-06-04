@@ -35,22 +35,18 @@ struct SupabaseProfileView: View {
                     }
                     .bold()
                     
+                    Button("Sign Out", role: .destructive) {
+                        Task {
+                            try? await supabase.auth.signOut()
+                        }
+                    }
+                    
                     if isLoading {
                         ProgressView()
                     }
                 }
             }
             .navigationTitle("Profile")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Sign Out", role: .destructive) {
-                        Task {
-                            try? await supabase.auth.signOut()
-                        }
-                    }
-                }
-            }
-
         }
         .task {
             await getInitialProfile()

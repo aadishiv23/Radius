@@ -9,10 +9,12 @@
 import SwiftUI
 import MapKit
 
+
 struct ZoneEditorView: View {
     @Binding var isPresenting: Bool
     @Binding var userZones: [Zone]
     @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @EnvironmentObject var locationManager: LocationManager
     @State private var newZoneLocation: CLLocationCoordinate2D?
     @State private var newZoneRadius: Double = 100.0
     @State private var showAddressEntry: Bool = false
@@ -25,14 +27,15 @@ struct ZoneEditorView: View {
                     AddressEntryView(showView: $showAddressEntry, locationToAdd: $newZoneLocation)
                 } else {
                     MapView(region: $mapRegion, location: $newZoneLocation, radius: $newZoneRadius)
+                        .frame(height: 300) // Fixed height for the map
                 }
-                
+
                 Slider(value: $newZoneRadius, in: 10...500, step: 5)
                     .padding()
 
                 Button("Save Zone") {
-                if let location = newZoneLocation, let currentUserFriendLocation = friendsDataManager.currentUser {
-                    let newZone = Zone(id: UUID(), name: "New Zone", latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUserFriendLocation.id)
+                    if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
+                        let newZone = Zone(id: UUID(), name: "New Zone", latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUser.id)
                         self.userZones.append(newZone)
                         self.isPresenting = false
                     }
@@ -46,10 +49,18 @@ struct ZoneEditorView: View {
                         isPresenting = false
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Address") {
-                        showAddressEntry.toggle()
+                if !showAddressEntry {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Address") {
+                            showAddressEntry.toggle()
+                        }
                     }
+                }
+            }
+            .onAppear {
+                if let userLocation = locationManager.userLocation {
+                    mapRegion = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                    newZoneLocation = userLocation.coordinate
                 }
             }
         }
@@ -62,6 +73,7 @@ extension MKCoordinateRegion {
         MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
     }
 }
+
 
 
 //struct ZoneEditorView: View {

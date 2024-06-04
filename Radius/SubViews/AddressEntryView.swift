@@ -16,21 +16,19 @@ struct AddressEntryView: View {
 
     
     var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("Enter Address")) {
-                    TextField("Address", text: $address)
-                    Button("Confirm") {
-                        geocodeAddress(address)
-                    }
+        Form {
+            Section(header: Text("Enter Address")) {
+                TextField("Address", text: $address)
+                Button("Confirm") {
+                    geocodeAddress(address)
                 }
             }
-            .navigationTitle("Add Zone")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Cancel") {
-                        showView = false
-                    }
+        }
+        .navigationTitle("Add Zone")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Map Editor") {
+                    showView = false
                 }
             }
         }
@@ -48,7 +46,6 @@ struct AddressEntryView: View {
             }
         }
     }
-    
 }
 
 

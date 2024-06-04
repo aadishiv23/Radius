@@ -24,7 +24,7 @@ class FriendsDataManager: ObservableObject {
     private var supabaseClient: SupabaseClient
     
     @Published var friends: [Profile] = []
-    @Published var currentUser: Profile?
+    @Published var currentUser: Profile!
     
     private var userId: UUID?
 

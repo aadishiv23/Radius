@@ -16,7 +16,10 @@ struct MapView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
+        mapView.delegate = context.coordinator
         mapView.setRegion(region, animated: true)
+        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleTap(_:)))
+        mapView.addGestureRecognizer(tapGesture)
         return mapView
     }
 
@@ -46,6 +49,14 @@ struct MapView: UIViewRepresentable {
 
         init(_ parent: MapView) {
             self.parent = parent
+        }
+        
+        @objc func handleTap( _ gestureRecognizer: UITapGestureRecognizer) {
+            let location = gestureRecognizer.location(in: gestureRecognizer.view)
+            if let mapView = gestureRecognizer.view as? MKMapView {
+                let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
+                parent.location = coordinate
+            }
         }
         
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

@@ -51,14 +51,12 @@ struct HomeView: View {
                         Image(systemName: "plus")
                     }
                     .sheet(isPresented: $isPresentingZoneEditor) {
-                        if let friend = selectedFriend {
-                            ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
-                                .onDisappear {
-                                    Task {
-                                        try await friendsDataManager.addZones(to: friend.id, zones: userZones)
-                                    }
+                        ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
+                            .onDisappear {
+                                Task {
+                                    try await friendsDataManager.addZones(to: friendsDataManager.currentUser.id, zones: userZones)
                                 }
-                        }
+                            }
                     }
                 }
             }
