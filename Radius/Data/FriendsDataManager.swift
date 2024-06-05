@@ -225,4 +225,16 @@ class FriendsDataManager: ObservableObject {
             .execute()
     }
 
+    func renameZone(zoneId: UUID, newName: String) async throws {
+        do {
+            try await supabaseClient
+                .from("zones")
+                .update(["name": newName])
+                .eq("id", value: zoneId.uuidString)
+                .execute()
+        } catch {
+            print("Failed to rename zone: \(error)")
+        }
+    }
+
 }

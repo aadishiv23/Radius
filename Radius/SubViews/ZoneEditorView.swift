@@ -19,51 +19,69 @@ struct ZoneEditorView: View {
     @State private var newZoneRadius: Double = 100.0
     @State private var showAddressEntry: Bool = false
     @State private var mapRegion: MKCoordinateRegion = MKCoordinateRegion.defaultRegion
+    @State private var zoneName: String = ""
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
         NavigationView {
-            VStack {
-                if showAddressEntry {
-                    AddressEntryView(showView: $showAddressEntry, locationToAdd: $newZoneLocation)
-                } else {
-                    MapView(region: $mapRegion, location: $newZoneLocation, radius: $newZoneRadius)
-                        .frame(height: 300) // Fixed height for the map
-                }
+            ScrollView {
+                VStack {
+                    TextField("Zone name", text: $zoneName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
+                        .focused($isTextFieldFocused)
+                    
+                    if showAddressEntry {
+                        AddressEntryView(showView: $showAddressEntry, locationToAdd: $newZoneLocation)
+                            .padding()
+                    } else {
+                        MapView(region: $mapRegion, location: $newZoneLocation, radius: $newZoneRadius)
+                            .frame(height: 300)
+                            .padding()
+                    }
 
-                Slider(value: $newZoneRadius, in: 10...500, step: 5)
+                    Slider(value: $newZoneRadius, in: 10...500, step: 5)
+                        .padding()
+                    
+                    Button("Save Zone") {
+                        if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
+                            let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUser.id)
+                            self.userZones.append(newZone)
+                            self.isPresenting = false
+                        }
+                    }
+                    .disabled(newZoneLocation == nil)
                     .padding()
-
-                Button("Save Zone") {
-                    if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
-                        let newZone = Zone(id: UUID(), name: "New Zone", latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUser.id)
-                        self.userZones.append(newZone)
-                        self.isPresenting = false
-                    }
                 }
-                .disabled(newZoneLocation == nil)
-            }
-            .navigationTitle("Add Zone")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        isPresenting = false
+                .navigationTitle("Add Zone")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            isPresenting = false
+                        }
                     }
-                }
-                if !showAddressEntry {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Address") {
-                            showAddressEntry.toggle()
+                    if !showAddressEntry {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Address") {
+                                showAddressEntry.toggle()
+                            }
                         }
                     }
                 }
-            }
-            .onAppear {
-                if let userLocation = locationManager.userLocation {
-                    mapRegion = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-                    newZoneLocation = userLocation.coordinate
+                .onAppear {
+                    if let userLocation = locationManager.userLocation {
+                        mapRegion = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                        newZoneLocation = userLocation.coordinate
+                    }
+                }
+                .onChange(of: isTextFieldFocused) { focused in
+                    if !focused {
+                        // Handle any additional actions when the TextField loses focus
+                    }
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
