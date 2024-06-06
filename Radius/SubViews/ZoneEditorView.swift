@@ -43,13 +43,20 @@ struct ZoneEditorView: View {
                     Slider(value: $newZoneRadius, in: 10...500, step: 5)
                         .padding()
                     
-                    Button("Save Zone") {
+                    Text("Radius: \(newZoneRadius, specifier: "%.1f") meters") // Display the radius with one decimal point
+                                            .padding()
+                    
+                    Spacer()
+                    
+                    Button(action: {
                         if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
                             let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUser.id)
                             self.userZones.append(newZone)
                             self.isPresenting = false
                         }
-                    }
+                    }, label: {
+                        Text("Save Zone")
+                    })
                     .disabled(newZoneLocation == nil)
                     .padding()
                 }

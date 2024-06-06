@@ -23,6 +23,8 @@ struct HomeView: View {
     @State private var showFullScreenMap = false
     @State private var buttonScale: CGFloat = 1.0
     @State private var isPresentingZoneEditor = false
+    @State private var isPresentingGroupView = false
+    
     @State private var userZones: [Zone] = []
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
@@ -45,23 +47,37 @@ struct HomeView: View {
             .navigationTitle("Home")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        isPresentingZoneEditor.toggle()
-                    }) {
+                    Menu {
+                        Button {
+                            isPresentingZoneEditor = true
+                        } label: {
+                            Label("Add Zones", systemImage: "mappin.and.ellipse")
+                        }
+
+                        Button {
+                            isPresentingGroupView = true
+                        } label: {
+                            Label("Add Group", systemImage: "person.3")
+                        }
+                    } label: {
                         Image(systemName: "plus")
                     }
-                    .sheet(isPresented: $isPresentingZoneEditor) {
-                        ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
-                            .onDisappear {
-                                Task {
-                                    try await friendsDataManager.addZones(to: friendsDataManager.currentUser.id, zones: userZones)
-                                }
-                            }
-                    }
+
                 }
+            }
+            .sheet(isPresented: $isPresentingZoneEditor) {
+                ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
+                    .onDisappear {
+                        Task {
+                            try await friendsDataManager.addZones(to: friendsDataManager.currentUser.id, zones: userZones)
+                        }
+                    }
             }
             .sheet(item: $selectedFriend) { friend in
                 FriendDetailView(friend: friend)
+            }
+            .sheet(isPresented: $isPresentingGroupView) {
+                AddGroupView()
             }
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
