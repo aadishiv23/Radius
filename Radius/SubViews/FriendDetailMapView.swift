@@ -9,7 +9,49 @@ import Foundation
 import SwiftUI
 import MapKit
 
-struct MapKitView: UIViewRepresentable {
+struct FriendDetailMapView: View {
+    var friend: Profile
+    
+    var body: some View {
+        
+        if #available(iOS 17.0, *) {
+            Map(
+                initialPosition: MapCameraPosition.automatic,
+                bounds: MapCameraBounds(centerCoordinateBounds: MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: friend.latitude, longitude: friend.longitude),
+                    span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+                )),
+                interactionModes: MapInteractionModes.all
+            ) {
+                ForEach(friend.zones) { zone in
+                    MapCircle(MKCircle(center: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius))
+                        .foregroundStyle(.blue.opacity(0.2))
+                        .stroke(Color.blue.opacity(0.5), lineWidth: 5)
+                    
+                    Annotation(friend.full_name, coordinate: CLLocationCoordinate2D(latitude: friend.latitude, longitude: friend.longitude)) {
+                        Circle()
+                            .foregroundStyle(LinearGradient(colors: [.red, .pink, .blue], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: 20, height: 20)
+                            .overlay {
+                                Text(friend.full_name.prefix(1))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(Color.white)
+                                //RadialGradient(colors: [.blue, .black], center: .center, startRadius: 20, endRadius: 200)
+
+                            }
+                    }
+                }
+            }
+            .mapStyle(.standard(pointsOfInterest: .excludingAll))
+        } else {
+            // Fallback on earlier versions
+            OldFriendDetailMapView(friend: friend)
+        }
+        
+    }
+}
+
+struct OldFriendDetailMapView: UIViewRepresentable {
     var friend: Profile
     
     func makeUIView(context: Context) -> MKMapView {
@@ -46,9 +88,9 @@ struct MapKitView: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, MKMapViewDelegate {
-        var parent: MapKitView
+        var parent: OldFriendDetailMapView
         
-        init(_ parent: MapKitView) {
+        init(_ parent: OldFriendDetailMapView) {
             self.parent = parent
         }
         

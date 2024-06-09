@@ -12,7 +12,7 @@
 		AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */; };
 		AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */; };
 		AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */; };
-		AC0AC70C2BDB1FD0000418B8 /* MapKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC70B2BDB1FD0000418B8 /* MapKitView.swift */; };
+		AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */; };
 		AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1B00532BF4753C000BB30B /* AuthViewModel.swift */; };
 		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
 		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
@@ -57,7 +57,7 @@
 		AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenMapView.swift; sourceTree = "<group>"; };
 		AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendProfileView.swift; sourceTree = "<group>"; };
 		AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModifiers.swift; sourceTree = "<group>"; };
-		AC0AC70B2BDB1FD0000418B8 /* MapKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapKitView.swift; sourceTree = "<group>"; };
+		AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendDetailMapView.swift; sourceTree = "<group>"; };
 		AC1B00532BF4753C000BB30B /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
 		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
@@ -127,7 +127,7 @@
 				AC0AC7032BDB0F9B000418B8 /* FriendDetailView.swift */,
 				AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */,
 				AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */,
-				AC0AC70B2BDB1FD0000418B8 /* MapKitView.swift */,
+				AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */,
 				AC5855FB2BDF1391009C490B /* AddressEntryView.swift */,
 				AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */,
 				AC5855FF2BDF1925009C490B /* MapView.swift */,
@@ -343,7 +343,7 @@
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
-				AC0AC70C2BDB1FD0000418B8 /* MapKitView.swift in Sources */,
+				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,

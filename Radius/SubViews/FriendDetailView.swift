@@ -26,7 +26,7 @@ struct FriendDetailView: View {
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
-                    MapKitView(friend: friend)
+                    FriendDetailMapView(friend: friend)
                         .ignoresSafeArea()
                         .onAppear {
                             // Additional setup if needed
