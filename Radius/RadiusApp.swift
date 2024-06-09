@@ -14,13 +14,11 @@ struct RadiusApp: App {
     let supabaseClient = supabase
     @StateObject private var friendsDataManager: FriendsDataManager
     @StateObject private var authViewModel: AuthViewModel
-    @StateObject private var locationManager: LocationManager
-
+    
     init() {
         let friendsDataManager = FriendsDataManager(supabaseClient: supabaseClient)
         _friendsDataManager = StateObject(wrappedValue: friendsDataManager)
         _authViewModel = StateObject(wrappedValue: AuthViewModel(friendsDataManager: friendsDataManager))
-        _locationManager = StateObject(wrappedValue: LocationManager(supabaseClient: supabase))
         CLLocationCoordinate2DTransformer.register()
         ColorTransformer.register()
     }
@@ -31,7 +29,6 @@ struct RadiusApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(friendsDataManager)
                 .environmentObject(authViewModel)
-                .environmentObject(locationManager)
         }
     }
 }

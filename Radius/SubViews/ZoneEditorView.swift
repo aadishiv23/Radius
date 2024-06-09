@@ -14,7 +14,6 @@ struct ZoneEditorView: View {
     @Binding var isPresenting: Bool
     @Binding var userZones: [Zone]
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-    @EnvironmentObject var locationManager: LocationManager
     @State private var newZoneLocation: CLLocationCoordinate2D?
     @State private var newZoneRadius: Double = 100.0
     @State private var showAddressEntry: Bool = false
@@ -76,7 +75,7 @@ struct ZoneEditorView: View {
                     }
                 }
                 .onAppear {
-                    if let userLocation = locationManager.userLocation {
+                    if let userLocation = LocationManager.shared.userLocation {
                         mapRegion = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
                         newZoneLocation = userLocation.coordinate
                     }

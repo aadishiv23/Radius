@@ -8,8 +8,8 @@ import CoreLocation
 import Supabase
 
 final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    static let shared = LocationManager()
     private var locationManager = CLLocationManager()
-    private let supabaseClient = supabase
     private var lastUploadedLocation: CLLocation?
     private let locationUpdateInterval: TimeInterval = 60 // Set the interval to 60 seconds
     private let minimumDistance: CLLocationDistance = 50 // Set the minimum distance to 50 meters
@@ -19,7 +19,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 
     @Published var userLocation: CLLocation?
     
-    init(supabaseClient: SupabaseClient) {
+    private override init() {
         super.init()
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -72,7 +72,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         Task {
             do {
                 await fdm.fetchCurrentUserProfile()
-                try await supabaseClient
+                try await supabase
                     .from("profiles")
                     .update(locationArr)
                     .eq("id", value: fdm.currentUser?.id.uuidString)
