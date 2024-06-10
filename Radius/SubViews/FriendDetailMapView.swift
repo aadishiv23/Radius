@@ -56,78 +56,78 @@ struct FriendDetailMapView: View {
                 OldFriendDetailMapView(friend: friend)
             }
             
-            if showOverlay {
-                SwipeableOverlay(friend: friend, currentZoneIndex: $currentZoneIndex)
-                    .transition(.move(edge: .bottom))
-                    .animation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.5))
-            }
 //            if showOverlay {
-//                VStack {
-//                    Spacer()
-//                    
-//                    Text(friend.full_name)
-//                        .font(.title)
-//                        .padding()
-//                        .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
-//                        .background(Color.white.opacity(0.8))
-//                        .foregroundColor(.black)
-//                        .cornerRadius(10)
-//                        .shadow(radius: 5)
-//                        .padding(.bottom, 25)
-//                }
-//                .transition(.move(edge: .bottom))
-//                .animation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.5), value: showOverlay)
+//                SwipeableOverlay(friend: friend, currentZoneIndex: $currentZoneIndex)
+//                    .transition(.move(edge: .bottom))
+//                    .animation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.5))
 //            }
+            if showOverlay {
+                VStack {
+                    Spacer()
+                    
+                    Text(friend.full_name)
+                        .font(.title)
+                        .padding()
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
+                        .background(Color.white.opacity(0.8))
+                        .foregroundColor(.black)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+                        .padding(.bottom, 25)
+                }
+                .transition(.move(edge: .bottom))
+                .animation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.5), value: showOverlay)
+            }
         }
     }
 }
 
-struct SwipeableOverlay: View {
-    var friend: Profile
-    @Binding var currentZoneIndex: Int
-    @State private var translation: CGFloat = 0
-    
-    var body: some View {
-        VStack {
-            Spacer()
-            
-            Text("Zone \(currentZoneIndex + 1): \(friend.zones[currentZoneIndex].name ?? "Unnamed")")
-                .font(.title)
-                .padding()
-                .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
-                .background(Color.white.opacity(0.8))
-                .foregroundColor(.black)
-                .cornerRadius(10)
-                .shadow(radius: 5)
-                .padding(.bottom, 25)
-                .offset(x: translation)
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            self.translation = value.translation.width
-                        }
-                        .onEnded { value in
-                            let threshold: CGFloat = 50
-                            if value.translation.width < -threshold {
-                                withAnimation(.spring()) {
-                                    currentZoneIndex = (currentZoneIndex + 1) % friend.zones.count
-                                    translation = 0
-                                }
-                            } else if value.translation.width > threshold {
-                                withAnimation(.spring()) {
-                                    currentZoneIndex = (currentZoneIndex - 1 + friend.zones.count) % friend.zones.count
-                                    translation = 0
-                                }
-                            } else {
-                                withAnimation(.spring()) {
-                                    translation = 0
-                                }
-                            }
-                        }
-                )
-        }
-    }
-}
+//struct SwipeableOverlay: View {
+//    var friend: Profile
+//    @Binding var currentZoneIndex: Int
+//    @State private var translation: CGFloat = 0
+//    
+//    var body: some View {
+//        VStack {
+//            Spacer()
+//            
+//            Text("Zone \(currentZoneIndex + 1): \(friend.zones[currentZoneIndex].name ?? "Unnamed")")
+//                .font(.title)
+//                .padding()
+//                .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
+//                .background(Color.white.opacity(0.8))
+//                .foregroundColor(.black)
+//                .cornerRadius(10)
+//                .shadow(radius: 5)
+//                .padding(.bottom, 25)
+//                .offset(x: translation)
+//                .gesture(
+//                    DragGesture()
+//                        .onChanged { value in
+//                            self.translation = value.translation.width
+//                        }
+//                        .onEnded { value in
+//                            let threshold: CGFloat = 50
+//                            if value.translation.width < -threshold {
+//                                withAnimation(.spring()) {
+//                                    currentZoneIndex = (currentZoneIndex + 1) % friend.zones.count
+//                                    translation = 0
+//                                }
+//                            } else if value.translation.width > threshold {
+//                                withAnimation(.spring()) {
+//                                    currentZoneIndex = (currentZoneIndex - 1 + friend.zones.count) % friend.zones.count
+//                                    translation = 0
+//                                }
+//                            } else {
+//                                withAnimation(.spring()) {
+//                                    translation = 0
+//                                }
+//                            }
+//                        }
+//                )
+//        }
+//    }
+//}
 
 struct OldFriendDetailMapView: UIViewRepresentable {
     var friend: Profile
