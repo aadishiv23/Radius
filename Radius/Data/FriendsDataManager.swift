@@ -123,26 +123,37 @@ class FriendsDataManager: ObservableObject {
     }
     
     
-    func joinGroup(groupId: UUID, friendId: UUID, password: String) async throws -> Bool {
+    func joinGroup(groupName: String, password: String) async throws -> Bool {
         do {
-            let group: Group = try await supabaseClient
+            let groups: [Group] = try await supabaseClient
                 .from("groups")
-                .select("password")
-                .eq("id", value: groupId.uuidString)
-                .single()
+                .select("id, password")
+                .eq("name", value: groupName)
                 .execute()
                 .value
             
-            
+            guard let group = groups.first else {
+                print("No group found with the name: \(groupName)")
+                return false
+            }
             
             if group.password == hashPassword(password) {
-                try await supabaseClient
-                    .from("groups")
+                // If password matches, add current user to the group
+                guard let currentUserID = userId else {
+                    print("Current user ID is not set")
+                    return false
+                }
+                
+                // Insert the current user into the group
+                let insertResult = try await supabaseClient
+                    .from("group_members") // Assuming 'group_members' is the table where group memberships are stored
                     .insert([
-                        "group_id": groupId,
-                        "friendId": friendId
+                        "group_id": group.id.uuidString,
+                        "profile_id": currentUserID.uuidString
                     ])
                     .execute()
+
+                print("User successfully added to group: \(insertResult)")
                 return true
                 
             } else {

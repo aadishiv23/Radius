@@ -46,6 +46,8 @@
 		ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */; };
 		ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */; };
 		ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */; };
+		ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */; };
+		ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB24E92C11698800D9693F /* AddGroupView.swift */; };
@@ -87,6 +89,8 @@
 		ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DTransformer.swift; sourceTree = "<group>"; };
+		ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupView.swift; sourceTree = "<group>"; };
+		ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGroupView.swift; sourceTree = "<group>"; };
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -135,6 +139,8 @@
 				AC9BD1D22BEB101B00D23123 /* AuthView.swift */,
 				AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */,
 				ACEB24E92C11698800D9693F /* AddGroupView.swift */,
+				ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */,
+				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -349,6 +355,7 @@
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */,
 				AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */,
+				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
 				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
@@ -356,6 +363,7 @@
 				AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */,
 				AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */,
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
+				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
 				ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */,
 				ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */,
 			);
