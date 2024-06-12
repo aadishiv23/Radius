@@ -44,6 +44,13 @@ struct HomeView: View {
                     friendListSection
                 }
             }
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.white.opacity(0.3), Color.green.opacity(0.3)]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .navigationTitle("Home")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -119,7 +126,7 @@ struct HomeView: View {
             .frame(height: 300)
             .cornerRadius(15)
             .padding()
-            .background(Color.gray.opacity(0.2))
+            //.background(Color.gray.opacity(0.2))
             
             HStack {
                 if showRecenterButton {

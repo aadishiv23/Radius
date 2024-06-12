@@ -35,6 +35,8 @@ struct CreateGroupView: View {
                 } else if passwordMatch && !confirmPassword.isEmpty {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
+                } else {
+                    ProgressView()
                 }
             }
 
@@ -43,6 +45,12 @@ struct CreateGroupView: View {
                 if passwordMatch {
                     Task {
                         await friendsDataManager.createGroup(name: groupName, description: "A new group", password: password)
+                        let val = try await friendsDataManager.joinGroup(groupName: groupName, password: password)
+                        if val {
+                            print("works")
+                        } else {
+                            print("bruh no work")
+                        }
                         isPresented = false
                     }
                 }

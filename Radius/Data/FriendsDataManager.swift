@@ -25,6 +25,7 @@ class FriendsDataManager: ObservableObject {
     
     @Published var friends: [Profile] = []
     @Published var currentUser: Profile!
+    @Published var userGroups: [Group] = []
     
     private var userId: UUID?
 
@@ -125,9 +126,18 @@ class FriendsDataManager: ObservableObject {
     
     func joinGroup(groupName: String, password: String) async throws -> Bool {
         do {
+            let result = try await supabaseClient
+                    .from("groups")
+                    .select("id, password")
+                    .eq("name", value: groupName)
+                    .execute()
+                    .response
+
+            print("Response: \(result)")
+
             let groups: [Group] = try await supabaseClient
                 .from("groups")
-                .select("id, password")
+                .select("id, name, password")
                 .eq("name", value: groupName)
                 .execute()
                 .value
@@ -161,8 +171,20 @@ class FriendsDataManager: ObservableObject {
                 return false
             }
             
+        }  catch DecodingError.keyNotFound(let key, let context) {
+            print("Could not find key \(key) in JSON: \(context)")
+            return false
+
+        } catch DecodingError.typeMismatch(let type, let context) {
+            print("Type mismatch for type \(type) in JSON: \(context)")
+            return false
+
+        } catch DecodingError.valueNotFound(let type, let context) {
+            print("Value not found for type \(type) in JSON: \(context)")
+            return false
+
         } catch {
-            print("Failed to access group: \(error)")
+            print("General error: \(error)")
             return false
         }
     }
@@ -245,6 +267,42 @@ class FriendsDataManager: ObservableObject {
                 .execute()
         } catch {
             print("Failed to rename zone: \(error)")
+        }
+    }
+
+    func fetchUserGroups() async {
+        guard let userId = userId else {
+            print("User ID is not set")
+            return
+        }
+        do {
+            let groups: [Group] = try await supabaseClient
+                .from("group_members")
+                .select("group_id, groups!inner(name)")  // Using 'inner' to ensure a proper join.
+                .eq("profile_id", value: userId.uuidString)
+                .execute()
+                .value
+
+            DispatchQueue.main.async {
+                self.userGroups = groups
+            }
+        } catch {
+            print("Failed to fetch groups: \(error)")
+        }
+    }
+    
+    func fetchGroupMembers(groupId: UUID) async throws -> [Profile] {
+        do {
+            let members: [Profile] = try await supabaseClient
+                .from("group_members")
+                .select("profile_id, profiles(*)")
+                .eq("group_id", value: groupId.uuidString)
+                .execute()
+                .value
+            return members
+        } catch {
+            print("Failed to fetch group members: \(error)")
+            return []
         }
     }
 

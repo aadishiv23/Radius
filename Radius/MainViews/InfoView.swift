@@ -17,14 +17,36 @@ struct InfoView: View {
     
     var body: some View {
         NavigationView {
-            List(friendsDataManager.friends) { friend in
-                NavigationLink(destination: FriendProfileView(friend: friend)) {
-                    HStack {
-                        Circle()
-                            .fill(Color(friend.color))
-                            .frame(width: 30, height: 30)
-                        Text(friend.full_name)
-                            .foregroundColor(.primary)
+            List {
+                Section(header: Text("Friends")) {
+                    ForEach(friendsDataManager.friends) { friend in
+                        NavigationLink(destination: FriendProfileView(friend: friend)) {
+                            HStack {
+                                Circle()
+                                    .fill(Color(friend.color))
+                                    .frame(width: 30, height: 30)
+                                Text(friend.full_name)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                    }
+                }
+
+                Section(header: Text("Groups")) {
+                    if friendsDataManager.userGroups.isEmpty {
+                        VStack {
+                            Image(systemName: "person.3.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.gray)
+                            Text("It's lonely here, create a group!")
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                    } else {
+                        ForEach(friendsDataManager.userGroups, id: \.id) { group in
+                            GroupView(group: group)
+                        }
                     }
                 }
             }
@@ -54,6 +76,11 @@ struct InfoView: View {
             }
             .fullScreenCover(isPresented: $isPresentingJoinGroupView) {
                 JoinGroupView(isPresented: $isPresentingJoinGroupView).environmentObject(friendsDataManager)
+            }
+            .onAppear {
+                Task {
+                    await friendsDataManager.fetchUserGroups()
+                }
             }
         }
     }
