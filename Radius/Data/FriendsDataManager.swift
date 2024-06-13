@@ -25,7 +25,7 @@ class FriendsDataManager: ObservableObject {
     
     @Published var friends: [Profile] = []
     @Published var currentUser: Profile!
-    @Published var userGroups: [Group] = []
+    @Published var userGroups: [Group2] = []
     
     private var userId: UUID?
 
@@ -276,7 +276,7 @@ class FriendsDataManager: ObservableObject {
             return
         }
         do {
-            let groups: [Group] = try await supabaseClient
+            let groups: [Group2] = try await supabaseClient
                 .from("group_members")
                 .select("group_id, groups!inner(name)")  // Using 'inner' to ensure a proper join.
                 .eq("profile_id", value: userId.uuidString)

@@ -16,6 +16,14 @@ struct Group: Codable {
     let password: String
 }
 
+
+struct Group2: Codable {
+    let id: UUID
+    let name: String
+    let description: String?
+    let password: String?
+}
+
 struct Zone: Codable, Identifiable {
     let id: UUID
     let name: String

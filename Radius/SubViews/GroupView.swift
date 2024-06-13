@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct GroupView: View {
-    var group: Group
+    var group: Group2
     var body: some View {
         NavigationLink(destination: GroupDetailView(group: group)) {
             HStack {
@@ -32,7 +32,7 @@ struct GroupView: View {
 
 struct GroupDetailView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-    var group: Group
+    var group: Group2
     @State private var groupMembers: [Profile] = []
     @State private var isLoading: Bool = true
     

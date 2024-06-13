@@ -29,6 +29,8 @@ struct HomeView: View {
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
     
+    @State private var animateGradient = false
+    
 //    @StateObject private var mapRegionObserver: MapRegionObserver
 //
 //    init() {
@@ -46,10 +48,17 @@ struct HomeView: View {
             }
             .background(
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.white.opacity(0.3), Color.green.opacity(0.3)]),
+                    gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.white.opacity(0.5), Color.yellow.opacity(0.5)]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+                .edgesIgnoringSafeArea(.all)
+                .hueRotation(.degrees(animateGradient ? 45 : 0))
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                        animateGradient.toggle()
+                    }
+                }
             )
             .navigationTitle("Home")
             .toolbar {

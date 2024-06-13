@@ -26,7 +26,6 @@ struct JoinGroupView: View {
                 Button("Join Group") {
                     Task {
                         joinGroup()
-                        isPresented = false
                     }
                 }
             }

@@ -14,13 +14,37 @@ struct FriendProfileView: View {
     @State private var editingZoneId: UUID? = nil
     @State private var zoneName: String = ""
     @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @State private var iconTapped: Bool = false
+    @State private var rotationAngle: Double = 0
+
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Name: \(friend.full_name)")
-                .font(.title)
+        VStack(spacing: 20) {
+            Spacer().frame(height: 20)
+            VStack {
+                ZStack {
+                   Circle()
+                       .foregroundStyle(LinearGradient(colors: [.red, .pink, .blue], startPoint: .leading, endPoint: .trailing))
+                       .frame(width: iconTapped ? 100 : 60, height: iconTapped ? 100 : 60)
+                       .rotationEffect(.degrees(rotationAngle))
+                       .onTapGesture {
+                           withAnimation(.spring()) {
+                               iconTapped.toggle()
+                               rotationAngle += 360
+                           }
+                       }
+                   Text(friend.full_name.prefix(1))
+                       .font(.largeTitle)
+                       .fontWeight(.bold)
+                       .foregroundStyle(Color.white)
+                       .shadow(radius: iconTapped ? 10 : 5)
+               }
+            }
+            .frame(maxWidth: .infinity)
             Text("Coordinates: \(friend.latitude), \(friend.longitude)")
                 .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .center)
+            
             ForEach(friend.zones) { zone in
                 VStack {
                     if editingZoneId == zone.id {
@@ -41,6 +65,12 @@ struct FriendProfileView: View {
                             }
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(LinearGradient(gradient: Gradient(colors: [.pink, .blue]), startPoint: .leading, endPoint: .trailing), lineWidth: 2)
+                                    .padding(-5)
+                                    .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
+                            )
                     } else {
                         Text(zone.name)
                             .onTapGesture {
@@ -52,12 +82,100 @@ struct FriendProfileView: View {
                     Text(String(zone.longitude))
                     Text(String(zone.radius))
                 }
-                .background(Rectangle().foregroundStyle(.blue).opacity(0.3))
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundStyle(.blue)
+                        .opacity(0.3)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(LinearGradient(gradient: Gradient(colors: [.pink, .blue]), startPoint: .leading, endPoint: .trailing), lineWidth: 2)
+                                .opacity(editingZoneId == zone.id ? 1 : 0)
+                                .animation(.easeInOut, value: editingZoneId)
+                        )
+                )
+                .padding(.vertical, 5)
             }
             Spacer()
         }
         .padding()
         .navigationTitle(friend.full_name)
+    }
+}
+
+struct CardGradientView: View {
+    @State var rotation: CGFloat = 0.0
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .frame(width: 260, height: 340)
+                .foregroundColor(.black.opacity(0.9))
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .frame(width: 130, height: 500)
+                .foregroundStyle(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.blue, Color.red, Color.purple]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .rotationEffect(.degrees(rotation))
+                .mask {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(lineWidth: 7)
+                        .frame(width: 256, height: 336)
+                }
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
+                rotation = 360
+            }
+        }
+        
+    }
+}
+
+struct CardGradientViewV2: View {
+    @State var rotation: CGFloat = 0.0
+
+    var body: some View {
+        ZStack {
+            Color(.gray)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .frame(width: 440, height: 430)
+                .foregroundStyle(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.red, .orange, .yellow, .green, .blue, .purple, .pink]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .rotationEffect(.degrees(rotation))
+                .mask {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(lineWidth: 10)
+                        .frame(width: 250, height: 335)
+                        .blur(radius: 5)
+                }
+            
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .frame(width: 260, height: 340)
+                .foregroundColor(.black)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .frame(width: 500, height: 440)
+                .rotationEffect(.degrees(rotation))
+                .mask {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(lineWidth: 10)
+                        .frame(width: 250, height: 336)
+                }
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
+                rotation = 360
+            }
+        }
+        
     }
 }
 

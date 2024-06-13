@@ -14,6 +14,8 @@ struct InfoView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Access the shared data
     @State private var isPresentingCreateGroupView = false
     @State private var isPresentingJoinGroupView = false
+    @State private var isShownDemo: Bool = false
+
     
     var body: some View {
         NavigationView {
@@ -48,6 +50,50 @@ struct InfoView: View {
                             GroupView(group: group)
                         }
                     }
+                }
+                
+                Section(header: Text("Demos")) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Spacer()
+                            Text("Hello Fetch iOS")
+                                .font(Font.largeTitle.bold())
+                                .offset(x: 0, y: isShownDemo ? 0 : 75)
+                                .opacity(isShownDemo ? 1 : 0)
+                                .padding(4)
+                                .foregroundColor(.orange)
+                                .animation(Animation.easeOut.delay(isShownDemo ? 0.1 : 0.2))
+                            
+                            Text("WWDC24")
+                                .font(Font.largeTitle.bold())
+                                .offset(x: 0, y: isShownDemo ? 0 : 75)
+                                .opacity(isShownDemo ? 1 : 0)
+                                .padding(4)
+                                .foregroundColor(.red)
+                                .animation(Animation.easeOut.delay(0.15))
+                            
+                            Text("Animate Everything")
+                                .font(Font.largeTitle.bold())
+                                .offset(x: 0, y: isShownDemo ? 0 : 75)
+                                .opacity(isShownDemo ? 1 : 0)
+                                .padding(4)
+                                .foregroundColor(.blue)
+                                .animation(Animation.easeOut.delay(isShownDemo ? 0.2 : 0.1))
+                            
+                            Spacer()
+                            Button(action: {
+                                isShownDemo.toggle()
+                            }) {
+                                Text(isShownDemo ? "Hide" : "Show")
+                            }
+                        }
+                        Spacer()
+                    }.padding(16)
+                }
+                
+                Section(header: Text("card demo")) {
+                    NavigationLink("card demo1", destination: CardGradientView())
+                    NavigationLink("card demo2", destination: CardGradientViewV2())
                 }
             }
             .navigationTitle("Friends Info")
