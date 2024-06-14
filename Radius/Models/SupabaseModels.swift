@@ -8,8 +8,7 @@
 import Foundation
 import SwiftUI
 
-
-struct Group: Codable {
+struct Group: Codable, Identifiable {
     let id: UUID
     let name: String
     let description: String?
@@ -17,11 +16,11 @@ struct Group: Codable {
 }
 
 
-struct Group2: Codable {
+struct Group2: Codable, Identifiable {
     let id: UUID
     let name: String
     let description: String?
-    let password: String?
+    let password: String
 }
 
 struct Zone: Codable, Identifiable {
@@ -106,4 +105,9 @@ struct UpdateProfileParams: Encodable {
     case username
     case fullName = "full_name"
   }
+}
+
+struct GroupMember: Codable {
+    let group_id: UUID
+    let profile_id: UUID
 }

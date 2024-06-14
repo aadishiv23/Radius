@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct GroupView: View {
-    var group: Group2
+    var group: Group
     var body: some View {
         NavigationLink(destination: GroupDetailView(group: group)) {
             HStack {
@@ -32,7 +32,7 @@ struct GroupView: View {
 
 struct GroupDetailView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-    var group: Group2
+    var group: Group
     @State private var groupMembers: [Profile] = []
     @State private var isLoading: Bool = true
     
@@ -64,7 +64,7 @@ struct GroupDetailView: View {
     private func fetchGroupMembers() {
         Task {
             do {
-                groupMembers = try await friendsDataManager.fetchGroupMembers(groupId: group.id)
+                groupMembers = try await friendsDataManager.fetchGroupMembersProfiles(groupId: group.id)
                 isLoading = false
             } catch {
                 print("Error fetching group members: \(error)")

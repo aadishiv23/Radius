@@ -25,7 +25,7 @@ class FriendsDataManager: ObservableObject {
     
     @Published var friends: [Profile] = []
     @Published var currentUser: Profile!
-    @Published var userGroups: [Group2] = []
+    @Published var userGroups: [Group] = []
     
     private var userId: UUID?
 
@@ -270,40 +270,155 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-    func fetchUserGroups() async {
+//    func fetchUserGroups() async {
+//        guard let userId = userId else {
+//            print("User ID is not set")
+//            return
+//        }
+//        do {
+//            let groups: [Group2] = try await supabaseClient
+//                .from("group_members")
+//                .select("group_id, groups!inner(name)")  // Using 'inner' to ensure a proper join.
+//                .eq("profile_id", value: userId.uuidString)
+//                .execute()
+//                .value
+//
+//            DispatchQueue.main.async {
+//                self.userGroups = groups
+//            }
+//        } catch {
+//            print("Failed to fetch groups: \(error)")
+//        }
+//    }
+    func fetchUserGroupMembers() async -> [GroupMember] {
         guard let userId = userId else {
             print("User ID is not set")
-            return
+            return []
         }
         do {
-            let groups: [Group2] = try await supabaseClient
+            let groupMembers: [GroupMember] = try await supabaseClient
                 .from("group_members")
-                .select("group_id, groups!inner(name)")  // Using 'inner' to ensure a proper join.
+                .select("group_id, profile_id")
                 .eq("profile_id", value: userId.uuidString)
                 .execute()
                 .value
-
-            DispatchQueue.main.async {
-                self.userGroups = groups
-            }
-        } catch {
-            print("Failed to fetch groups: \(error)")
-        }
-    }
-    
-    func fetchGroupMembers(groupId: UUID) async throws -> [Profile] {
-        do {
-            let members: [Profile] = try await supabaseClient
-                .from("group_members")
-                .select("profile_id, profiles(*)")
-                .eq("group_id", value: groupId.uuidString)
-                .execute()
-                .value
-            return members
+            
+            return groupMembers
         } catch {
             print("Failed to fetch group members: \(error)")
             return []
         }
     }
+   
+    func fetchGroupsByIDs(_ groupIDs: [UUID]) async -> [Group] {
+        do {
+            // Convert UUIDs to Strings
+            let groupIDStrings = groupIDs.map { $0.uuidString }
 
+            let groups: [Group] = try await supabaseClient
+                .from("groups")
+                .select("id, name, description, password")
+                .in("id", values: groupIDStrings)
+                .execute()
+                .value
+            return groups
+        } catch {
+            print("Failed to fetch groups: \(error)")
+            return []
+        }
+    }
+
+
+    
+    func fetchUserGroups() async {
+        guard let userId = userId else {
+            print("User ID is not set")
+            return
+        }
+        
+        do {
+            // Step 1: Fetch Group Members
+            let groupMembers = await fetchUserGroupMembers()
+            let groupIDs = groupMembers.map { $0.group_id }
+            
+            guard !groupIDs.isEmpty else {
+                print("No groups found for user")
+                return
+            }
+            
+            // Step 2: Fetch Groups by IDs
+            let groups = await fetchGroupsByIDs(groupIDs)
+            
+            // Update the userGroups property on the main thread
+            DispatchQueue.main.async {
+                self.userGroups = groups
+            }
+        } catch {
+            print("Failed to fetch user groups: \(error)")
+        }
+    }
+
+
+//    func fetchUserGroupMembers() async -> [GroupMember] {
+//        guard let userId = userId else {
+//            print("User ID is not set")
+//            return []
+//        }
+//        do {
+//            let groupMembers: [GroupMember] = try await supabaseClient
+//                .from("group_members")
+//                .select("group_id, profile_id")
+//                .eq("profile_id", value: userId.uuidString)
+//                .execute()
+//                .value
+//            
+//            return groupMembers
+//        } catch {
+//            print("Failed to fetch group members: \(error)")
+//            return []
+//        }
+//    }
+//
+//    func fetchGroupMembers(groupId: UUID) async throws -> [Profile] {
+//        do {
+//            let members: [Profile] = try await supabaseClient
+//                .from("group_members")
+//                .select("profile_id, profiles(*)")
+//                .eq("group_id", value: groupId.uuidString)
+//                .execute()
+//                .value
+//            return members
+//        } catch {
+//            print("Failed to fetch group members: \(error)")
+//            return []
+//        }
+//    }
+    func fetchGroupMembersProfiles(groupId: UUID) async throws -> [Profile] {
+            do {
+                let groupMembers: [GroupMember] = try await supabaseClient
+                    .from("group_members")
+                    .select("profile_id")
+                    .eq("group_id", value: groupId.uuidString)
+                    .execute()
+                    .value
+
+                let profileIDs = groupMembers.map { $0.profile_id }
+                
+                guard !profileIDs.isEmpty else {
+                    return []
+                }
+
+                let profiles: [Profile] = try await supabaseClient
+                    .from("profiles")
+                    .select("*")
+                    .in("id", values: profileIDs.map { $0.uuidString })
+                    .execute()
+                    .value
+                
+                return profiles
+            } catch {
+                print("Failed to fetch group members' profiles: \(error)")
+                throw error
+            }
+        }
 }
