@@ -15,6 +15,7 @@ struct InfoView: View {
     @State private var isPresentingCreateGroupView = false
     @State private var isPresentingJoinGroupView = false
     @State private var isShownDemo: Bool = false
+    @State private var animateGradient = false
 
     
     var body: some View {
@@ -31,6 +32,20 @@ struct InfoView: View {
                                     .foregroundColor(.primary)
                             }
                         }
+//                        .listRowBackground(
+//                            LinearGradient(
+//                                gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.white.opacity(0.5), Color.yellow.opacity(0.5)]),
+//                                startPoint: .topLeading,
+//                                endPoint: .bottomTrailing
+//                            )
+//                            .edgesIgnoringSafeArea(.all)
+//                            .hueRotation(.degrees(animateGradient ? 45 : 0))
+//                            .onAppear {
+//                                withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+//                                    animateGradient.toggle()
+//                                }
+//                            }
+//                        )
                     }
                 }
 
@@ -97,6 +112,21 @@ struct InfoView: View {
                 }
             }
             .navigationTitle("Friends Info")
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.white.opacity(0.5), Color.yellow.opacity(0.5)]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .edgesIgnoringSafeArea(.all)
+                .hueRotation(.degrees(animateGradient ? 45 : 0))
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                        animateGradient.toggle()
+                    }
+                }
+            )
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
