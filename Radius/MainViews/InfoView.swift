@@ -67,49 +67,49 @@ struct InfoView: View {
                     }
                 }
                 
-                Section(header: Text("Demos")) {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Spacer()
-                            Text("Hello Fetch iOS")
-                                .font(Font.largeTitle.bold())
-                                .offset(x: 0, y: isShownDemo ? 0 : 75)
-                                .opacity(isShownDemo ? 1 : 0)
-                                .padding(4)
-                                .foregroundColor(.orange)
-                                .animation(Animation.easeOut.delay(isShownDemo ? 0.1 : 0.2))
-                            
-                            Text("WWDC24")
-                                .font(Font.largeTitle.bold())
-                                .offset(x: 0, y: isShownDemo ? 0 : 75)
-                                .opacity(isShownDemo ? 1 : 0)
-                                .padding(4)
-                                .foregroundColor(.red)
-                                .animation(Animation.easeOut.delay(0.15))
-                            
-                            Text("Animate Everything")
-                                .font(Font.largeTitle.bold())
-                                .offset(x: 0, y: isShownDemo ? 0 : 75)
-                                .opacity(isShownDemo ? 1 : 0)
-                                .padding(4)
-                                .foregroundColor(.blue)
-                                .animation(Animation.easeOut.delay(isShownDemo ? 0.2 : 0.1))
-                            
-                            Spacer()
-                            Button(action: {
-                                isShownDemo.toggle()
-                            }) {
-                                Text(isShownDemo ? "Hide" : "Show")
-                            }
-                        }
-                        Spacer()
-                    }.padding(16)
-                }
+//                Section(header: Text("Demos")) {
+//                    HStack {
+//                        VStack(alignment: .leading) {
+//                            Spacer()
+//                            Text("Hello Fetch iOS")
+//                                .font(Font.largeTitle.bold())
+//                                .offset(x: 0, y: isShownDemo ? 0 : 75)
+//                                .opacity(isShownDemo ? 1 : 0)
+//                                .padding(4)
+//                                .foregroundColor(.orange)
+//                                .animation(Animation.easeOut.delay(isShownDemo ? 0.1 : 0.2))
+//                            
+//                            Text("WWDC24")
+//                                .font(Font.largeTitle.bold())
+//                                .offset(x: 0, y: isShownDemo ? 0 : 75)
+//                                .opacity(isShownDemo ? 1 : 0)
+//                                .padding(4)
+//                                .foregroundColor(.red)
+//                                .animation(Animation.easeOut.delay(0.15))
+//                            
+//                            Text("Animate Everything")
+//                                .font(Font.largeTitle.bold())
+//                                .offset(x: 0, y: isShownDemo ? 0 : 75)
+//                                .opacity(isShownDemo ? 1 : 0)
+//                                .padding(4)
+//                                .foregroundColor(.blue)
+//                                .animation(Animation.easeOut.delay(isShownDemo ? 0.2 : 0.1))
+//                            
+//                            Spacer()
+//                            Button(action: {
+//                                isShownDemo.toggle()
+//                            }) {
+//                                Text(isShownDemo ? "Hide" : "Show")
+//                            }
+//                        }
+//                        Spacer()
+//                    }.padding(16)
+//                }
                 
-                Section(header: Text("card demo")) {
-                    NavigationLink("card demo1", destination: CardGradientView())
-                    NavigationLink("card demo2", destination: CardGradientViewV2())
-                }
+//                Section(header: Text("card demo")) {
+//                    NavigationLink("card demo1", destination: CardGradientView())
+//                    NavigationLink("card demo2", destination: CardGradientViewV2())
+//                }
             }
             .navigationTitle("Friends Info")
             .scrollContentBackground(.hidden)
@@ -120,12 +120,12 @@ struct InfoView: View {
                     endPoint: .bottomTrailing
                 )
                 .edgesIgnoringSafeArea(.all)
-                .hueRotation(.degrees(animateGradient ? 45 : 0))
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                        animateGradient.toggle()
-                    }
-                }
+//                .hueRotation(.degrees(animateGradient ? 45 : 0))
+//                .onAppear {
+//                    withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+//                        animateGradient.toggle()
+//                    }
+//                }
             )
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
