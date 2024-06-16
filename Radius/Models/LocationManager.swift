@@ -46,10 +46,28 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let newLocation = locations.last {
-            self.userLocation = newLocation
-            if shouldUploadLocation(newLocation) {
-                uploadLocation(newLocation)
+        guard let newLocation = locations.last else { return }
+        
+        self.userLocation = newLocation
+        if shouldUploadLocation(newLocation) {
+            uploadLocation(newLocation)
+        }
+        
+        checkZoneBoundaries(for: newLocation)
+    }
+    
+    private func checkZoneBoundaries(for location: CLLocation) {
+        Task {
+            await fdm.fetchCurrentUserProfile()
+            guard let currentUser = fdm.currentUser else { return }
+            
+            for zone in currentUser.zones {
+                let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
+                   if location.distance(from: zoneCenter) > zone.radius {
+                       // User has left the zone
+                      // userLeftZone(zone, at: location.timestamp)
+                       break
+                   }
             }
         }
     }
