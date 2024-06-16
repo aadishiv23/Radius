@@ -49,6 +49,7 @@
 		ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */; };
 		ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */; };
 		ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFE2C193F8500E12E0B /* GroupView.swift */; };
+		ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB24E92C11698800D9693F /* AddGroupView.swift */; };
@@ -93,6 +94,7 @@
 		ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupView.swift; sourceTree = "<group>"; };
 		ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGroupView.swift; sourceTree = "<group>"; };
 		ACAEFDFE2C193F8500E12E0B /* GroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupView.swift; sourceTree = "<group>"; };
+		ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeManager.swift; sourceTree = "<group>"; };
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 				ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */,
 				ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */,
 				AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */,
+				ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				AC79CD982BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld in Sources */,
 				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
 				ACC537302BF3258300BECF8A /* Stuff.swift in Sources */,
+				ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */,
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */,
