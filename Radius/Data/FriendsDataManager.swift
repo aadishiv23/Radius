@@ -33,6 +33,68 @@ class FriendsDataManager: ObservableObject {
     
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
+        Task {
+            let channel = await supabase.realtimeV2.channel("public:profiles")
+            
+            let insertions = await channel.postgresChange(InsertAction.self, schema: "public", table: "profiles")
+            let updates = await channel.postgresChange(UpdateAction.self, table: "profiles")
+            let deletions = await channel.postgresChange(DeleteAction.self, table: "profiles")
+            
+            await channel.subscribe()
+            
+            Task {
+                for await insertion in insertions {
+                    handleInsertedChannel(insertion)
+                }
+            }
+            
+            Task {
+                for await update in updates {
+                    handleUpdatedChannel(update)
+                }
+            }
+            
+            Task {
+                for await deletion in deletions {
+                    handleDeletionChannel(deletion)
+                }
+            }
+        }
+    }
+    
+    private func handleInsertedChannel(_ action: InsertAction) {
+        do {
+            let newProfile = try action.decodeRecord(decoder: decoder) as Profile
+            friends.append(newProfile)
+        } catch {
+            print("Failed to handle InsertedChannel due to \(error)")
+        }
+    }
+    
+    private func handleUpdatedChannel(_ action: UpdateAction) {
+        do {
+            let updatedProfile = try action.decodeRecord(decoder: decoder) as Profile
+            if let index = friends.firstIndex(where: { $0.id == updatedProfile.id }) {
+                DispatchQueue.main.async {
+                    self.friends[index] = updatedProfile
+                }
+            }
+        } catch {
+            print("Failed to handle updated channel due to \(error)")
+        }
+    }
+    
+    private func handleDeletionChannel(_ action: DeleteAction) {
+        do {
+            let profileToDelete = try action.decodeOldRecord(decoder: decoder) as Profile
+            if let index = friends.firstIndex(where: { $0.id == profileToDelete.id }) {
+                DispatchQueue.main.async {
+                    self.friends.remove(at: index)
+                }
+            }
+        } catch {
+            print("Failed to handle deleted channel update due to \(error)")
+        }
     }
     
     private func hashPassword(_ password: String) -> String {

@@ -16,6 +16,18 @@ let supabase = SupabaseClient(
 )
 
 
+let encoder: JSONEncoder = {
+  let encoder = PostgrestClient.Configuration.jsonEncoder
+  encoder.keyEncodingStrategy = .convertToSnakeCase
+  return encoder
+}()
+
+let decoder: JSONDecoder = {
+  let decoder = PostgrestClient.Configuration.jsonDecoder
+  decoder.keyDecodingStrategy = .convertFromSnakeCase
+  return decoder
+}()
+
 extension Color {
     init?(hex: String) {
         let r, g, b: Double
