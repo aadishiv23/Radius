@@ -62,7 +62,7 @@ struct Profile: Decodable, Identifiable {
         color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#FFFFFF"
         latitude = try container.decodeIfPresent(Double.self, forKey: .latitude) ?? 0.0
         longitude = try container.decodeIfPresent(Double.self, forKey: .longitude) ?? 0.0
-        phone_num = try container.decodeIfPresent(String.self, forKey: .phone_num)!
+        phone_num = try container.decodeIfPresent(String.self, forKey: .phone_num) ?? "123456789"
         zones = try container.decodeIfPresent([Zone].self, forKey: .zones) ?? []
     }
     

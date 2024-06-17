@@ -17,7 +17,7 @@ struct FriendProfileView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var iconTapped: Bool = false
     @State private var rotationAngle: Double = 0
-
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -98,60 +98,19 @@ struct FriendProfileView: View {
                         .shadow(radius: 5)
                 }
             }
-//            ForEach(friend.zones) { zone in
-//                VStack {
-//                    if editingZoneId == zone.id {
-//                        TextField("Zone name", text: $zoneName)
-//                            .onSubmit {
-//                                Task {
-//                                    do {
-//                                        try await friendsDataManager.renameZone(zoneId: zone.id, newName: zoneName)
-//                                        // Refresh friend profile data here or use an observable object to trigger a view update.
-//                                        editingZoneId = nil // Exit editing mode after saving.
-//                                    } catch {
-//                                        print("Failed to rename zone")
-//                                    }
-//                                }
-//                            }
-//                            .onAppear {
-//                                zoneName = zone.name
-//                            }
-//                            .textFieldStyle(RoundedBorderTextFieldStyle())
-//                            .padding()
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 10)
-//                                    .stroke(LinearGradient(gradient: Gradient(colors: [.pink, .blue]), startPoint: .leading, endPoint: .trailing), lineWidth: 2)
-//                                    .padding(-5)
-//                                    .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
-//                            )
-//                    } else {
-//                        Text(zone.name)
-//                            .onTapGesture {
-//                                editingZoneId = zone.id
-//                                zoneName = zone.name
-//                            }
-//                    }
-//                    Text(String(zone.latitude))
-//                    Text(String(zone.longitude))
-//                    Text(String(zone.radius))
-//                }
-//                .background(
-//                    RoundedRectangle(cornerRadius: 10)
-//                        .foregroundStyle(.blue)
-//                        .opacity(0.3)
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: 10)
-//                                .stroke(LinearGradient(gradient: Gradient(colors: [.pink, .blue]), startPoint: .leading, endPoint: .trailing), lineWidth: 2)
-//                                .opacity(editingZoneId == zone.id ? 1 : 0)
-//                                .animation(.easeInOut, value: editingZoneId)
-//                        )
-//                )
-//                .padding(.vertical, 5)
-//            }
-//            Spacer()
         }
         //.padding()
         .navigationTitle(friend.full_name)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    dismiss()
+                }, label: {
+                    Label("Back", systemImage: "arrow.backward")
+                })
+            }
+        }
     }
 }
 
@@ -183,7 +142,7 @@ struct PolaroidCard: View {
     var body: some View {
         VStack {
             MapViewForPolaroid(coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
-                .frame(height: 150)
+                .frame(height: 200)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -192,20 +151,19 @@ struct PolaroidCard: View {
             
             VStack {
                 Text("\(zone.name)")
-                    .font(.footnote)
-                    .padding(.top, 5)
-                    .padding(.bottom, 10)
+                    .font(.headline)
+                    .padding(.bottom, 5)
                     .foregroundColor(.black)
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
             .background(Color.white)
-//            .cornerRadius(10)
-//            .shadow(radius: 5)
         }
+        .padding(5)
         .frame(width: 200)
         .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 5)
+        .cornerRadius(15)
+        .shadow(radius: 5, x: 0, y: 5)
     }
 }
 
@@ -338,4 +296,29 @@ struct CardGradientViewV2: View {
         }
         
     }
+}
+
+#Preview {
+    PolaroidCard(zone: Zone(
+        id: UUID(),
+        name: "Central Park",
+        latitude: 40.785091,
+        longitude: -73.968285,
+        radius: 500,
+        profile_id: UUID()
+    ))
+//    struct PolaroidCard_Previews: PreviewProvider {
+//        static var previews: some View {
+//            PolaroidCard(zone: Zone(
+//                id: UUID(),
+//                name: "Central Park",
+//                latitude: 40.785091,
+//                longitude: -73.968285,
+//                radius: 500
+//            ))
+//            .previewLayout(.sizeThatFits)
+//            .padding(10)
+//            .background(Color.gray.edgesIgnoringSafeArea(.all))
+//        }
+//    }
 }
