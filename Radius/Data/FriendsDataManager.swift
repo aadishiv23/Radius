@@ -459,7 +459,7 @@ class FriendsDataManager: ObservableObject {
             do {
                 let groupMembers: [GroupMember] = try await supabaseClient
                     .from("group_members")
-                    .select("profile_id")
+                    .select("group_id, profile_id")
                     .eq("group_id", value: groupId.uuidString)
                     .execute()
                     .value
