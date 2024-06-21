@@ -53,6 +53,7 @@
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB24E92C11698800D9693F /* AddGroupView.swift */; };
+		ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -99,6 +100,7 @@
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ACEB24E92C11698800D9693F /* AddGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGroupView.swift; sourceTree = "<group>"; };
+		ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressResult+AnnotationItem.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +163,7 @@
 		AC0AC7002BDB0EFC000418B8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				ACED0C8A2C25328700D30D15 /* AddressEntryModels */,
 				AC6A552C2BD9A32F00706E01 /* Friends.swift */,
 				ACCFF2C52BC22AF400D9265B /* LocationManager.swift */,
 				AC0AC7012BDB0F2F000418B8 /* LocationViewModel.swift */,
@@ -253,6 +256,14 @@
 				AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		ACED0C8A2C25328700D30D15 /* AddressEntryModels */ = {
+			isa = PBXGroup;
+			children = (
+				ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */,
+			);
+			path = AddressEntryModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -363,6 +374,7 @@
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */,
 				AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */,
+				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
