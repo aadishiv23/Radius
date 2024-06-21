@@ -8,44 +8,93 @@
 import Foundation
 import SwiftUI
 import CoreLocation
+import MapKit
 
 struct AddressEntryView: View {
-    @Binding var showView: Bool
-    @Binding var locationToAdd: CLLocationCoordinate2D?
-    @State private var address: String = ""
-
+    //@Binding var showView: Bool
+    //@Binding var locationToAdd: CLLocationCoordinate2D?
+    
+    @StateObject var viewModel: AddressEntryViewModel = AddressEntryViewModel()
+    @FocusState private var isFocusedTextField: Bool
     
     var body: some View {
-        Form {
-            Section(header: Text("Enter Address")) {
-                TextField("Address", text: $address)
-                Button("Confirm") {
-                    geocodeAddress(address)
-                }
-            }
-        }
-        .navigationTitle("Add Zone")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Map Editor") {
-                    showView = false
-                }
+        NavigationView {
+            VStack(alignment: .leading, spacing: 0) {
+                TextField("Type address", text: $viewModel.searchableText)
+                    .padding()
+                    .autocorrectionDisabled()
+                    .focused($isFocusedTextField)
+                    .font(.title)
+                    .onReceive(
+                        viewModel.$searchableText.debounce(
+                            for: .seconds(1),
+                            scheduler: DispatchQueue.main
+                        )
+                    ) {
+                        viewModel.searchAddress($0)
+                    }
+                    .background(Color.init(uiColor: .systemBackground))
+//                    .overlay {
+//                        ClearButton(text: $viewModel.searchableText)
+//                            .padding(.trailing)
+//                            .padding(.top, 8)
+//                    }
+                    .onAppear {
+                        isFocusedTextField = true
+                    }
+                
+                List(self.viewModel.results) { address in
+                        AddressRow(address: address)
+                            .listRowBackground(backgroundColor)
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
             }
         }
     }
-    
-    private func geocodeAddress(_ address: String) {
-        let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(address) { placemarks, error in
-            if let placemark = placemarks?.first, let location = placemark.location {
-                self.locationToAdd = location.coordinate
-                self.showView = false
-            }
-            else {
-                print("Address geocoding failed: \(error?.localizedDescription ?? "Unknown error")")
-            }
-        }
-    }
+    var backgroundColor: Color = Color.init(uiColor: .systemGray6)
 }
 
 
+struct AddressRow: View {
+    
+    let address: AddressResult
+    
+    var body: some View {
+        NavigationLink {
+            AddressEntryMapView(address: address)
+        } label: {
+            VStack(alignment: .leading) {
+                Text(address.title)
+                Text(address.subtitle)
+                    .font(.caption)
+            }
+        }
+        .padding(.bottom, 2)
+    }
+}
+
+struct AddressEntryMapView: View {
+    
+    @StateObject private var viewModel = AddressEntryMapViewModel()
+
+    private let address: AddressResult
+    
+    init(address: AddressResult) {
+        self.address = address
+    }
+    
+    var body: some View {
+        Map(
+            coordinateRegion: $viewModel.region,
+            annotationItems: viewModel.annotationItems,
+            annotationContent: { item in
+                MapMarker(coordinate: item.coordinate)
+            }
+        )
+        .onAppear {
+            self.viewModel.getPlace(from: address)
+        }
+        .edgesIgnoringSafeArea(.bottom)
+    }
+}

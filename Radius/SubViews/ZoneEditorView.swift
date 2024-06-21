@@ -31,8 +31,8 @@ struct ZoneEditorView: View {
                         .focused($isTextFieldFocused)
                     
                     if showAddressEntry {
-                        AddressEntryView(showView: $showAddressEntry, locationToAdd: $newZoneLocation)
-                            .padding()
+                        //AddressEntryView(showView: $showAddressEntry, locationToAdd: $newZoneLocation)
+                        NavigationLink("Address Entry", destination: AddressEntryView()   )
                     } else {
                         MapView(region: $mapRegion, location: $newZoneLocation, radius: $newZoneRadius)
                             .frame(height: 300)
