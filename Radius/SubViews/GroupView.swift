@@ -10,6 +10,7 @@ import SwiftUI
 
 struct GroupView: View {
     var group: Group
+    
     var body: some View {
         NavigationLink(destination: GroupDetailView(group: group)) {
             HStack {
@@ -37,6 +38,14 @@ struct GroupDetailView: View {
     @State private var isLoading: Bool = true
     
     var body: some View {
+        mainContent
+            .navigationTitle(group.name)
+            .onAppear {
+                fetchGroupMembers()
+            }
+    }
+    
+    @ViewBuilder private var mainContent: some View {
         List {
             if isLoading {
                 ProgressView("Loading...")
@@ -44,20 +53,26 @@ struct GroupDetailView: View {
                 Text("No members found")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(groupMembers, id: \.id) { member in
-                    HStack {
-                        Circle()
-                            .fill(Color.blue)  // Assuming 'color' is a string property in Profile
-                            .frame(width: 30, height: 30)
-                        Text(member.full_name)
-                            .foregroundColor(.primary)
-                    }
-                }
+                existingGroupMemberView
             }
         }
-        .navigationTitle(group.name)
-        .onAppear {
-            fetchGroupMembers()
+    }
+    
+    @ViewBuilder private var existingGroupMemberView: some View {
+        groupMembersList
+    }
+    
+    @ViewBuilder private var groupMembersList: some View {
+        ForEach(groupMembers, id: \.id) { member in
+            NavigationLink(destination: FriendProfileView(friend: member)) {
+                HStack {
+                    Circle()
+                        .fill(Color.blue)  // Assuming 'color' is a string property in Profile
+                        .frame(width: 30, height: 30)
+                    Text(member.full_name)
+                        .foregroundColor(.primary)
+                }
+            }
         }
     }
     

@@ -15,6 +15,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     private let minimumDistance: CLLocationDistance = 50 // Set the minimum distance to 50 meters
     private let fdm = FriendsDataManager(supabaseClient: supabase)
     
+    private var userZones: [Zone] = []
+    private var lastZoneStatuses: [UUID: Bool] = [:] // Tracks whether user was in each zone
 
 
     @Published var userLocation: CLLocation?
@@ -24,6 +26,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         self.checkLocationAuthorization()
+        self.locationManager.distanceFilter = 10 // Update location every 10 meters
     }
     
     func checkLocationAuthorization() {
@@ -56,27 +59,43 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         checkZoneBoundaries(for: newLocation)
     }
     
-    private func checkZoneBoundaries(for location: CLLocation) {
-        Task {
-            await fdm.fetchCurrentUserProfile()
-            guard let currentUser = fdm.currentUser else { return }
-            
-            for zone in currentUser.zones {
-                let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
-                   if location.distance(from: zoneCenter) > zone.radius {
-                       // User has left the zone
-                      // userLeftZone(zone, at: location.timestamp)
-                       break
-                       //await userLeftZone(zone, at: location.timestamp)
-                   }
-            }
+    private func fetchUserZones() async {
+        await fdm.fetchCurrentUserProfile()
+        guard let currentUser = fdm.currentUser else { return }
+        self.userZones = currentUser.zones
+        
+        // Initialize lastZoneStatuses
+        for zone in userZones {
+            lastZoneStatuses[zone.id] = isUserInZone(zone: zone, location: userLocation)
         }
+    }
+    
+    private func checkZoneBoundaries(for location: CLLocation) {
+        for zone in userZones {
+            let wasInZone = lastZoneStatuses[zone.id] ?? false
+            let isInZone = isUserInZone(zone: zone, location: location)
+            
+            if wasInZone && !isInZone {
+                // User has left the zone
+                Task {
+                    await userLeftZone(zone, at: location.timestamp)
+                }
+            }
+            
+            lastZoneStatuses[zone.id] = isInZone
+        }
+    }
+    
+    private func isUserInZone(zone: Zone, location: CLLocation?) -> Bool {
+        guard let location = location else { return false }
+        let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
+        return location.distance(from: zoneCenter) <= zone.radius
     }
     
     private func userLeftZone(_ zone: Zone, at time: Date) async {
        do {
            let zoneExit = [
-            "profile_id": fdm.currentUser?.id.uuidString ?? "",
+                "profile_id": fdm.currentUser?.id.uuidString ?? "",
                "zone_id": zone.id.uuidString,
                "exit_time": ISO8601DateFormatter().string(from: time)
            ]
@@ -131,6 +150,12 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     func startUpdatingLocation() {
        locationManager.startUpdatingLocation()
+        Task {
+            while true {
+                await fetchUserZones()
+                try? await Task.sleep(nanoseconds: 5 * 60 * 1_000_000_000) // Refresh every 5 minutes
+            }
+        }
     }
 
     func stopUpdatingLocation() {
