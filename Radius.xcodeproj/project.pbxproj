@@ -56,6 +56,7 @@
 		ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */; };
 		ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */; };
 		ACED0C912C2534DD00D30D15 /* AddressEntryMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */; };
+		ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -105,6 +106,7 @@
 		ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressResult+AnnotationItem.swift"; sourceTree = "<group>"; };
 		ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryViewModel.swift; sourceTree = "<group>"; };
 		ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryMapViewModel.swift; sourceTree = "<group>"; };
+		ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneExitIntent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +215,7 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				ACF5DA802C27E89A00123843 /* AppIntents */,
 				AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */,
 				ACED0C8D2C25331B00D30D15 /* ViewModels */,
 				AC9BD1CA2BEB0E6B00D23123 /* Helpers */,
@@ -278,6 +281,14 @@
 				ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		ACF5DA802C27E89A00123843 /* AppIntents */ = {
+			isa = PBXGroup;
+			children = (
+				ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */,
+			);
+			path = AppIntents;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -390,6 +401,7 @@
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
 				AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */,
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
+				ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,

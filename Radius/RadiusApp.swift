@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Supabase
+import AppIntents
 
 @main
 struct RadiusApp: App {

@@ -66,7 +66,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
                    if location.distance(from: zoneCenter) > zone.radius {
                        // User has left the zone
                       // userLeftZone(zone, at: location.timestamp)
-                       await userLeftZone(zone, at: location.timestamp)
+                       break
+                       //await userLeftZone(zone, at: location.timestamp)
                    }
             }
         }

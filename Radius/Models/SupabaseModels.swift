@@ -33,7 +33,7 @@ struct Zone: Codable, Identifiable {
     
 }
 
-struct Profile: Decodable, Identifiable {
+struct Profile: Codable, Identifiable {
     let id: UUID
     let username: String
     let full_name: String
