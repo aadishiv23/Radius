@@ -37,6 +37,8 @@ struct MapView: UIViewRepresentable {
             
             let circle = MKCircle(center: location, radius: radius)
             uiView.addOverlay(circle)
+            
+            context.coordinator.adjustMapView(uiView, forLocation: location, withRadius: radius)
         }
     }
 
@@ -65,9 +67,19 @@ struct MapView: UIViewRepresentable {
                 circleRenderer.strokeColor = .blue
                 circleRenderer.fillColor = .blue.withAlphaComponent(0.5)
                 circleRenderer.lineWidth = 1
+                
+                circleRenderer.alpha = 0
+                UIView.animate(withDuration: 0.25) {
+                    circleRenderer.alpha = 1
+                }
                 return circleRenderer
             }
             return MKOverlayRenderer(overlay: overlay)
+        }
+        
+        func adjustMapView(_ mapView: MKMapView, forLocation location: CLLocationCoordinate2D, withRadius radius: CLLocationDistance) {
+            let region = MKCoordinateRegion(center: location, latitudinalMeters: radius * 2.5, longitudinalMeters: radius * 2.5)
+            mapView.setRegion(region, animated: true)
         }
     }
 }

@@ -41,13 +41,22 @@ struct AddressEntryView: View {
                     self.isPresenting = false
                 }
             } else {
-                List(viewModel.results) { address in
-                    AddressRow(address: address)
-                        .onTapGesture {
-                            selectedAddress = address
-                        }
+                ZStack {
+                    List(viewModel.results) { address in
+                        AddressRow(address: address)
+                            .onTapGesture {
+                                selectedAddress = address
+                            }
+                    }
+                    .listStyle(.plain)
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.black.opacity(0.1))
+                            .foregroundStyle(Color.purple)
+                    }
                 }
-                .listStyle(.plain)
             }
         }
         .onAppear {

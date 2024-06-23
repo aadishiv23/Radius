@@ -11,6 +11,7 @@ import MapKit
 class AddressEntryViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published private(set) var results: Array<AddressResult> = []
     @Published var searchableText = ""
+    @Published var isLoading = false
     
     // mklcoalsearch compeltere is a utility object for generating list of commpletion string based on partial string provided by user
     private lazy var localSearchCompleter: MKLocalSearchCompleter = {
@@ -20,8 +21,10 @@ class AddressEntryViewModel: NSObject, ObservableObject, MKLocalSearchCompleterD
     }()
     
     func searchAddress(_ searchableText: String) {
+        self.isLoading = true
         guard searchableText.isEmpty == false else { return }
         localSearchCompleter.queryFragment = searchableText
+        self.isLoading = false
     }
     
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {

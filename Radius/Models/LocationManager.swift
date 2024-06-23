@@ -66,11 +66,30 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
                    if location.distance(from: zoneCenter) > zone.radius {
                        // User has left the zone
                       // userLeftZone(zone, at: location.timestamp)
-                       break
+                       await userLeftZone(zone, at: location.timestamp)
                    }
             }
         }
     }
+    
+    private func userLeftZone(_ zone: Zone, at time: Date) async {
+       do {
+           let zoneExit = [
+            "profile_id": fdm.currentUser?.id.uuidString ?? "",
+               "zone_id": zone.id.uuidString,
+               "exit_time": ISO8601DateFormatter().string(from: time)
+           ]
+           
+           try await supabase
+               .from("zone_exits")
+               .insert(zoneExit)
+               .execute()
+           
+           print("Zone exit recorded successfully")
+       } catch {
+           print("Failed to record zone exit: \(error)")
+       }
+   }
     
     private func shouldUploadLocation(_ newLocation: CLLocation) -> Bool {
         guard let lastLocation = lastUploadedLocation else {
