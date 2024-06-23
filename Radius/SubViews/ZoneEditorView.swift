@@ -15,7 +15,7 @@ struct ZoneEditorView: View {
     @Binding var userZones: [Zone]
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var newZoneLocation: CLLocationCoordinate2D?
-    @State private var newZoneRadius: Double = 100.0
+    @State private var zoneRadius: Double = 100.0
     @State private var showAddressEntry: Bool = false
     @State private var mapRegion: MKCoordinateRegion = MKCoordinateRegion.defaultRegion
     @State private var zoneName: String = ""
@@ -30,33 +30,25 @@ struct ZoneEditorView: View {
                         .padding()
                         .focused($isTextFieldFocused)
                     
-                    if showAddressEntry {
-                        //AddressEntryView(showView: $showAddressEntry, locationToAdd: $newZoneLocation)
-                        NavigationLink("Address Entry", destination: AddressEntryView(isPresenting: $isPresenting, userZones: $userZones))
-                    } else {
-                        MapView(region: $mapRegion, location: $newZoneLocation, radius: $newZoneRadius)
-                            .frame(height: 300)
-                            .padding()
-                    }
+                    MapView(region: $mapRegion, location: $newZoneLocation, radius: $zoneRadius)
+                        .frame(height: 300)
+                        .padding()
 
-                    Slider(value: $newZoneRadius, in: 10...500, step: 5)
+                    Slider(value: $zoneRadius, in: 10...500, step: 5)
                         .padding()
                     
-                    Text("Radius: \(newZoneRadius, specifier: "%.1f") meters") // Display the radius with one decimal point
-                                            .padding()
+                    Text("Radius: \(zoneRadius, specifier: "%.1f") meters")
+                        .padding()
                     
-                    Spacer()
+                    Button("Enter Address") {
+                        showAddressEntry = true
+                    }
+                    .padding()
                     
-                    Button(action: {
-                        if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
-                            let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: newZoneRadius, profile_id: currentUser.id)
-                            self.userZones.append(newZone)
-                            self.isPresenting = false
-                        }
-                    }, label: {
-                        Text("Save Zone")
-                    })
-                    .disabled(newZoneLocation == nil)
+                    Button("Save Zone") {
+                        saveZone()
+                    }
+                    .disabled(newZoneLocation == nil || zoneName.isEmpty)
                     .padding()
                 }
                 .navigationTitle("Add Zone")
@@ -66,28 +58,31 @@ struct ZoneEditorView: View {
                             isPresenting = false
                         }
                     }
-                    if !showAddressEntry {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Address") {
-                                showAddressEntry.toggle()
-                            }
-                        }
-                    }
-                }
-                .onAppear {
-                    if let userLocation = LocationManager.shared.userLocation {
-                        mapRegion = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-                        newZoneLocation = userLocation.coordinate
-                    }
-                }
-                .onChange(of: isTextFieldFocused) { focused in
-                    if !focused {
-                        // Handle any additional actions when the TextField loses focus
-                    }
                 }
             }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+        .sheet(isPresented: $showAddressEntry) {
+            AddressEntryView(
+                isPresenting: $showAddressEntry,
+                newZoneLocation: $newZoneLocation,
+                zoneName: $zoneName,
+                zoneRadius: $zoneRadius
+            )
+        }
+        .onAppear {
+            if let userLocation = LocationManager.shared.userLocation {
+                mapRegion = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                newZoneLocation = userLocation.coordinate
+            }
+        }
+    }
+    
+    private func saveZone() {
+        if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
+            let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: zoneRadius, profile_id: currentUser.id)
+            self.userZones.append(newZone)
+            self.isPresenting = false
+        }
     }
 }
 
