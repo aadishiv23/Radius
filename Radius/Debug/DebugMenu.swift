@@ -12,6 +12,7 @@ struct DebugMenuView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var zoneExits: [ZoneExit] = []
     @State private var isLoading = false
+    @State private var zones: [Zone] = []
     
     var body: some View {
         List {
@@ -60,6 +61,31 @@ struct DebugMenuView: View {
                     }
                 }
             }
+            ///  let id: UUID
+//            let name: String
+//            let latitude: Double
+//            let longitude: Double
+//            let radius: Double
+//            let profile_id: UUID
+//
+            Section(header: Text("User zones")) {
+                if isLoading {
+                    ProgressView()
+                }
+                else {
+                    ForEach(zones, id: \.id) { zone in
+                        VStack(alignment: .leading) {
+                            Text("Zone ID: \(zone.id)")
+                            Text("Zone Name: \(zone.name)")
+                            Text("Zone latitude: \(zone.latitude)")
+                            Text("Zone longitude: \(zone.longitude)")
+                            Text("Zone Radius: \(zone.radius)")
+                            Text("Assoc Profile ID: \(zone.profile_id)")
+                        }
+                        
+                    }
+                }
+            }
         }
         .navigationTitle("Debug Menu")
         .onAppear {
@@ -68,6 +94,11 @@ struct DebugMenuView: View {
         .refreshable {
             await friendsDataManager.fetchCurrentUserProfile()
             await friendsDataManager.fetchUserGroups()
+            do {
+                try await zones = friendsDataManager.fetchZones(for: friendsDataManager.currentUser.id)
+            } catch {
+                print("couldnt fetch zones: \(error)")
+            }
             fetchZoneExits()
         }
     }
