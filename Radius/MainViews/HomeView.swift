@@ -24,6 +24,7 @@ struct HomeView: View {
     @State private var buttonScale: CGFloat = 1.0
     @State private var isPresentingZoneEditor = false
     @State private var isPresentingGroupView = false
+    @State private var isPresentingDebugMenu = false
     
     @State private var userZones: [Zone] = []
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
@@ -75,6 +76,12 @@ struct HomeView: View {
                         } label: {
                             Label("Add Group", systemImage: "person.3")
                         }
+                        
+                        Button {
+                            isPresentingDebugMenu = true
+                        } label: {
+                            Label("Debug Menu", systemImage: "ladybug")
+                        }
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -95,6 +102,11 @@ struct HomeView: View {
             .sheet(isPresented: $isPresentingGroupView) {
                 AddGroupView()
             }
+            .sheet(isPresented: $isPresentingDebugMenu) {
+                NavigationView {
+                    DebugMenuView()
+                }
+            }
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
             }
@@ -103,9 +115,9 @@ struct HomeView: View {
             locationViewModel.checkIfLocationServicesIsEnabled()
             locationViewModel.plsInitiateLocationUpdates()
             region = MKCoordinateRegion(center:
-                                            CLLocationCoordinate2D(latitude: friendsDataManager.currentUser?.latitude ?? 40.7128,
-                                                                   longitude: friendsDataManager.currentUser?.longitude ?? -74.0060),
-                                                                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                CLLocationCoordinate2D(latitude: friendsDataManager.currentUser?.latitude ?? 40.7128,
+                   longitude: friendsDataManager.currentUser?.longitude ?? -74.0060),
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             Task {
                 if let userId = friendsDataManager.currentUser?.id {
                     await friendsDataManager.fetchFriends(for: userId)

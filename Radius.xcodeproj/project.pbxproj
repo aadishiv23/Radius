@@ -57,6 +57,7 @@
 		ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */; };
 		ACED0C912C2534DD00D30D15 /* AddressEntryMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */; };
 		ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */; };
+		ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF5DA842C28DD5200123843 /* DebugMenu.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -107,6 +108,7 @@
 		ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryViewModel.swift; sourceTree = "<group>"; };
 		ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryMapViewModel.swift; sourceTree = "<group>"; };
 		ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneExitIntent.swift; sourceTree = "<group>"; };
+		ACF5DA842C28DD5200123843 /* DebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMenu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				ACF5DA832C28DD4B00123843 /* Debug */,
 				ACF5DA802C27E89A00123843 /* AppIntents */,
 				AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */,
 				ACED0C8D2C25331B00D30D15 /* ViewModels */,
@@ -289,6 +292,14 @@
 				ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */,
 			);
 			path = AppIntents;
+			sourceTree = "<group>";
+		};
+		ACF5DA832C28DD4B00123843 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				ACF5DA842C28DD5200123843 /* DebugMenu.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -412,6 +423,7 @@
 				AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */,
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
+				ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */,
 				ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */,
 				ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */,
 			);
