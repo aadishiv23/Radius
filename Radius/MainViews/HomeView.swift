@@ -104,12 +104,15 @@ struct HomeView: View {
             }
             .sheet(isPresented: $isPresentingDebugMenu) {
                 NavigationView {
-                    DebugMenuView()
+                    PasswordProtectedDebugMenuView()
                 }
             }
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
             }
+        }
+        .refreshable {
+            await refreshData()
         }
         .onAppear {
             locationViewModel.checkIfLocationServicesIsEnabled()
@@ -130,6 +133,12 @@ struct HomeView: View {
                 print(friendsLocation.full_name)
             }
         }
+    }
+    
+    private func refreshData() async {
+        guard let userId = friendsDataManager.currentUser?.id else { return }
+        await friendsDataManager.fetchFriends(for: userId)
+        await friendsDataManager.fetchUserGroups()
     }
     
     private var mapSection: some View {

@@ -69,8 +69,6 @@ struct Profile: Codable, Identifiable {
     var swiftUIColor: Color {
         Color(hex: color) ?? .black // .black
     }
-    
-    
 }
 
 //struct Profile: Decodable, Identifiable {

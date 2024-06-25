@@ -11,34 +11,39 @@ import Supabase
 import AuthenticationServices
 
 struct ChangePasswordView: View {
-    @State private var password: String = ""
-    @State private var passwordReconfirm: String = ""
+    @State private var email: String = ""
     @State private var isLoading = false
     @State private var result: Result<Void, Error>?
 
     var body: some View {
         VStack {
-            SecureField("Password", text: $password)
+            TextField("Email", text: $email)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
                 .padding(.horizontal)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.emailAddress)
             
-            SecureField("Reconfirm", text: $passwordReconfirm)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .padding(.horizontal)
+            Button("Send Reset Password Email") {
+                sendResetPasswordEmail()
+            }
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.horizontal)
             
-            Button("Reset") {
-                resetPassword()
+            if isLoading {
+                ProgressView()
             }
             
             if let result = result {
                 Section {
                     switch result {
                     case .success:
-                        Text("Password reset succesfully").foregroundColor(.green)
+                        Text("Password reset email sent successfully").foregroundColor(.green)
                     case .failure(let error):
                         Text(error.localizedDescription).foregroundStyle(.red)
                     }
@@ -47,12 +52,12 @@ struct ChangePasswordView: View {
         }
     }
     
-    private func resetPassword() {
+    private func sendResetPasswordEmail() {
         Task {
             isLoading = true
-            defer {isLoading = false }
+            defer { isLoading = false }
             do {
-                try await supabase.auth.update(user: UserAttributes(password: password))
+                try await supabase.auth.resetPasswordForEmail(email)
                 result = .success(())
             } catch {
                 result = .failure(error)
@@ -60,102 +65,88 @@ struct ChangePasswordView: View {
         }
     }
 }
-
 struct AuthView: View {
-    //@Binding var isAuthenticated: Bool
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var isSignUp = false // Toggle between sign up and sign in
+    @State private var isSignUp = false
     @State private var isLoading = false
     @State private var result: Result<Void, Error>?
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                Text(isSignUp ? "Create Your Account" : "Welcome Back")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                Image(systemName: "map.fill")
-                    .resizable()
-                    .frame(width: 200, height: 200)
-                Spacer()
-                VStack(spacing: 15) {
-                    TextField("Email", text: $email)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .keyboardType(.emailAddress)
-                        .overlay(HStack {
-                            Image(systemName: "envelope")
-                                .foregroundColor(.gray)
-                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 25)
-                        })
-
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                        .overlay(HStack {
-                            Image(systemName: "lock")
-                                .foregroundColor(.gray)
-                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 30)
-                        })
-                }
+            ZStack {
+                // Background gradient
+                LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.3)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .edgesIgnoringSafeArea(.all)
                 
-                if isLoading {
-                    ProgressView()
-                }
-                
-                Button(action: isSignUp ? signUpWithEmailPassword : signInWithEmailPassword) {
-                    Text(isSignUp ? "Sign Up" : "Sign In")
-                        .fontWeight(.semibold)
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
-                        .cornerRadius(10)
-                }
-                .padding(.horizontal)
-                .padding(.top, 20)
-
-                if !isSignUp {
-                    NavigationLink(destination: ChangePasswordView()) {
-                        Text("Forgot Password?")
+                VStack(spacing: 25) {
+                    Text(isSignUp ? "Create Your Account" : "Welcome Back")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                    
+                    // Animated logo
+                    Image(systemName: "mappin.and.ellipse")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.blue)
+                        .shadow(color: .purple.opacity(0.3), radius: 10, x: 0, y: 5)
+                        .rotationEffect(Angle(degrees: isLoading ? 360 : 0))
+                        .animation(Animation.linear(duration: 2).repeatForever(autoreverses: true), value: isLoading)
+                    
+                    VStack(spacing: 20) {
+                        CustomTextField(text: $email, placeholder: "Email", imageName: "envelope")
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.emailAddress)
+                        CustomTextField(text: $password, placeholder: "Password", imageName: "lock", isSecure: true)
+                    }
+                    .padding(.horizontal)
+                    
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                            .scaleEffect(1.5)
+                    }
+                    
+                    Button(action: isSignUp ? signUpWithEmailPassword : signInWithEmailPassword) {
+                        Text(isSignUp ? "Sign Up" : "Sign In")
                             .fontWeight(.semibold)
-                            .foregroundColor(.blue)
+                            .frame(minWidth: 0, maxWidth: .infinity)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+                            .cornerRadius(15)
+                            .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
                     }
-                }
-                
-                Button("Switch to \(isSignUp ? "Sign In" : "Sign Up")") {
-                    withAnimation {
-                        isSignUp.toggle()
-                    }
-                }
-                .foregroundColor(.secondary)
-                
-                
-                if let result = result {
-                    Section {
-                        switch result {
-                        case .success:
-                            Text(isSignUp ? "Signup successful, please verify your email if required." : "Logged in successfully").foregroundColor(.green)
-                        case .failure(let error):
-                            Text(error.localizedDescription).foregroundStyle(.red)
+                    .padding(.horizontal)
+                    
+                    if !isSignUp {
+                        NavigationLink(destination: ChangePasswordView()) {
+                            Text("Forgot Password?")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.blue)
                         }
                     }
+                    
+                    Button("Switch to \(isSignUp ? "Sign In" : "Sign Up")") {
+                        withAnimation {
+                            isSignUp.toggle()
+                        }
+                    }
+                    .foregroundColor(.secondary)
+                    
+                    if let result = result {
+                        ResultView(result: result, isSignUp: isSignUp)
+                    }
                 }
-                
-                Spacer()
+                .padding()
+                .background(Color(.systemBackground).opacity(0.8))
+                .cornerRadius(25)
+                .shadow(color: .black.opacity(0.1), radius: 20, x: 0, y: 10)
+                .padding()
             }
-            .padding()
-            //.navigationTitle(isSignUp ? "Sign Up" : "Sign In")
         }
     }
     
@@ -165,7 +156,6 @@ struct AuthView: View {
             defer { isLoading = false }
             do {
                 try await supabase.auth.signIn(email: email, password: password)
-                //isAuthenticated = true
                 await friendsDataManager.fetchCurrentUserProfile()
                 result = .success(())
             } catch {
@@ -188,206 +178,49 @@ struct AuthView: View {
     }
 }
 
+struct CustomTextField: View {
+    @Binding var text: String
+    var placeholder: String
+    var imageName: String
+    var isSecure: Bool = false
+    
+    var body: some View {
+        HStack {
+            if isSecure {
+                SecureField(placeholder, text: $text)
+            } else {
+                TextField(placeholder, text: $text)
+            }
+            
+            Spacer()
+            
+            Image(systemName: imageName)
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(15)
+    }
+}
 
-
-
-
-/*
-
- struct AuthView: View {
-     @Binding var isAuthenticated: Bool
-     @State private var email: String = ""
-     @State private var password: String = ""
-     @State private var isSignUp = false // Toggle between sign up and sign in
-     @State private var isLoading = false
-     @State private var result: Result<Void, Error>?
-     
-     var body: some View {
-         NavigationView {
-             VStack(spacing: 20) {
-                 Text(isSignUp ? "Create Your Account" : "Welcome Back")
-                     .font(.largeTitle)
-                     .fontWeight(.bold)
-                 
-                 VStack(spacing: 15) {
-                     TextField("Email", text: $email)
-                         .padding()
-                         .background(Color(.systemGray6))
-                         .cornerRadius(10)
-                         .padding(.horizontal)
-                         .textInputAutocapitalization(.never)
-                         .autocorrectionDisabled()
-                         .keyboardType(.emailAddress)
-                         .overlay(HStack {
-                             Image(systemName: "envelope")
-                                 .foregroundColor(.gray)
-                                 .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                                 .padding(.leading, 15)
-                         })
-
-                     SecureField("Password", text: $password)
-                         .padding()
-                         .background(Color(.systemGray6))
-                         .cornerRadius(10)
-                         .padding(.horizontal)
-                         .overlay(HStack {
-                             Image(systemName: "lock")
-                                 .foregroundColor(.gray)
-                                 .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                                 .padding(.leading, 15)
-                         })
-                 }
-                 
-                 if isLoading {
-                     ProgressView()
-                 }
-                 
-                 Button(action: isSignUp ? signUpWithEmailPassword : signInWithEmailPassword) {
-                     Text(isSignUp ? "Sign Up" : "Sign In")
-                         .fontWeight(.semibold)
-                         .frame(minWidth: 0, maxWidth: .infinity)
-                         .padding()
-                         .foregroundColor(.white)
-                         .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
-                         .cornerRadius(10)
-                 }
-                 .padding(.horizontal)
-                 .padding(.top, 20)
-
-                 if !isSignUp {
-                     NavigationLink(destination: ForgotPasswordView()) {
-                         Text("Forgot Password?")
-                             .fontWeight(.semibold)
-                             .foregroundColor(.blue)
-                     }
-                 }
-                 
-                 Button("Switch to \(isSignUp ? "Sign In" : "Sign Up")") {
-                     withAnimation {
-                         isSignUp.toggle()
-                     }
-                 }
-                 .foregroundColor(.secondary)
-                 
-                 Spacer()
-             }
-             .padding()
-             .navigationTitle(isSignUp ? "Sign Up" : "Sign In")
-             .alert(item: $result) { result in
-                 switch result {
-                 case .success:
-                     return Alert(title: Text("Success"), message: Text(isSignUp ? "Please check your email to verify." : "You are successfully logged in!"), dismissButton: .default(Text("OK")))
-                 case .failure(let error):
-                     return Alert(title: Text("Error"), message: Text(error.localizedDescription), dismissButton: .default(Text("OK")))
-                 }
-             }
-         }
-     }
-     
-     private func signInWithEmailPassword() {
-         isLoading = true
-         Task {
-             defer { isLoading = false }
-             do {
-                 try await supabase.auth.signIn(email: email, password: password)
-                 isAuthenticated = true
-                 result = .success(())
-             } catch {
-                 result = .failure(error)
-             }
-         }
-     }
-     
-     private func signUpWithEmailPassword() {
-         isLoading = true
-         Task {
-             defer { isLoading = false }
-             do {
-                 try await supabase.auth.signUp(email: email, password: password)
-                 result = .success(())
-             } catch {
-                 result = .failure(error)
-             }
-         }
-     }
- }
-
- 
- */
-    /*
-     
-     struct AuthView: View {
-     @State var email: String = ""
-     @State var password: String = ""
-     @State var isLoading = false
-     @State var result: Result<Void, Error>?
-     @Binding var isAuthenticated: Bool
-     
-     
-     var body: some View {
-     Form {
-     
-     
-     Divider()
-     Text("OR")
-     
-     Section(header: Text("Magic Link")) {
-     TextField("Email", text: $email)
-     .textContentType(.emailAddress)
-     .textInputAutocapitalization(.never)
-     .autocorrectionDisabled()
-     
-     }
-     
-     Section {
-     Button("Sign In") {
-     signInButtonTapped()
-     }
-     
-     if isLoading {
-     ProgressView()
-     }
-     }
-     
-     if let result {
-     Section {
-     switch result {
-     case .success:
-     Text("Check your inbox")
-     case .failure(let error):
-     Text(error.localizedDescription).foregroundStyle(.red)
-     
-     }
-     }
-     }
-     }
-     .onOpenURL(perform: { url in
-     Task {
-     do {
-     try await supabase.auth.session(from: url)
-     } catch {
-     self.result = .failure(error)
-     }
-     }
-     })
-     }
-     
-     func signInButtonTapped() {
-     Task {
-     isLoading = true
-     defer {isLoading = false}
-     
-     do {
-     try await supabase.auth.signInWithOTP(email: email,
-     redirectTo: URL(string:"io.supabase.user-management://radius-login-callback"))
-     isAuthenticated = true
-     result = .success(())
-     } catch {
-     result = .failure(error)
-     }
-     }
-     }
-     }
-     
-     
-     */
+struct ResultView: View {
+    let result: Result<Void, Error>
+    let isSignUp: Bool
+    
+    var body: some View {
+        switch result {
+        case .success:
+            Text(isSignUp ? "Signup successful, please verify your email if required." : "Logged in successfully")
+                .foregroundColor(.green)
+                .padding()
+                .background(Color.green.opacity(0.2))
+                .cornerRadius(10)
+        case .failure(let error):
+            Text(error.localizedDescription)
+                .foregroundColor(.red)
+                .padding()
+                .background(Color.red.opacity(0.2))
+                .cornerRadius(10)
+        }
+    }
+}

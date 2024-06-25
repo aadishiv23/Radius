@@ -52,6 +52,7 @@
 		ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
+		ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */; };
 		ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB24E92C11698800D9693F /* AddGroupView.swift */; };
 		ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */; };
 		ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */; };
@@ -103,6 +104,7 @@
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectedDebugView.swift; sourceTree = "<group>"; };
 		ACEB24E92C11698800D9693F /* AddGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGroupView.swift; sourceTree = "<group>"; };
 		ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressResult+AnnotationItem.swift"; sourceTree = "<group>"; };
 		ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryViewModel.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 			isa = PBXGroup;
 			children = (
 				ACF5DA842C28DD5200123843 /* DebugMenu.swift */,
+				ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -403,6 +406,7 @@
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */,
+				ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
