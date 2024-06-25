@@ -9,6 +9,33 @@
 import SwiftUI
 import MapKit
 
+struct CustomView: View {
+
+    @Binding var percentage: Double // or some value binded
+    @State private var heightMultiplier: CGFloat = 1.0
+
+    var body: some View {
+        GeometryReader { geometry in
+            // TODO: - there might be a need for horizontal and vertical alignments
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .foregroundColor(.gray)
+                Rectangle()
+                    .foregroundColor(.accentColor)
+                    .frame(width: geometry.size.width * CGFloat(self.percentage / 100))
+            }
+            .cornerRadius(12)
+            .gesture(DragGesture(minimumDistance: 0)
+                .onChanged({ value in
+                    // TODO: - maybe use other logic here
+                    let newHeightMultiplier = min(max(1, heightMultiplier + (value.translation.height / geometry.size.height)), 2) // Limiting height to double the original
+                    let newPercentage = min(max(0, Double(value.location.x / geometry.size.width * 100)), 100)
+                    self.percentage = newPercentage
+                    self.heightMultiplier = newHeightMultiplier
+                }))
+        }
+    }
+}
 
 struct ZoneEditorView: View {
     @Binding var isPresenting: Bool
@@ -34,11 +61,15 @@ struct ZoneEditorView: View {
                         .frame(height: 300)
                         .padding()
 
-                    Slider(value: $zoneRadius, in: 10...500, step: 5)
+                    //Slider(value: $zoneRadius, in: 10...500, step: 5)
+                    CustomView(percentage: $zoneRadius)
                         .padding()
                     
                     Text("Radius: \(zoneRadius, specifier: "%.1f") meters")
                         .padding()
+                        .contentTransition(.numericText())
+                        //.contentTransition(.numericTransition())
+                        .animation(.easeInOut, value: zoneRadius)
                     
                     Button("Enter Address") {
                         showAddressEntry = true
