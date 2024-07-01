@@ -19,5 +19,19 @@
 	<array>
 		<string>location</string>
 	</array>
+    
+    <!-- Location Services -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Radius needs your location to check if you've left your defined zones.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Radius needs your location to check if you've left your defined zones, even when the app is not active.</string>
+    
+    <!-- Siri and App Shortcuts -->
+    <key>NSSiriUsageDescription</key>
+    <string>Radius uses Siri to quickly check your zone status.</string>
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>CheckZoneExitIntent</string>
+    </array>
 </dict>
 </plist>

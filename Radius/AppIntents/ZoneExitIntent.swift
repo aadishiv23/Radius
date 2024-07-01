@@ -5,42 +5,76 @@
 //  Created by Aadi Shiv Malhotra on 6/23/24.
 //
 
-import Foundation
 import AppIntents
-import SwiftUI
+import CoreLocation
 
-struct ZoneExitIntent: AppIntent {
-    static var title: LocalizedStringResource = "Notify Zone Exit"
-    static var description = IntentDescription("Notifies when a user leaves a zone")
-
-    @Parameter(title: "Message")
-    var message: String
-
-    static var parameterSummary: some ParameterSummary {
-        Summary("Notify \(\.$message) when a user leaves their zone")
+struct CheckZoneExitShortcut: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: CheckZoneExitIntent(),
+            phrases: [
+                "Check if I've left my zones in \(.applicationName)",
+                "Have I left any zones in \(.applicationName)?",
+                "\(.applicationName) zone check"
+            ],
+            shortTitle: "Check Zone Exit",
+            systemImageName: "mappin.and.ellipse"
+        )
     }
+}
 
-    func perform() async throws -> some IntentResult {
-        // Fetch the latest zone exit
-        let latestExit: ZoneExit = try await supabase
-            .from("zone_exits")
-            .select("*, profiles(*), zones(*)")
-            .order("exit_time", ascending: false)
-            .limit(1)
-            .single()
-            .execute()
-            .value
-
-        let formattedMessage = String(format: message,
-                                      latestExit.profile.full_name,
-                                      latestExit.zone.name,
-                                      latestExit.exit_time as CVarArg)
-
-        // Here you would typically send a notification or perform some action
-        // For this example, we'll just print the message
-        print(formattedMessage)
-
-        return .result()
+struct CheckZoneExitIntent: AppIntent {
+    static var title: LocalizedStringResource = "Check Zone Exit"
+    static var description = IntentDescription("Checks if you've left any of your zones")
+    
+    static var openAppWhenRun: Bool = false
+    
+    func perform() async throws -> some ReturnsValue<String> & ProvidesDialog {
+        let locationManager = LocationManager.shared
+        let fdm = FriendsDataManager(supabaseClient: supabase)
+        
+        // Fetch the current user's profile
+        await fdm.fetchCurrentUserProfile()
+        guard let currentUser = fdm.currentUser else {
+            return .result(
+                value: "Couldn't find your profile",
+                dialog: "Couldn't find your profile"
+            )
+        }
+        
+        // Get the current location
+        guard let currentLocation = locationManager.userLocation else {
+            return .result(
+                value: "Couldn't get your current location",
+                dialog: "Couldn't get your current location"
+            )
+        }
+        
+        var exitedZones: [String] = []
+        
+        // Check each zone
+        for zone in currentUser.zones {
+            let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
+            let distance = currentLocation.distance(from: zoneCenter)
+            
+            if distance > zone.radius {
+                // User has left the zone
+                exitedZones.append(zone.name)
+            }
+        }
+        
+        if exitedZones.isEmpty {
+            return .result(
+                value: "You're still within all your zones",
+                dialog: "You're still within all your zones"
+            )
+        } else {
+            let zoneList = exitedZones.joined(separator: ", ")
+            return .result(
+                value: "You've left the following zones: \(zoneList)",
+                dialog: "You've left the following zones: \(zoneList)"
+            )
+        }
     }
 }
 
