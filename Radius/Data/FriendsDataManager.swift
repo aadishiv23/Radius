@@ -22,6 +22,7 @@ import Supabase
 
 class FriendsDataManager: ObservableObject {
     private var supabaseClient: SupabaseClient
+    private var channel: RealtimeChannelV2?
     
     @Published var friends: [Profile] = []
     @Published var currentUser: Profile!
@@ -33,27 +34,32 @@ class FriendsDataManager: ObservableObject {
     
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
+        setupRealtime()
         Task {
-            let channel = await supabase.realtimeV2.channel("public:profiles")
-            
-            let insertions = await channel.postgresChange(InsertAction.self, schema: "public", table: "profiles")
-            let updates = await channel.postgresChange(UpdateAction.self, table: "profiles")
-            let deletions = await channel.postgresChange(DeleteAction.self, table: "profiles")
-            
-            await channel.subscribe()
-            
+            await fetchCurrentUserProfile()
+        }
+    }
+    
+    private func setupRealtime() {
+        Task {
+            channel = await supabaseClient.realtimeV2.channel("public:profiles")
+
+            let insertions = await channel!.postgresChange(InsertAction.self, schema: "public", table: "profiles")
+            let updates = await channel!.postgresChange(UpdateAction.self, table: "profiles")
+            let deletions = await channel!.postgresChange(DeleteAction.self, table: "profiles")
+
+            await channel?.subscribe()
+
             Task {
                 for await insertion in insertions {
                     handleInsertedChannel(insertion)
                 }
             }
-            
             Task {
                 for await update in updates {
                     handleUpdatedChannel(update)
                 }
             }
-            
             Task {
                 for await deletion in deletions {
                     handleDeletionChannel(deletion)
@@ -65,7 +71,9 @@ class FriendsDataManager: ObservableObject {
     private func handleInsertedChannel(_ action: InsertAction) {
         do {
             let newProfile = try action.decodeRecord(decoder: decoder) as Profile
-            friends.append(newProfile)
+            DispatchQueue.main.async {
+                self.friends.append(newProfile)
+            }
         } catch {
             print("Failed to handle InsertedChannel due to \(error)")
         }
