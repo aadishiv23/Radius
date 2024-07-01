@@ -20,8 +20,6 @@
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
-		AC79CD982BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */; };
-		AC79CDA32BE0B63300B49E90 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC79CDA22BE0B63300B49E90 /* DataController.swift */; };
 		AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */; };
 		AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* ContentView.swift */; };
 		AC98AE042BC0873000879A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE032BC0873000879A25 /* Assets.xcassets */; };
@@ -29,8 +27,6 @@
 		AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */; };
 		AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */; };
 		AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */; };
-		AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */; };
-		AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */; };
 		AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */; };
 		AC9BD1C12BEB0E5E00D23123 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1C02BEB0E5E00D23123 /* Auth */; };
 		AC9BD1C32BEB0E5E00D23123 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1C22BEB0E5E00D23123 /* Functions */; };
@@ -43,8 +39,6 @@
 		AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */; };
 		AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D62BEB3CF500D23123 /* SupabaseModels.swift */; };
 		AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D82BEB3EB000D23123 /* AppView.swift */; };
-		ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */; };
-		ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */; };
 		ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */; };
 		ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */; };
 		ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */; };
@@ -75,8 +69,6 @@
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
-		AC79CD972BE0B4F800B49E90 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
-		AC79CDA22BE0B63300B49E90 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		AC98ADFC2BC0872E00879A25 /* Radius.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Radius.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusApp.swift; sourceTree = "<group>"; };
 		AC98AE012BC0872E00879A25 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -85,8 +77,6 @@
 		AC98AE0D2BC1CECD00879A25 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsDataManager.swift; sourceTree = "<group>"; };
 		AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTransformer.swift; sourceTree = "<group>"; };
-		AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoneEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFriendView.swift; sourceTree = "<group>"; };
 		AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Supabase+Helpers.swift"; sourceTree = "<group>"; };
 		AC9BD1D22BEB101B00D23123 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
@@ -94,8 +84,6 @@
 		AC9BD1D62BEB3CF500D23123 /* SupabaseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseModels.swift; sourceTree = "<group>"; };
 		AC9BD1D82BEB3EB000D23123 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Radius.entitlements; sourceTree = "<group>"; };
-		ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FriendLocationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DTransformer.swift; sourceTree = "<group>"; };
 		ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupView.swift; sourceTree = "<group>"; };
 		ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGroupView.swift; sourceTree = "<group>"; };
@@ -187,12 +175,6 @@
 		AC79CDA12BE0B60400B49E90 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */,
-				AC79CDA22BE0B63300B49E90 /* DataController.swift */,
-				AC9BD1B92BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift */,
-				AC9BD1BA2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift */,
-				ACA021432BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift */,
-				ACA021442BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift */,
 				AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */,
 				ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */,
 			);
@@ -393,13 +375,11 @@
 				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
 				AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
-				AC79CDA32BE0B63300B49E90 /* DataController.swift in Sources */,
 				AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */,
 				AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
 				ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */,
-				AC79CD982BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld in Sources */,
 				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
 				ACC537302BF3258300BECF8A /* Stuff.swift in Sources */,
 				ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */,
@@ -412,9 +392,7 @@
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
-				AC9BD1BB2BE4944E00D23123 /* ZoneEntity+CoreDataClass.swift in Sources */,
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
-				AC9BD1BC2BE4944E00D23123 /* ZoneEntity+CoreDataProperties.swift in Sources */,
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
 				ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
@@ -428,8 +406,6 @@
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
 				ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */,
-				ACA021472BE0B77200E98DA4 /* FriendLocationEntity+CoreDataClass.swift in Sources */,
-				ACA021482BE0B77200E98DA4 /* FriendLocationEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,19 +669,6 @@
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
-
-/* Begin XCVersionGroup section */
-		AC79CD962BE0B4F800B49E90 /* CoreDataModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				AC79CD972BE0B4F800B49E90 /* CoreDataModel.xcdatamodel */,
-			);
-			currentVersion = AC79CD972BE0B4F800B49E90 /* CoreDataModel.xcdatamodel */;
-			path = CoreDataModel.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = AC98ADF42BC0872E00879A25 /* Project object */;
 }

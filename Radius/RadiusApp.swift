@@ -11,7 +11,7 @@ import AppIntents
 
 @main
 struct RadiusApp: App {
-    let dataController = DataController()
+    //let dataController = DataController()
     let supabaseClient = supabase
     @StateObject private var friendsDataManager: FriendsDataManager
     @StateObject private var authViewModel: AuthViewModel
@@ -27,7 +27,7 @@ struct RadiusApp: App {
     var body: some Scene {
         WindowGroup {
             AppView()
-                .environment(\.managedObjectContext, dataController.container.viewContext)
+                //.environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(friendsDataManager)
                 .environmentObject(authViewModel)
         }

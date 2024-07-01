@@ -20,11 +20,11 @@ class RealtimeManager: ObservableObject {
         Task {
             channel = await supabase.realtimeV2.channel("public:profiles")
             
-            let insertions = await channel?.postgresChange(InsertAction.self, schema: "public", table: "profiles")
-            let updates = await channel.postgresChange(UpdateAction.self, table: "profiles")
-            let deletions = await channel.postgresChange(DeleteAction.self, table: "profiles")
+            let insertions = await channel!.postgresChange(InsertAction.self, schema: "public", table: "profiles")
+            let updates = await channel!.postgresChange(UpdateAction.self, table: "profiles")
+            let deletions = await channel!.postgresChange(DeleteAction.self, table: "profiles")
             
-            await channel.subscribe()
+            await channel!.subscribe()
             
             Task {
                 for await insertion in insertions {
