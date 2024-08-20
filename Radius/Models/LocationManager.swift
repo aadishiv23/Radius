@@ -11,22 +11,35 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     static let shared = LocationManager()
     private var locationManager = CLLocationManager()
     private var lastUploadedLocation: CLLocation?
-    private let locationUpdateInterval: TimeInterval = 60 // Set the interval to 60 seconds
-    private let minimumDistance: CLLocationDistance = 50 // Set the minimum distance to 50 meters
+    private let locationUpdateInterval: TimeInterval = 60
+    private let minimumDistance: CLLocationDistance = 50
+    
+    private let zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)  // Add ZoneUpdateManager instance
     private let fdm = FriendsDataManager(supabaseClient: supabase)
     
     private var userZones: [Zone] = []
-    private var lastZoneStatuses: [UUID: Bool] = [:] // Tracks whether user was in each zone
-
-
+    private var lastZoneStatuses: [UUID: Bool] = [:]
+    
     @Published var userLocation: CLLocation?
     
-    private override init() {
+    override init() {
         super.init()
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         self.checkLocationAuthorization()
-        self.locationManager.distanceFilter = 10 // Update location every 10 meters
+        self.locationManager.distanceFilter = 10
+    }
+    
+    func checkIfLocationServicesIsEnabled() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+    
+    func plsInitiateLocationUpdates() {
+        locationManager.startUpdatingLocation()
+    }
+    
+    func stopUpdating() {
+        locationManager.stopUpdatingLocation()
     }
     
     func checkLocationAuthorization() {
@@ -34,7 +47,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         case .notDetermined:
             locationManager.requestAlwaysAuthorization()
         case .restricted, .denied:
-            break // Handle case where user has denied/restricted location usage
+            break
         case .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
         case .authorizedAlways:
@@ -64,25 +77,27 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         guard let currentUser = fdm.currentUser else { return }
         self.userZones = currentUser.zones
         
-        // Initialize lastZoneStatuses
         for zone in userZones {
             lastZoneStatuses[zone.id] = isUserInZone(zone: zone, location: userLocation)
         }
     }
     
     private func checkZoneBoundaries(for location: CLLocation) {
+        var exitedZones: [UUID] = []
+        
         for zone in userZones {
             let wasInZone = lastZoneStatuses[zone.id] ?? false
             let isInZone = isUserInZone(zone: zone, location: location)
             
             if wasInZone && !isInZone {
-                // User has left the zone
-                Task {
-                    await userLeftZone(zone, at: location.timestamp)
-                }
+                exitedZones.append(zone.id)
             }
             
             lastZoneStatuses[zone.id] = isInZone
+        }
+        
+        if !exitedZones.isEmpty {
+            handleZoneExits(exitedZones: exitedZones, at: location.timestamp)
         }
     }
     
@@ -92,24 +107,12 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         return location.distance(from: zoneCenter) <= zone.radius
     }
     
-    private func userLeftZone(_ zone: Zone, at time: Date) async {
-       do {
-           let zoneExit = [
-                "profile_id": fdm.currentUser?.id.uuidString ?? "",
-               "zone_id": zone.id.uuidString,
-               "exit_time": ISO8601DateFormatter().string(from: time)
-           ]
-           
-           try await supabase
-               .from("zone_exits")
-               .insert(zoneExit)
-               .execute()
-           
-           print("Zone exit recorded successfully")
-       } catch {
-           print("Failed to record zone exit: \(error)")
-       }
-   }
+    private func handleZoneExits(exitedZones: [UUID], at time: Date) {
+        guard let profileId = fdm.currentUser?.id else { return }
+        Task {
+            await zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: exitedZones, at: time)
+        }
+    }
     
     private func shouldUploadLocation(_ newLocation: CLLocation) -> Bool {
         guard let lastLocation = lastUploadedLocation else {
@@ -143,25 +146,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
             }
         }
     }
-    
-    func plsInitiateLocationUpdates() {
-        locationManager.startUpdatingLocation()
-    }
-    
-    func startUpdatingLocation() {
-       locationManager.startUpdatingLocation()
-        Task {
-            while true {
-                await fetchUserZones()
-                try? await Task.sleep(nanoseconds: 5 * 60 * 1_000_000_000) // Refresh every 5 minutes
-            }
-        }
-    }
-
-    func stopUpdatingLocation() {
-       locationManager.stopUpdatingLocation()
-    }
 }
+
 
 
 //class MapRegionObserver: ObservableObject {

@@ -15,6 +15,8 @@
 		AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */; };
 		AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1B00532BF4753C000BB30B /* AuthViewModel.swift */; };
 		AC3989562C705637002F84E6 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989552C705637002F84E6 /* DataController.swift */; };
+		AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupViewModel.swift */; };
+		AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */; };
 		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
 		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
 		AC5856002BDF1925009C490B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FF2BDF1925009C490B /* MapView.swift */; };
@@ -66,6 +68,8 @@
 		AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendDetailMapView.swift; sourceTree = "<group>"; };
 		AC1B00532BF4753C000BB30B /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		AC3989552C705637002F84E6 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		AC39895B2C70592C002F84E6 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
+		AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneUpdateManager.swift; sourceTree = "<group>"; };
 		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
 		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
 		AC5855FF2BDF1925009C490B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -176,13 +180,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		AC79CDA12BE0B60400B49E90 /* Data */ = {
+		AC79CDA12BE0B60400B49E90 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
 				AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */,
 				ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */,
+				AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */,
 			);
-			path = Data;
+			path = Managers;
 			sourceTree = "<group>";
 		};
 		AC98ADF32BC0872E00879A25 = {
@@ -212,7 +217,7 @@
 				ACED0C8D2C25331B00D30D15 /* ViewModels */,
 				AC9BD1CA2BEB0E6B00D23123 /* Helpers */,
 				ACA021492BE0B7C100E98DA4 /* Utility */,
-				AC79CDA12BE0B60400B49E90 /* Data */,
+				AC79CDA12BE0B60400B49E90 /* Managers */,
 				AC0AC7002BDB0EFC000418B8 /* Models */,
 				AC0AC6FF2BDB0EF5000418B8 /* Components */,
 				AC0AC6FE2BDB0EE4000418B8 /* SubViews */,
@@ -280,6 +285,7 @@
 			children = (
 				ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */,
 				ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */,
+				AC39895B2C70592C002F84E6 /* GroupViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -402,6 +408,7 @@
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
 				ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */,
 				ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */,
+				AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
@@ -419,6 +426,7 @@
 				AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */,
 				ACED0C912C2534DD00D30D15 /* AddressEntryMapViewModel.swift in Sources */,
 				AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */,
+				AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */,
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
 				ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */,

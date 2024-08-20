@@ -34,13 +34,13 @@ struct Zone: Codable, Identifiable {
 }
 
 struct Profile: Codable, Identifiable {
-    let id: UUID
-    let username: String
-    let full_name: String
-    let color: String
-    let latitude: Double
-    let longitude: Double
-    let phone_num: String
+    var id: UUID
+    var username: String
+    var full_name: String
+    var color: String
+    var latitude: Double
+    var longitude: Double
+    var phone_num: String
     var zones: [Zone]
 
     enum CodingKeys: String, CodingKey {

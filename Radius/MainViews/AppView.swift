@@ -24,12 +24,12 @@ struct AppView: View {
                         Task {
                             await friendsDataManager.fetchCurrentUserProfile()
                             if let userId = friendsDataManager.currentUser?.id {
-                                LocationManager.shared.startUpdatingLocation()
+                                LocationManager.shared.plsInitiateLocationUpdates()
                             }
                         }
                     }
                     .onDisappear {
-                        LocationManager.shared.stopUpdatingLocation()
+                        LocationManager.shared.stopUpdating()
                     }
             } else {
                 AuthView()

@@ -23,7 +23,13 @@ struct GroupView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.green.opacity(0.3)]), startPoint: .leading, endPoint: .trailing))
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.green.opacity(0.3)]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
             .cornerRadius(10)
             .shadow(radius: 5)
         }

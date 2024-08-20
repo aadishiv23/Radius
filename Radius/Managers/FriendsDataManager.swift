@@ -30,8 +30,6 @@ class FriendsDataManager: ObservableObject {
     
     private var userId: UUID?
 
-
-    
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
         setupRealtime()
