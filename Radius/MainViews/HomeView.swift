@@ -191,41 +191,101 @@ struct HomeView: View {
     }
     
     private var friendListSection: some View {
-           VStack {
-               ForEach(friendsDataManager.friends, id: \.id) { friend in
-                   friendRow(friend)
+       VStack(alignment: .leading, spacing: 16) {
+           // Me Section
+           Section(header: Text("Me").font(.headline).padding(.leading)) {
+               if let currentUser = friendsDataManager.currentUser {
+                   friendRow(currentUser)
                }
-//               if let userLocation = locationViewModel.userLocation {
-//                   friendRow(FriendLocation(name: "You", color: .purple, coordinate: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), zones: []))
-//               }
+           }
+           
+           Divider()
+           
+           // Friends Section
+           Section(header: Text("Friends").font(.headline).padding(.leading)) {
+               let friends = friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
+               if friends.isEmpty {
+                   noFriendsRow
+               } else {
+                   ForEach(friends, id: \.id) { friend in
+                       friendRow(friend)
+                   }
+               }
            }
        }
+       .padding(.top)
+   }
     
     @ViewBuilder
     func friendRow(_ friend: Profile) -> some View {
-        HStack {
+        HStack(spacing: 16) {
             Circle()
-                .fill(Color(hex: friend.color) ?? .black)
-                .frame(width: 30, height: 30)
-            VStack(alignment: .leading) {
+                .fill(Color(hex: friend.color) ?? .white)
+                .frame(width: 50, height: 50)
+                .overlay(
+                    Text(friend.full_name.prefix(1))
+                        .font(.title2.bold())
+                        .foregroundColor(.purple.opacity(0.4))
+                )
+                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+            
+            VStack(alignment: .leading, spacing: 4) {
                 Text(friend.full_name)
                     .font(.headline)
                     .foregroundColor(.primary)
-                Text("\(friend.latitude), \(friend.longitude)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    Image(systemName: "mappin.circle.fill")
+                        .foregroundColor(.secondary)
+                    Text("\(friend.latitude), \(friend.longitude)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
+            
             Spacer()
+            
+            Image(systemName: "chevron.right")
+                .foregroundColor(.secondary)
         }
-        .padding()
-        .background(colorScheme == .dark ? .black : .white)
-        .cornerRadius(10)
-        .shadow(radius: 2)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+        .background(Color(UIColor.systemBackground).opacity(0.8))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.03), radius: 3, x: 0, y: 1)
         .padding(.horizontal)
         .padding(.vertical, 4)
         .onTapGesture {
             selectedFriend = friend
         }
+    }
+    
+    private var noFriendsRow: some View {
+        HStack(spacing: 16) {
+            Image(systemName: "face.smiling.inverse")
+                .font(.largeTitle)
+                .foregroundColor(.secondary)
+            
+            Text("😢 Boohoo! You have no friends. Add some now!")
+                .font(.headline)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+        .background(Color(UIColor.systemBackground).opacity(0.8))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.03), radius: 3, x: 0, y: 1)
+        .padding(.horizontal)
+        .padding(.vertical, 4)
     }
     
     private func checkDistance() {
@@ -241,78 +301,6 @@ struct HomeView: View {
         showRecenterButton = false
     }
 }
-
-//private func checkDistance() {
-//    let currentLocation = CLLocation(latitude: region.center.latitude, longitude: region.center.longitude)
-//    let initialLocation = CLLocation(latitude: initialCenter.latitude, longitude: initialCenter.longitude)
-//    let distance = currentLocation.distance(from: initialLocation)
-//    showRecenterButton = distance > 500
-//}
-//}
-//
-//
-//struct ContentView: View {
-//    @State private var region = MKCoordinateRegion(
-//        center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
-//        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-//    )
-//
-//    @State private var selectedFriend: FriendLocation?
-//
-//    let friendsLocations: [FriendLocation] = [
-//        FriendLocation(name: "Alice", color: .red, coordinate: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),
-//        FriendLocation(name: "Bob", color: .blue, coordinate: CLLocationCoordinate2D(latitude: 40.7158, longitude: -74.0080)),
-//        FriendLocation(name: "Charlie", color: .green, coordinate: CLLocationCoordinate2D(latitude: 40.7108, longitude: -74.0100)),
-//        FriendLocation(name: "David", color: .yellow, coordinate: CLLocationCoordinate2D(latitude: 40.7138, longitude: -74.0120))
-//    ]
-//
-//    var body: some View {
-//        VStack {
-//            Map(coordinateRegion: $region, annotationItems: friendsLocations) { friendLocation in
-//                MapAnnotation(coordinate: friendLocation.coordinate) {
-//                    Circle()
-//                        .fill(friendLocation.color)
-//                        .frame(width: 20, height: 20)
-//                        .onTapGesture {
-//                            selectedFriend = friendLocation
-//                        }
-//                }
-//            }
-//            .frame(height: 300)
-//            .cornerRadius(15)
-//            .padding()
-//
-//            List(friendsLocations, id: \.id) { friend in
-//                HStack {
-//                    Circle()
-//                        .fill(friend.color)
-//                        .frame(width: 15, height: 15)
-//                    VStack(alignment: .leading) {
-//                        Text(friend.name)
-//                            .foregroundColor(.primary)
-//                        Text("\(friend.coordinate.latitude), \(friend.coordinate.longitude)")
-//                            .font(.caption)
-//                            .foregroundColor(.secondary)
-//                    }
-//                }
-//                .padding(.vertical, 4)
-//                .onTapGesture {
-//                    selectedFriend = friend
-//                }
-//            }
-//        }
-//        .sheet(item: $selectedFriend) { friend in
-//            FriendDetailView(friend: friend)
-//        }
-//    }
-//}
-
-
-
-
-
-
-
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
