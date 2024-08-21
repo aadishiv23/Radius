@@ -148,7 +148,23 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-    // Method to fetch pending friend requests
+    func fetchFriends(for userId: UUID) async {
+        do {
+            let friends: [Profile] = try await supabaseClient
+                .from("friends")
+                .select("profiles!friends_profile_id1_fkey(*)")
+                .eq("profile_id1", value: userId.uuidString)
+                .execute()
+                .value
+            
+            DispatchQueue.main.async {
+                self.friends = friends
+            }
+        } catch {
+            print("Failed to fetch friends new code: \(error)")
+        }
+    }
+
     func fetchPendingFriendRequests() async {
         do {
             guard let userId = userId else { return }
@@ -169,6 +185,7 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
+
     // Method to accept a friend request
     func acceptFriendRequest(_ request: FriendRequest) async {
         do {
@@ -178,12 +195,12 @@ class FriendsDataManager: ObservableObject {
                 .eq("id", value: request.id.uuidString)
                 .execute()
             
-            // Add the users as friends
+            // Assuming you want to add both profiles as friends
             try await supabaseClient
                 .from("friends")
                 .insert([
-                    ["profile_id": request.sender_id.uuidString, "friend_id": request.receiver_id.uuidString],
-                    ["profile_id": request.receiver_id.uuidString, "friend_id": request.sender_id.uuidString]
+                    ["profile_id1": request.sender_id.uuidString, "profile_id2": request.receiver_id.uuidString],
+                    ["profile_id1": request.receiver_id.uuidString, "profile_id2": request.sender_id.uuidString]
                 ])
                 .execute()
             
@@ -195,23 +212,6 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-    // Method to fetch friends including new ones via friend requests
-    func fetchFriends(for userId: UUID) async {
-        do {
-            let friends: [Profile] = try await supabaseClient
-                .from("friends")
-                .select("profiles(*)")
-                .eq("profile_id", value: userId.uuidString)
-                .execute()
-                .value
-            
-            DispatchQueue.main.async {
-                self.friends = friends
-            }
-        } catch {
-            print("Failed to fetch friends: \(error)")
-        }
-    }
     
     func fetchCurrentUserProfile() async {
         do {

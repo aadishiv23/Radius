@@ -8,38 +8,77 @@
 import Foundation
 import SwiftUI
 
+//struct FriendRequest: Identifiable, Codable {
+//    var id: UUID
+//    var sender_id: UUID
+//    var receiver_id: UUID
+//    var status: String
+//    var created_at: Date
+//    
+//    // For more readable status values, you can use an enum
+//    enum Status: String, Codable {
+//        case pending = "pending"
+//        case accepted = "accepted"
+//        case rejected = "rejected"
+//    }
+//    
+//    // Computed property to get the status as an enum
+//    var requestStatus: Status {
+//        return Status(rawValue: status) ?? .pending
+//    }
+//    
+//    // Additional convenience computed properties
+//    var isPending: Bool {
+//        return requestStatus == .pending
+//    }
+//    
+//    var isAccepted: Bool {
+//        return requestStatus == .accepted
+//    }
+//    
+//    var isRejected: Bool {
+//        return requestStatus == .rejected
+//    }
+//}
+
 struct FriendRequest: Identifiable, Codable {
     var id: UUID
     var sender_id: UUID
     var receiver_id: UUID
     var status: String
     var created_at: Date
-    
-    // For more readable status values, you can use an enum
-    enum Status: String, Codable {
-        case pending = "pending"
-        case accepted = "accepted"
-        case rejected = "rejected"
+
+    enum CodingKeys: String, CodingKey {
+        case id, sender_id, receiver_id, status, created_at
     }
-    
-    // Computed property to get the status as an enum
-    var requestStatus: Status {
-        return Status(rawValue: status) ?? .pending
-    }
-    
-    // Additional convenience computed properties
-    var isPending: Bool {
-        return requestStatus == .pending
-    }
-    
-    var isAccepted: Bool {
-        return requestStatus == .accepted
-    }
-    
-    var isRejected: Bool {
-        return requestStatus == .rejected
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        sender_id = try container.decode(UUID.self, forKey: .sender_id)
+        receiver_id = try container.decode(UUID.self, forKey: .receiver_id)
+        status = try container.decode(String.self, forKey: .status)
+
+        let dateString = try container.decode(String.self, forKey: .created_at)
+        if let date = DateFormatter.customSupabaseFormat.date(from: dateString) {
+            created_at = date
+        } else {
+            throw DecodingError.dataCorruptedError(forKey: .created_at, in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
     }
 }
+
+
+extension DateFormatter {
+    static let customSupabaseFormat: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+}
+
 
 struct Group: Codable, Identifiable {
     let id: UUID
