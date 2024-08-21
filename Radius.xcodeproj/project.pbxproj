@@ -17,6 +17,7 @@
 		AC3989562C705637002F84E6 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989552C705637002F84E6 /* DataController.swift */; };
 		AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupViewModel.swift */; };
 		AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */; };
+		AC39896A2C758E3D002F84E6 /* FriendsRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */; };
 		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
 		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
 		AC5856002BDF1925009C490B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FF2BDF1925009C490B /* MapView.swift */; };
@@ -70,6 +71,7 @@
 		AC3989552C705637002F84E6 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		AC39895B2C70592C002F84E6 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
 		AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneUpdateManager.swift; sourceTree = "<group>"; };
+		AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsRequestsView.swift; sourceTree = "<group>"; };
 		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
 		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
 		AC5855FF2BDF1925009C490B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 				ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */,
 				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
 				ACAEFDFE2C193F8500E12E0B /* GroupView.swift */,
+				AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -425,6 +428,7 @@
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,
 				AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */,
 				ACED0C912C2534DD00D30D15 /* AddressEntryMapViewModel.swift in Sources */,
+				AC39896A2C758E3D002F84E6 /* FriendsRequestsView.swift in Sources */,
 				AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */,
 				AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */,
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,

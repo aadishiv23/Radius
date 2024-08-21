@@ -13,27 +13,35 @@ struct GroupView: View {
     
     var body: some View {
         NavigationLink(destination: GroupDetailView(group: group)) {
-            HStack {
-                Image(systemName: "person.3.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                Text(group.name)
-                    .foregroundColor(.white)
-                    .font(.headline)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.green.opacity(0.3)]),
-                    startPoint: .leading,
-                    endPoint: .trailing
+            HStack() {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(group.name)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    
+                    ProgressView(value: Double(10), total: 100) // Example progress
+                        .progressViewStyle(LinearProgressViewStyle(tint: .white.opacity(0.7)))
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                }
+                .padding()
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.blue.opacity(0.4)]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
-            )
-            .cornerRadius(10)
-            .shadow(radius: 5)
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+                
+                Spacer()
+            }
+            .padding(.vertical, 8)
         }
-        .padding(.horizontal)
     }
 }
 

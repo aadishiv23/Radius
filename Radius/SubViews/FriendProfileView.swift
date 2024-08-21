@@ -45,7 +45,8 @@ struct FriendProfileView: View {
             Text("Coordinates: \(friend.latitude), \(friend.longitude)")
                 .font(.subheadline)
                 .frame(maxWidth: .infinity, alignment: .center)
-            
+            Spacer()
+            underConstructionSection
             Spacer()
             
 //            ScrollView(.horizontal, showsIndicators: false) {
@@ -112,6 +113,36 @@ struct FriendProfileView: View {
             }
         }
     }
+    
+    private var underConstructionSection: some View {
+            HStack {
+                Image(systemName: "hammer")
+                    .font(.title2)
+                    .foregroundColor(.black)
+                Text("Under Construction")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+            }
+            .padding()
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.yellow, Color.black]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .cornerRadius(10)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(LinearGradient(
+                        gradient: Gradient(colors: [Color.black, Color.yellow]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ), lineWidth: 5)
+            )
+            .shadow(radius: 5)
+        }
 }
 
 struct ProfileCard: View {
