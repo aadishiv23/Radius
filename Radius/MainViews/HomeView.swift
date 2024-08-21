@@ -25,6 +25,7 @@ struct HomeView: View {
     @State private var isPresentingZoneEditor = false
     @State private var isPresentingGroupView = false
     @State private var isPresentingDebugMenu = false
+    @State private var isPresentingFriendRequests = false
     
     @State private var userZones: [Zone] = []
     private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
@@ -54,12 +55,6 @@ struct HomeView: View {
                     endPoint: .bottomTrailing
                 )
                 .edgesIgnoringSafeArea(.all)
-                .hueRotation(.degrees(animateGradient ? 45 : 0))
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                        animateGradient.toggle()
-                    }
-                }
             )
             .navigationTitle("Home")
             .toolbar {
@@ -81,6 +76,12 @@ struct HomeView: View {
                             isPresentingDebugMenu = true
                         } label: {
                             Label("Debug Menu", systemImage: "ladybug")
+                        }
+                        
+                        Button {
+                            isPresentingFriendRequests = true
+                        } label: {
+                            Label("Friend Requests", systemImage: "person.crop.circle.badge.plus")
                         }
                     } label: {
                         Image(systemName: "plus")
@@ -106,6 +107,10 @@ struct HomeView: View {
                 NavigationView {
                     PasswordProtectedDebugMenuView()
                 }
+            }
+            .sheet(isPresented: $isPresentingFriendRequests) {
+                FriendRequestsView()
+                    .environmentObject(friendsDataManager)
             }
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()

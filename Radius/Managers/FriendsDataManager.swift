@@ -27,6 +27,7 @@ class FriendsDataManager: ObservableObject {
     @Published var friends: [Profile] = []
     @Published var currentUser: Profile!
     @Published var userGroups: [Group] = []
+    @Published var pendingRequests: [FriendRequest] = []
     
     private var userId: UUID?
 
@@ -116,6 +117,101 @@ class FriendsDataManager: ObservableObject {
         return hashed.compactMap { String(format: "%02x", $0) }.joined()
     }
     
+    // Method to send a friend request
+    func sendFriendRequest(to username: String) async throws {
+        do {
+            let receiverProfile: Profile? = try await supabaseClient
+                .from("profiles")
+                .select("id")
+                .eq("username", value: username)
+                .single()
+                .execute()
+                .value
+            
+            guard let receiverId = receiverProfile?.id, let senderId = userId else {
+                print("Receiver not found or sender ID is nil")
+                return
+            }
+            
+            try await supabaseClient
+                .from("friend_requests")
+                .insert([
+                    "sender_id": senderId.uuidString,
+                    "receiver_id": receiverId.uuidString,
+                    "status": "pending"
+                ])
+                .execute()
+            
+            print("Friend request sent to \(username)")
+        } catch {
+            print("Failed to send friend request: \(error)")
+        }
+    }
+
+    // Method to fetch pending friend requests
+    func fetchPendingFriendRequests() async {
+        do {
+            guard let userId = userId else { return }
+            
+            let requests: [FriendRequest] = try await supabaseClient
+                .from("friend_requests")
+                .select("*")
+                .eq("receiver_id", value: userId.uuidString)
+                .eq("status", value: "pending")
+                .execute()
+                .value
+            
+            DispatchQueue.main.async {
+                self.pendingRequests = requests
+            }
+        } catch {
+            print("Failed to fetch pending friend requests: \(error)")
+        }
+    }
+
+    // Method to accept a friend request
+    func acceptFriendRequest(_ request: FriendRequest) async {
+        do {
+            try await supabaseClient
+                .from("friend_requests")
+                .update(["status": "accepted"])
+                .eq("id", value: request.id.uuidString)
+                .execute()
+            
+            // Add the users as friends
+            try await supabaseClient
+                .from("friends")
+                .insert([
+                    ["profile_id": request.sender_id.uuidString, "friend_id": request.receiver_id.uuidString],
+                    ["profile_id": request.receiver_id.uuidString, "friend_id": request.sender_id.uuidString]
+                ])
+                .execute()
+            
+            print("Friend request accepted")
+            // Refresh friends list
+            await fetchFriends(for: userId!)
+        } catch {
+            print("Failed to accept friend request: \(error)")
+        }
+    }
+
+    // Method to fetch friends including new ones via friend requests
+    func fetchFriends(for userId: UUID) async {
+        do {
+            let friends: [Profile] = try await supabaseClient
+                .from("friends")
+                .select("profiles(*)")
+                .eq("profile_id", value: userId.uuidString)
+                .execute()
+                .value
+            
+            DispatchQueue.main.async {
+                self.friends = friends
+            }
+        } catch {
+            print("Failed to fetch friends: \(error)")
+        }
+    }
     
     func fetchCurrentUserProfile() async {
         do {
@@ -132,7 +228,7 @@ class FriendsDataManager: ObservableObject {
                     .value
                 
                 if let profile = profile {
-                    await fetchFriends(for: userId)
+                    await OldfetchFriends(for: userId)
                     print(profile.full_name)
                     print(profile.username)
                     print(user.email ?? "N/A")
@@ -147,7 +243,7 @@ class FriendsDataManager: ObservableObject {
         }
     }
         
-    func fetchFriends(for userId: UUID) async {
+    func OldfetchFriends(for userId: UUID) async {
         do {
             let friends: [Profile] = try await supabaseClient
                 .from("profiles")

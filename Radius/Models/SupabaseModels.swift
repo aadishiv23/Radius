@@ -8,6 +8,39 @@
 import Foundation
 import SwiftUI
 
+struct FriendRequest: Identifiable, Codable {
+    var id: UUID
+    var sender_id: UUID
+    var receiver_id: UUID
+    var status: String
+    var created_at: Date
+    
+    // For more readable status values, you can use an enum
+    enum Status: String, Codable {
+        case pending = "pending"
+        case accepted = "accepted"
+        case rejected = "rejected"
+    }
+    
+    // Computed property to get the status as an enum
+    var requestStatus: Status {
+        return Status(rawValue: status) ?? .pending
+    }
+    
+    // Additional convenience computed properties
+    var isPending: Bool {
+        return requestStatus == .pending
+    }
+    
+    var isAccepted: Bool {
+        return requestStatus == .accepted
+    }
+    
+    var isRejected: Bool {
+        return requestStatus == .rejected
+    }
+}
+
 struct Group: Codable, Identifiable {
     let id: UUID
     let name: String
