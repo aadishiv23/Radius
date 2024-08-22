@@ -34,6 +34,7 @@ struct FriendRequestsView: View {
             
             TextField("Enter Username", text: $newFriendUsername)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                .textInputAutocapitalization(.never)
                 .padding()
             
             Button("Send Request") {

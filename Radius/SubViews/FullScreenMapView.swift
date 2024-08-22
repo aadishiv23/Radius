@@ -17,22 +17,7 @@ struct FullScreenMapView: View {
     @Binding var isPresented: Bool  // Binding to control sheet presentation
 
     var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                Button(action: {
-                    isPresented = false  // Dismiss the sheet
-                }) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.primary)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(Circle())
-                }
-                .padding()
-            }
-            .zIndex(1)  // Ensure the button is on top
-
+        ZStack(alignment: .topTrailing) {
             Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendDataManager.friends) { friendLocation in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
                     Circle()
@@ -46,6 +31,18 @@ struct FullScreenMapView: View {
                 }
             }
             .ignoresSafeArea()
+
+            Button(action: {
+                isPresented = false  // Dismiss the sheet
+            }) {
+                Image(systemName: "xmark")
+                    .foregroundColor(.primary)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .clipShape(Circle())
+            }
+            .padding()
+            .zIndex(1)  // Ensure the button is on top
         }
     }
 }
