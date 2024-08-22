@@ -14,10 +14,10 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     private let locationUpdateInterval: TimeInterval = 60
     private let minimumDistance: CLLocationDistance = 50
     
-    private let zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)  // Add ZoneUpdateManager instance
+    let zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)  // Add ZoneUpdateManager instance
     private let fdm = FriendsDataManager(supabaseClient: supabase)
     
-    private var userZones: [Zone] = []
+    @Published var userZones: [Zone] = []
     private var lastZoneStatuses: [UUID: Bool] = [:]
     
     @Published var userLocation: CLLocation?
@@ -28,6 +28,10 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         self.checkLocationAuthorization()
         self.locationManager.distanceFilter = 10
+        
+        Task {
+            await fetchUserZones()
+        }
     }
     
     func checkIfLocationServicesIsEnabled() {

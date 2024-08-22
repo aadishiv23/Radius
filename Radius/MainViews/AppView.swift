@@ -28,9 +28,6 @@ struct AppView: View {
                             }
                         }
                     }
-                    .onDisappear {
-                        LocationManager.shared.stopUpdating()
-                    }
             } else {
                 AuthView()
             }

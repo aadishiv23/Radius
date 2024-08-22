@@ -150,18 +150,19 @@ class FriendsDataManager: ObservableObject {
 
     func fetchFriends(for userId: UUID) async {
         do {
-            let friends: [Profile] = try await supabaseClient
+            // Fetch profiles that are friends with the given user
+            let response: [Profile] = try await supabaseClient
                 .from("friends")
-                .select("profiles!friends_profile_id1_fkey(*)")
-                .eq("profile_id1", value: userId.uuidString)
+                .select("profiles!profile_id2(*)")
+                .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
                 .execute()
                 .value
             
             DispatchQueue.main.async {
-                self.friends = friends
+                self.friends = response
             }
         } catch {
-            print("Failed to fetch friends new code: \(error)")
+            print("Failed to fetch friends: \(error)")
         }
     }
 

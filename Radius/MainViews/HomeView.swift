@@ -12,7 +12,8 @@ import Combine
 struct HomeView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Assuming this contains your friendsLocations
     @Environment(\.colorScheme) var colorScheme
-    @StateObject private var locationViewModel = LocationViewModel()
+    @ObservedObject private var locationManager = LocationManager.shared
+    
     @State private var region =  MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -32,6 +33,8 @@ struct HomeView: View {
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
     
     @State private var animateGradient = false
+    @State private var showZoneExitActionSheet = false
+
     
 //    @StateObject private var mapRegionObserver: MapRegionObserver
 //
@@ -83,11 +86,27 @@ struct HomeView: View {
                         } label: {
                             Label("Friend Requests", systemImage: "person.crop.circle.badge.plus")
                         }
+                        
+                        Button {
+                            showZoneExitActionSheet = true
+                        } label: {
+                            Label("Manual Zone Exit", systemImage: "exclamationmark.circle")
+                        }
                     } label: {
                         Image(systemName: "plus")
                     }
 
                 }
+            }
+            .actionSheet(isPresented: $showZoneExitActionSheet) {
+                ActionSheet(
+                    title: Text("Select Zone to Trigger Exit"),
+                    buttons: friendsDataManager.currentUser.zones.map { zone in
+                        .default(Text(zone.name)) {
+                            handleManualZoneExit(for: zone)
+                        }
+                    } + [.cancel()]
+                )
             }
             .sheet(isPresented: $isPresentingZoneEditor) {
                 ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
@@ -112,6 +131,7 @@ struct HomeView: View {
                 FriendRequestsView()
                     .environmentObject(friendsDataManager)
             }
+            
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
             }
@@ -120,8 +140,8 @@ struct HomeView: View {
             await refreshData()
         }
         .onAppear {
-            locationViewModel.checkIfLocationServicesIsEnabled()
-            locationViewModel.plsInitiateLocationUpdates()
+            locationManager.checkIfLocationServicesIsEnabled()
+            locationManager.plsInitiateLocationUpdates()
             region = MKCoordinateRegion(center:
                 CLLocationCoordinate2D(latitude: friendsDataManager.currentUser?.latitude ?? 40.7128,
                    longitude: friendsDataManager.currentUser?.longitude ?? -74.0060),
@@ -140,6 +160,13 @@ struct HomeView: View {
         }
     }
     
+    private func handleManualZoneExit(for zone: Zone) {
+        guard let profileId = friendsDataManager.currentUser?.id else { return }
+        Task {
+            await locationManager.zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zone.id], at: Date())
+        }
+    }
+    
     private func refreshData() async {
         guard let userId = friendsDataManager.currentUser?.id else { return }
         await friendsDataManager.fetchFriends(for: userId)
@@ -147,8 +174,8 @@ struct HomeView: View {
     }
     
     private var mapSection: some View {
-        ZStack(alignment: .top/*Alignment(horizontal: .leading, vertical: .top)*/) {
-            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id} ) { friendLocation in
+        ZStack(alignment: .top) {
+            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }) { friendLocation in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
                     Circle()
                         .fill(Color(hex: friendLocation.color) ?? .blue)
@@ -161,8 +188,7 @@ struct HomeView: View {
             .frame(height: 300)
             .cornerRadius(15)
             .padding()
-            //.background(Color.gray.opacity(0.2))
-            
+
             HStack {
                 if showRecenterButton {
                     Button(action: recenterMap) {
@@ -174,10 +200,9 @@ struct HomeView: View {
                     .padding(.leading, 20)
                     .padding(.top, 20)
                 }
-               
-                
+
                 Spacer()
-                
+
                 Button(action: {
                     showFullScreenMap.toggle()
                 }) {
@@ -189,9 +214,8 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showFullScreenMap) {
-            // Present the FullScreenMapView here
             FullScreenMapView(region: $region, selectedFriend: $selectedFriend, isPresented: $showFullScreenMap)
-                    .environmentObject(friendsDataManager)
+                .environmentObject(friendsDataManager)
         }
     }
     
