@@ -7,10 +7,13 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 struct DebugMenuView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @StateObject private var zoneExitObserver = ZoneExitObserver()
     @State private var zoneExits: [ZoneExit] = []
+    @State private var localZoneExits: [LocalZoneExit] = []
     @State private var isLoading = false
     @State private var zones: [Zone] = []
     
@@ -48,6 +51,21 @@ struct DebugMenuView: View {
                 }
             }
 
+            Section(header: Text("Local Zone Exits")) {
+                if localZoneExits.isEmpty {
+                    Text("No local zone exits recorded")
+                } else {
+                    ForEach(localZoneExits.reversed(), id: \.id) { exit in
+                        VStack(alignment: .leading) {
+                            Text("Zone: \(exit.zoneName)")
+                            Text("Exit Time: \(formatDate(exit.exitTime))")
+                            Text("Latitude: \(exit.latitude)")
+                            Text("Longitude: \(exit.longitude)")
+                        }
+                    }
+                }
+            }
+            
             Section(header: Text("Zone Exits")) {
                 if isLoading {
                     ProgressView()
@@ -90,6 +108,13 @@ struct DebugMenuView: View {
         .navigationTitle("Debug Menu")
         .onAppear {
             fetchZoneExits()
+            zoneExitObserver.startObserving()
+        }
+        .onDisappear {
+           zoneExitObserver.stopObserving()
+        }
+        .onReceive(zoneExitObserver.$localZoneExits) { newExits in
+           self.localZoneExits = newExits
         }
         .refreshable {
             await friendsDataManager.fetchCurrentUserProfile()
@@ -126,5 +151,35 @@ struct DebugMenuView: View {
                 }
             }
         }
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .medium
+        return formatter.string(from: date)
+    }
+}
+
+class ZoneExitObserver: ObservableObject {
+    @Published var localZoneExits: [LocalZoneExit] = []
+    private var cancellables = Set<AnyCancellable>()
+    
+    func startObserving() {
+        NotificationCenter.default.publisher(for: .zoneExited)
+            .sink { [weak self] notification in
+                if let zoneExit = notification.object as? LocalZoneExit {
+                    DispatchQueue.main.async {
+                        self?.localZoneExits.append(zoneExit)
+                        // Keep only the last 10 exits
+                        self?.localZoneExits = Array(self?.localZoneExits.suffix(10) ?? [])
+                    }
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    func stopObserving() {
+        cancellables.removeAll()
     }
 }
