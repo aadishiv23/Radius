@@ -14,8 +14,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     private let locationUpdateInterval: TimeInterval = 60
     private let minimumDistance: CLLocationDistance = 50
     
-    let zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)  // Add ZoneUpdateManager instance
-    private let fdm = FriendsDataManager(supabaseClient: supabase)
+    let zoneUpdateManager: ZoneUpdateManager  // Add ZoneUpdateManager instance
+    private let fdm: FriendsDataManager
     
     @Published var userZones: [Zone] = []
     private var lastZoneStatuses: [UUID: Bool] = [:]
@@ -23,11 +23,16 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     @Published var userLocation: CLLocation?
     
     override init() {
+        self.zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)
+        self.fdm = FriendsDataManager(supabaseClient: supabase)
+        
         super.init()
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         self.checkLocationAuthorization()
         self.locationManager.distanceFilter = 10
+        self.locationManager.allowsBackgroundLocationUpdates = true
+        self.locationManager.pausesLocationUpdatesAutomatically = false
         
         Task {
             await fetchUserZones()
@@ -35,11 +40,17 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
     
     func checkIfLocationServicesIsEnabled() {
-        locationManager.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled() {
+            checkLocationAuthorization()
+        } else {
+            print("Location services are disabled")
+            locationManager.requestWhenInUseAuthorization()
+        }
     }
     
     func plsInitiateLocationUpdates() {
         locationManager.startUpdatingLocation()
+        setupGeofences()
     }
     
     func stopUpdating() {
@@ -50,12 +61,15 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         switch locationManager.authorizationStatus {
         case .notDetermined:
             locationManager.requestAlwaysAuthorization()
+            setupGeofences()
         case .restricted, .denied:
             break
         case .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
+            setupGeofences()
         case .authorizedAlways:
             locationManager.startUpdatingLocation()
+            setupGeofences()
         @unknown default:
             break
         }
@@ -84,24 +98,28 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         for zone in userZones {
             lastZoneStatuses[zone.id] = isUserInZone(zone: zone, location: userLocation)
         }
+        setupGeofences()
     }
     
-    private func checkZoneBoundaries(for location: CLLocation) {
-        var exitedZones: [UUID] = []
-        
-        for zone in userZones {
-            let wasInZone = lastZoneStatuses[zone.id] ?? false
-            let isInZone = isUserInZone(zone: zone, location: location)
-            
-            if wasInZone && !isInZone {
-                exitedZones.append(zone.id)
-            }
-            
-            lastZoneStatuses[zone.id] = isInZone
+    func setupGeofences() {
+        // Removes all prexisting monitoring zones
+        for region in locationManager.monitoredRegions {
+            locationManager.stopMonitoring(for: region)
         }
         
-        if !exitedZones.isEmpty {
-            handleZoneExits(exitedZones: exitedZones, at: location.timestamp)
+        // Set-up geofences for zones
+        for zone in userZones {
+            let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
+            let region = CLCircularRegion(center: center, radius: zone.radius, identifier: zone.id.uuidString)
+            region.notifyOnExit = true
+            locationManager.startMonitoring(for: region)
+        }
+    }
+    
+    func stopLocationUpdates() {
+            locationManager.stopUpdatingLocation()
+        for region in locationManager.monitoredRegions {
+            locationManager.stopMonitoring(for: region)
         }
     }
     
@@ -152,6 +170,59 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
 }
 
+struct LocalZoneExit: Identifiable {
+    let id = UUID()
+    let zoneName: String
+    let exitTime: Date
+    let latitude: Double
+    let longitude: Double
+}
+
+extension Notification.Name {
+    static let zoneExited = Notification.Name("zoneExited")
+}
+
+extension LocationManager {
+    private func notifyZoneExit(zone: Zone, location: CLLocation) {
+        let localZoneExit = LocalZoneExit(
+            zoneName: zone.name,
+            exitTime: Date(),
+            latitude: location.coordinate.latitude,
+            longitude: location.coordinate.longitude
+        )
+        NotificationCenter.default.post(name: .zoneExited, object: localZoneExit)
+    }
+
+    private func checkZoneBoundaries(for location: CLLocation) {
+        for zone in userZones {
+            let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
+            let distance = location.distance(from: zoneCenter)
+            
+            if distance > zone.radius {
+                // User has exited the zone
+                Task {
+                    await zoneUpdateManager.handleZoneExits(for: fdm.currentUser?.id ?? UUID(), zoneIds: [zone.id], at: Date())
+                }
+                notifyZoneExit(zone: zone, location: location)
+            }
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        guard let circularRegion = region as? CLCircularRegion,
+              let zoneId = UUID(uuidString: circularRegion.identifier),
+              let profileId = fdm.currentUser?.id,
+              let zone = userZones.first(where: { $0.id == zoneId }),
+              let location = manager.location else {
+            return
+        }
+        
+        Task {
+            await zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zoneId], at: Date())
+        }
+        notifyZoneExit(zone: zone, location: location)
+    }
+}
 
 
 //class MapRegionObserver: ObservableObject {
