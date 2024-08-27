@@ -14,6 +14,7 @@ struct InfoView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Access the shared data
     @State private var isPresentingCreateGroupView = false
     @State private var isPresentingJoinGroupView = false
+    @State private var isPresentingCompetitionManagerView = false
     @State private var isShownDemo: Bool = false
     @State private var animateGradient = false
 
@@ -111,10 +112,20 @@ struct InfoView: View {
                         }) {
                             Label("Join Group", systemImage: "person.crop.circle.badge.plus")
                         }
+                        
+                        Button(action: {
+                            // Navigate to Competition Manager View
+                            isPresentingCompetitionManagerView = true
+                        }) {
+                            Label("Manage Competitions", systemImage: "flag.2.crossed")
+                        }
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
+            }
+            .fullScreenCover(isPresented: $isPresentingCompetitionManagerView) {
+                CompetitionManagerView().environmentObject(friendsDataManager)
             }
             .fullScreenCover(isPresented: $isPresentingCreateGroupView) {
                 CreateGroupView(isPresented: $isPresentingCreateGroupView).environmentObject(friendsDataManager)

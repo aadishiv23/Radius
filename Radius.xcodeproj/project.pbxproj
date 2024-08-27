@@ -21,6 +21,9 @@
 		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
 		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
 		AC5856002BDF1925009C490B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FF2BDF1925009C490B /* MapView.swift */; };
+		AC5DB4D52C7D7F0100A1019E /* CompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */; };
+		AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */; };
+		AC5DB4DA2C7D800E00A1019E /* CompetitionManagerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */; };
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
@@ -76,6 +79,9 @@
 		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
 		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
 		AC5855FF2BDF1925009C490B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
+		AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerView.swift; sourceTree = "<group>"; };
+		AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerViewModel.swift; sourceTree = "<group>"; };
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
@@ -145,6 +151,7 @@
 		AC0AC6FE2BDB0EE4000418B8 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				AC5DB4D62C7D7FDF00A1019E /* Competitions */,
 				AC0AC7032BDB0F9B000418B8 /* FriendDetailView.swift */,
 				AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */,
 				AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */,
@@ -186,12 +193,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		AC5DB4D62C7D7FDF00A1019E /* Competitions */ = {
+			isa = PBXGroup;
+			children = (
+				AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */,
+				AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */,
+			);
+			path = Competitions;
+			sourceTree = "<group>";
+		};
 		AC79CDA12BE0B60400B49E90 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
 				AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */,
 				ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */,
 				AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */,
+				AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -401,6 +418,7 @@
 				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
 				AC3989562C705637002F84E6 /* DataController.swift in Sources */,
 				AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */,
+				AC5DB4DA2C7D800E00A1019E /* CompetitionManagerViewModel.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
 				AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */,
 				AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */,
@@ -408,6 +426,7 @@
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
 				ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */,
 				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
+				AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */,
 				ACC537302BF3258300BECF8A /* Stuff.swift in Sources */,
 				ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */,
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
@@ -437,6 +456,7 @@
 				ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */,
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
+				AC5DB4D52C7D7F0100A1019E /* CompetitionManager.swift in Sources */,
 				ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
