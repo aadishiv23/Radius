@@ -221,3 +221,17 @@ struct ZoneExit: Identifiable, Codable {
     var exit_time: Date
 }
 
+struct GroupCompetition: Identifiable, Codable {
+    var id: UUID
+    var competitionName: String
+    var competitionDate: Date
+    var maxPoints: Int?
+    var createdAt: Date
+}
+
+struct GroupCompetitionLink: Identifiable, Codable {
+    var id: UUID
+    var competitionId: UUID
+    var groupId: UUID
+}
+

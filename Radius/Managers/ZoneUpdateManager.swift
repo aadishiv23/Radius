@@ -18,8 +18,20 @@ final class ZoneUpdateManager {
     func handleZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async {
         let dateFormatter = ISO8601DateFormatter()
         let exitTime = dateFormatter.string(from: time)
+        let currentDateString = dateFormatter.string(from: time)
+
         
         do {
+            // Get the current count of exits for today to determine the global exit order
+            let exitCountResponse: [DailyZoneExit] = try await supabaseClient
+                .from("daily_zone_exits")
+                .select()
+                .eq("date", value: currentDateString)
+                .execute()
+                .value
+            
+            let globalExitOrder = exitCountResponse.count + 1  // Next exit order
+
             for (index, zoneId) in zoneIds.enumerated() {
                 let zoneExit = [
                     "profile_id": profileId.uuidString,
@@ -41,8 +53,8 @@ final class ZoneUpdateManager {
                     date: Date(),
                     profileId: profileId,
                     zoneExitId: insertedZoneExit.id,
-                    exitOrder: index + 1,
-                    pointsEarned: calculatePoints(for: index)
+                    exitOrder: globalExitOrder + 1,
+                    pointsEarned: calculatePoints(for: globalExitOrder)
                 )
                 
                 try await supabaseClient
