@@ -184,3 +184,40 @@ struct GroupMember: Codable {
     let group_id: UUID
     let profile_id: UUID
 }
+
+struct DailyZoneExit: Identifiable, Codable {
+    var id: UUID
+    var date: Date
+    var profileId: UUID
+    var zoneExitId: UUID
+    var exitOrder: Int
+    var pointsEarned: Int
+}
+
+struct GroupTotalPoints: Identifiable, Codable {
+    var id: UUID
+    var groupId: UUID
+    var totalPoints: Int
+}
+
+struct UserTotalPoints: Identifiable, Codable {
+    var id: UUID
+    var profileId: UUID
+    var totalPoints: Int
+}
+
+struct DailyPoints: Identifiable, Codable {
+    var id: UUID
+    var profileId: UUID
+    var groupId: UUID?
+    var points: Int
+    var date: Date
+}
+
+struct ZoneExit: Identifiable, Codable {
+    var id: UUID
+    var profile_id: UUID
+    var zone_id: UUID
+    var exit_time: Date
+}
+
