@@ -47,6 +47,10 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Info", systemImage: "info.circle")
                 }
+            LeaderboardView()
+                .tabItem {
+                    Label("Leaderboard", systemImage: "list.number")
+                }
             SupabaseProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle")

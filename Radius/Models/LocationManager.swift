@@ -7,6 +7,7 @@
 import CoreLocation
 import Supabase
 
+@available(iOS 17.0, *)
 final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     static let shared = LocationManager()
     private var locationManager = CLLocationManager()
@@ -22,6 +23,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     @Published var userLocation: CLLocation?
     
+    private var monitor: CLMonitor?
+    
     override init() {
         self.zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)
         self.fdm = FriendsDataManager(supabaseClient: supabase)
@@ -36,9 +39,40 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         
         Task {
             await fetchUserZones()
+            await setupMonitor()
         }
     }
     
+    private func setupMonitor() async {
+        monitor = await CLMonitor("zone_monitor")
+        
+        for zone in userZones {
+            let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
+            let condition = CLCircularGeographicCondition(center: center, radius: zone.radius)
+            
+            await monitor?.add(condition, identifier: "notify_when_user_exits_radius")
+        }
+        
+        if let monitor = monitor {
+            Task {
+                for try await event in await monitor.events {
+                    guard let zoneId = UUID(uuidString: event.identifier),
+                          let zone = userZones.first(where: { $0.id == zoneId }) else {
+                        return
+                    }
+                    
+                    if event.state == .satisfied {
+                        Task {
+                            await zoneUpdateManager.handleZoneExits(for: fdm.currentUser.id, zoneIds: [zoneId], at: Date())
+                        }
+                        notifyZoneExit(zone: zone, location: userLocation ?? CLLocation())
+                    }
+                }
+            }
+        }
+    }
+    
+
     func checkIfLocationServicesIsEnabled() {
         if CLLocationManager.locationServicesEnabled() {
             checkLocationAuthorization()
@@ -50,7 +84,6 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     func plsInitiateLocationUpdates() {
         locationManager.startUpdatingLocation()
-        setupGeofences()
     }
     
     func stopUpdating() {
@@ -103,9 +136,9 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     func setupGeofences() {
         // Removes all prexisting monitoring zones
-        for region in locationManager.monitoredRegions {
-            locationManager.stopMonitoring(for: region)
-        }
+//        for region in locationManager.monitoredRegions {
+//            locationManager.stopMonitoring(for: region)
+//        }
         
         // Set-up geofences for zones
         for zone in userZones {
@@ -154,10 +187,14 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         Task {
             do {
                 await fdm.fetchCurrentUserProfile()
+                guard let currentUser = fdm.currentUser else {
+                    print("Current user is nil, cannot update location.")
+                    return
+                }
                 try await supabase
                     .from("profiles")
                     .update(locationArr)
-                    .eq("id", value: fdm.currentUser?.id.uuidString)
+                    .eq("id", value: currentUser.id.uuidString)
                     .execute()
                 
                 DispatchQueue.main.async {
@@ -168,6 +205,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
             }
         }
     }
+
 }
 
 struct LocalZoneExit: Identifiable {
@@ -207,21 +245,6 @@ extension LocationManager {
             }
         }
     }
-
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        guard let circularRegion = region as? CLCircularRegion,
-              let zoneId = UUID(uuidString: circularRegion.identifier),
-              let profileId = fdm.currentUser?.id,
-              let zone = userZones.first(where: { $0.id == zoneId }),
-              let location = manager.location else {
-            return
-        }
-        
-        Task {
-            await zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zoneId], at: Date())
-        }
-        notifyZoneExit(zone: zone, location: location)
-    }
 }
 
 
@@ -246,3 +269,17 @@ extension LocationManager {
 //        currentCenter = newCenter
 //    }
 //}
+
+@objc(CLCircularGeographicCondition)
+class CLCircularGeographicCondition: NSObject, CLCondition {
+    @objc var center: CLLocationCoordinate2D { get { fatalError("This is just a stub") } }
+    @objc var radius: CLLocationDistance { get { fatalError("This is just a stub") } }
+    
+    @objc init(center: CLLocationCoordinate2D, radius: CLLocationDistance) {
+        super.init()
+    }
+    
+    @objc required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}

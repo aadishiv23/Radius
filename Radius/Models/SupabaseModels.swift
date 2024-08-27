@@ -80,7 +80,7 @@ extension DateFormatter {
 }
 
 
-struct Group: Codable, Identifiable {
+struct Group: Codable, Identifiable, Hashable {
     let id: UUID
     let name: String
     let description: String?

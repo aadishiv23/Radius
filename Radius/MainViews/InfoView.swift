@@ -125,6 +125,12 @@ struct InfoView: View {
             .onAppear {
                 Task {
                     await friendsDataManager.fetchUserGroups()
+                    if let userId = friendsDataManager.currentUser?.id {
+                        await friendsDataManager.OldfetchFriends(for: userId)
+                        print("Current user is: \(userId) and fetched freinds for em")
+                    } else {
+                        print("Current user id is nil")
+                    }
                 }
             }
         }

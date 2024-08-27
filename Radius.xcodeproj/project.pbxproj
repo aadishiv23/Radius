@@ -49,6 +49,7 @@
 		ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFE2C193F8500E12E0B /* GroupView.swift */; };
 		ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
+		ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */; };
 		ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACD4812C2C326E98004653A1 /* CoreDataModel.xcdatamodeld */; };
@@ -99,6 +100,7 @@
 		ACAEFDFE2C193F8500E12E0B /* GroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupView.swift; sourceTree = "<group>"; };
 		ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeManager.swift; sourceTree = "<group>"; };
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
+		ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectedDebugView.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				AC6A552A2BD99B1700706E01 /* InfoView.swift */,
 				AC98AE012BC0872E00879A25 /* ContentView.swift */,
 				AC9BD1D82BEB3EB000D23123 /* AppView.swift */,
+				ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */,
 			);
 			path = MainViews;
 			sourceTree = "<group>";
@@ -431,6 +434,7 @@
 				AC39896A2C758E3D002F84E6 /* FriendsRequestsView.swift in Sources */,
 				AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */,
 				AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */,
+				ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */,
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
 				ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */,
