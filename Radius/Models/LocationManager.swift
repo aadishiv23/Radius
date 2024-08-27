@@ -48,24 +48,32 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         
         for zone in userZones {
             let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
-            let condition = CLCircularGeographicCondition(center: center, radius: zone.radius)
+            let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
             
-            await monitor?.add(condition, identifier: "notify_when_user_exits_radius")
+            await monitor?.add(condition, identifier: "notify_when_user_exits_radius", assuming: .unsatisfied)
         }
         
         if let monitor = monitor {
             Task {
                 for try await event in await monitor.events {
-                    guard let zoneId = UUID(uuidString: event.identifier),
-                          let zone = userZones.first(where: { $0.id == zoneId }) else {
-                        return
-                    }
-                    
-                    if event.state == .satisfied {
-                        Task {
-                            await zoneUpdateManager.handleZoneExits(for: fdm.currentUser.id, zoneIds: [zoneId], at: Date())
+                    if let record = await monitor.record(for: event.identifier) {
+                        let lastEvent = record.lastEvent
+                        let duration = lastEvent.date.timeIntervalSinceNow // stats keeping for now
+                        
+                        guard let zoneId = UUID(uuidString: event.identifier),
+                              let zone = userZones.first(where: { $0.id == zoneId }) else {
+                            return
                         }
-                        notifyZoneExit(zone: zone, location: userLocation ?? CLLocation())
+                        
+                        if (lastEvent.state == .satisfied) {
+                            Task {
+                                await zoneUpdateManager.handleZoneExits(for: fdm.currentUser.id, zoneIds: [zoneId], at: Date())
+                            }
+                            notifyZoneExit(zone: zone, location: userLocation ?? CLLocation())
+                        }
+                        if (lastEvent.state == .unsatisfied) {
+                            print("Re-entering zone")
+                        }
                     }
                 }
             }
@@ -269,17 +277,3 @@ extension LocationManager {
 //        currentCenter = newCenter
 //    }
 //}
-
-@objc(CLCircularGeographicCondition)
-class CLCircularGeographicCondition: NSObject, CLCondition {
-    @objc var center: CLLocationCoordinate2D { get { fatalError("This is just a stub") } }
-    @objc var radius: CLLocationDistance { get { fatalError("This is just a stub") } }
-    
-    @objc init(center: CLLocationCoordinate2D, radius: CLLocationDistance) {
-        super.init()
-    }
-    
-    @objc required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
