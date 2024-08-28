@@ -9,6 +9,7 @@ struct CompetitionManagerView: View {
     @State private var isCreatingCompetition = false
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var maxPoints: Int = 0
 
     var body: some View {
         VStack {
@@ -25,6 +26,17 @@ struct CompetitionManagerView: View {
                         .padding()
                         .background(Color.white.opacity(0.3))
                         .cornerRadius(10)
+                    
+                    TextField("Max Points per Day", value: $maxPoints, format: .number)
+                        .keyboardType(.numberPad)
+                        .padding()
+                        .background(Color.white.opacity(0.3))
+                        .cornerRadius(10)
+
+                    Text("This should be number of users in competition minus 1")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 5)
                 }
                 .listRowBackground(Color.clear)
 
@@ -116,26 +128,35 @@ struct CompetitionManagerView: View {
     }
 
     private func createCompetition() {
-        isCreatingCompetition = true
-        Task {
-            do {
-                let competition = try await viewModel.createCompetition(
-                    name: competitionName,
-                    date: competitionDate,
-                    groupIds: Array(selectedGroups)
-                )
-                alertMessage = "Competition '\(competition.competitionName)' created with max points \(competition.maxPoints ?? 0)"
-                showAlert = true
-                isCreatingCompetition = false
-                competitionName = ""
-                selectedGroups = []
-            } catch {
-                alertMessage = "Failed to create competition: \(error.localizedDescription)"
-                showAlert = true
-                isCreatingCompetition = false
+//            guard let maxPointsInt = Int(maxPoints), maxPointsInt > 0 else {
+//                alertMessage = "Please enter a valid number for max points."
+//                showAlert = true
+//                return
+//            }
+
+
+            isCreatingCompetition = true
+            Task {
+                do {
+                    let competition = try await viewModel.createCompetition(
+                        name: competitionName,
+                        date: competitionDate, 
+                        points: maxPoints,
+                        groupIds: Array(selectedGroups)
+                    )
+                    alertMessage = "Competition '\(competition.competitionName)' created with max points \(competition.maxPoints ?? 0)"
+                    showAlert = true
+                    isCreatingCompetition = false
+                    competitionName = ""
+                    selectedGroups = []
+                    maxPoints = 0  // Reset the max points field
+                } catch {
+                    alertMessage = "Failed to create competition: \(error.localizedDescription)"
+                    showAlert = true
+                    isCreatingCompetition = false
+                }
             }
         }
-    }
 }
 
 struct CompetitionManagerView_Previews: PreviewProvider {

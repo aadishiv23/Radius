@@ -24,10 +24,11 @@ class CompetitionManagerViewModel: ObservableObject {
         }
     }
 
-    func createCompetition(name: String, date: Date, groupIds: [UUID]) async throws -> GroupCompetition {
+    func createCompetition(name: String, date: Date, points: Int, groupIds: [UUID]) async throws -> GroupCompetition {
         return try await competitionManager.createCompetition(
             competitionName: name,
             competitionDate: date,
+            maxPoints: points,
             groupIds: groupIds
         )
     }

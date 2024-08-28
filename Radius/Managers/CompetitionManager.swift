@@ -23,12 +23,12 @@ class CompetitionManager {
             .value
     }
     
-    func createCompetition(competitionName: String, competitionDate: Date, groupIds: [UUID]) async throws -> GroupCompetition {
+    func createCompetition(competitionName: String, competitionDate: Date, maxPoints: Int, groupIds: [UUID]) async throws -> GroupCompetition {
         let competition = GroupCompetition(
             id: UUID(),
             competitionName: competitionName,
             competitionDate: competitionDate,
-            maxPoints: nil,
+            maxPoints: maxPoints,
             createdAt: Date()
         )
         
