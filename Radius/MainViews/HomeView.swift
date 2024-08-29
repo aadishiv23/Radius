@@ -50,6 +50,16 @@ struct HomeView: View {
                     friendListSection
                 }
             }
+            .onAppear {
+                Task {
+                    if let userId = friendsDataManager.currentUser?.id {
+                        await friendsDataManager.fetchFriends(for: userId)
+                        print("Current user is: \(userId)")
+                    } else {
+                        print("Current user id is nil")
+                    }
+                }
+            }
             .background(
                 LinearGradient(
                     gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.white.opacity(0.5), Color.yellow.opacity(0.5)]),
