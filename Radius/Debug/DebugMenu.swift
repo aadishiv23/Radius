@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+// MARK: - DebugMenuView
 struct DebugMenuView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @StateObject private var zoneExitObserver = ZoneExitObserver()
@@ -19,8 +20,35 @@ struct DebugMenuView: View {
 
     var body: some View {
         List {
-            // ... (other sections remain the same)
-
+            Section(header: Text("Current User")) {
+                if let currentUser = friendsDataManager.currentUser {
+                    Text("Name: \(currentUser.full_name)")
+                    Text("Username: \(currentUser.username)")
+                    Text("Latitude: \(currentUser.latitude)")
+                    Text("Longitude: \(currentUser.longitude)")
+                } else {
+                    Text("No current user data")
+                }
+            }
+            Section(header: Text("Friends")) {
+                ForEach(friendsDataManager.friends, id: \.id) { friend in
+                    VStack(alignment: .leading) {
+                        Text("Name: \(friend.full_name)")
+                        Text("Username: \(friend.username)")
+                        Text("Latitude: \(friend.latitude)")
+                        Text("Longitude: \(friend.longitude)")
+                        Text("Zones: \(friend.zones.count)")
+                    }
+                }
+            }
+            Section(header: Text("User Groups")) {
+                ForEach(friendsDataManager.userGroups, id: \.id) { group in
+                    VStack(alignment: .leading) {
+                        Text("Name: \(group.name)")
+                        Text("Description: \(group.description ?? "N/A")")
+                    }
+                }
+            }
             Section(header: Text("Local Zone Exits")) {
                 if localZoneExits.isEmpty {
                     Text("No local zone exits recorded")
@@ -35,30 +63,24 @@ struct DebugMenuView: View {
                     }
                 }
             }
-
-            Section(header: Text("Supabase Zone Exits")) {
+            Section(header: Text("Zone Exits")) {
                 if isLoading {
                     ProgressView()
                 } else if zoneExits.isEmpty {
-                    Text("No Supabase zone exits found")
+                    Text("No zone exits recorded")
                 } else {
-                    ForEach(zoneExits, id: \.zone_id) { exit in
+                    ForEach(zoneExits, id: \.id) { exit in
                         VStack(alignment: .leading) {
-                            Text("Profile ID: \(exit.profile_id)")
                             Text("Zone ID: \(exit.zone_id)")
-                            Text("Exit Time: \(exit.exit_time)")
+                            Text("Exit Time: \(formatDate(exit.exit_time))")
                         }
                     }
                 }
             }
-
-            // ... (other sections remain the same)
         }
         .navigationTitle("Debug Menu")
         .onAppear {
-            Task {
-                await fetchZoneExits()
-            }
+            fetchZoneExitsForCurrentUser()
             zoneExitObserver.startObserving()
         }
         .onDisappear {
@@ -68,40 +90,28 @@ struct DebugMenuView: View {
             self.localZoneExits = newExits
         }
         .refreshable {
-            await refreshData()
+            await friendsDataManager.fetchCurrentUserProfile()
+            fetchZoneExitsForCurrentUser()
         }
     }
 
-    private func refreshData() async {
-        await friendsDataManager.fetchCurrentUserProfile()
-        await friendsDataManager.fetchUserGroups()
-        do {
-            zones = try await friendsDataManager.fetchZones(for: friendsDataManager.currentUser?.id ?? UUID())
-        } catch {
-            print("Couldn't fetch zones: \(error)")
-        }
-        await fetchZoneExits()
-    }
-
-    private func fetchZoneExits() async {
+    private func fetchZoneExitsForCurrentUser() {
+        guard let currentUser = friendsDataManager.currentUser else { return }
         isLoading = true
-        do {
-            let exits: [ZoneExit] = try await supabase
-                .from("zone_exits")
-                .select("*")
-                .order("exit_time", ascending: false)
-                .limit(10)
-                .execute()
-                .value
-
-            DispatchQueue.main.async {
-                self.zoneExits = exits
-                self.isLoading = false
-            }
-        } catch {
-            print("Failed to fetch zone exits: \(error)")
-            DispatchQueue.main.async {
-                self.isLoading = false
+        
+        Task {
+            do {
+                let fetchedZoneExits = try await ZoneUpdateManager(supabaseClient: supabase)
+                    .fetchZoneExits(for: currentUser.id)
+                DispatchQueue.main.async {
+                    self.zoneExits = fetchedZoneExits
+                    self.isLoading = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
+                print("Failed to fetch zone exits: \(error)")
             }
         }
     }
