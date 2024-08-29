@@ -50,35 +50,34 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
             let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
             let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
             
-            await monitor?.add(condition, identifier: "notify_when_user_exits_radius", assuming: .unsatisfied)
+            await monitor?.add(condition, identifier: zone.id.uuidString, assuming: .unsatisfied)
         }
         
         if let monitor = monitor {
             Task {
                 for try await event in await monitor.events {
-                    if let record = await monitor.record(for: event.identifier) {
-                        let lastEvent = record.lastEvent
-                        let duration = lastEvent.date.timeIntervalSinceNow // stats keeping for now
-                        
-                        guard let zoneId = UUID(uuidString: event.identifier),
-                              let zone = userZones.first(where: { $0.id == zoneId }) else {
-                            return
+                    guard let record = await monitor.record(for: event.identifier),
+                          let zoneId = UUID(uuidString: event.identifier),
+                          let zone = userZones.first(where: { $0.id == zoneId }) else {
+                        continue
+                    }
+                    
+                    // Get the last event state for the zone
+                    let lastEvent = record.lastEvent
+                    
+                    // Only handle if the event is transitioning from satisfied to unsatisfied (exit)
+                    if lastEvent.state == .satisfied && event.state == .unsatisfied {
+                        // Handle zone exit
+                        Task {
+                            await zoneUpdateManager.handleZoneExits(for: fdm.currentUser?.id ?? UUID(), zoneIds: [zoneId], at: Date())
                         }
-                        
-                        if (lastEvent.state == .satisfied) {
-                            Task {
-                                await zoneUpdateManager.handleZoneExits(for: fdm.currentUser.id, zoneIds: [zoneId], at: Date())
-                            }
-                            notifyZoneExit(zone: zone, location: userLocation ?? CLLocation())
-                        }
-                        if (lastEvent.state == .unsatisfied) {
-                            print("Re-entering zone")
-                        }
+                        notifyZoneExit(zone: zone, location: userLocation ?? CLLocation())
                     }
                 }
             }
         }
     }
+
     
 
     func checkIfLocationServicesIsEnabled() {
