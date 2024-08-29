@@ -147,24 +147,49 @@ class FriendsDataManager: ObservableObject {
             print("Failed to send friend request: \(error)")
         }
     }
-
-    func fetchFriends(for userId: UUID) async {
-        do {
-            // Fetch profiles that are friends with the given user
-            let response: [Profile] = try await supabaseClient
-                .from("friends")
-                .select("profiles!profile_id2(*)")
-                .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
-                .execute()
-                .value
-            
-            DispatchQueue.main.async {
-                self.friends = response
-            }
-        } catch {
-            print("Failed to fetch friends: \(error)")
-        }
+    
+    func fetchFriendsAndGroups() async {
+        guard let userId = self.userId else { return }
+        
+        await fetchFriends(for: userId)
+        await fetchUserGroups()
     }
+    
+    func fetchFriends(for userId: UUID) async {
+            do {
+                // First, fetch friend relationships
+                let friendRelations: [FriendRelation] = try await supabaseClient
+                    .from("friends")
+                    .select("friendship_id, profile_id1, profile_id2")
+                    .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
+                    .execute()
+                    .value
+
+                // Extract friend IDs
+                let friendIds = friendRelations.compactMap { relation -> UUID? in
+                    if relation.profile_id1 == userId {
+                        return relation.profile_id2
+                    } else if relation.profile_id2 == userId {
+                        return relation.profile_id1
+                    }
+                    return nil
+                }
+
+                // Now fetch the actual friend profiles
+                let friendProfiles: [Profile] = try await supabaseClient
+                    .from("profiles")
+                    .select("id, username, full_name, color, latitude, longitude, phone_num")
+                    .in("id", values: friendIds.map { $0.uuidString })
+                    .execute()
+                    .value
+
+                DispatchQueue.main.async {
+                    self.friends = friendProfiles
+                }
+            } catch {
+                print("Failed to fetch friends: \(error)")
+            }
+        }
 
     func fetchPendingFriendRequests() async {
         do {
@@ -265,7 +290,7 @@ class FriendsDataManager: ObservableObject {
             }
             
         } catch {
-            print("Failed to fetch friends: \(error)")
+            print("Failed to fetch friends old: \(error)")
         }
     }
 

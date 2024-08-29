@@ -88,6 +88,9 @@ struct InfoView: View {
                 .padding(.top) // Add padding to the top
             }
             .navigationTitle("Friends Info")
+            .refreshable {
+                await refreshData()
+            }
             .scrollContentBackground(.hidden)
             .background(
                 LinearGradient(
@@ -135,16 +138,27 @@ struct InfoView: View {
             }
             .onAppear {
                 Task {
-                    await friendsDataManager.fetchUserGroups()
+                    await friendsDataManager.fetchFriendsAndGroups()
+                }
+                
+                Task {
                     if let userId = friendsDataManager.currentUser?.id {
-                        await friendsDataManager.OldfetchFriends(for: userId)
-                        print("Current user is: \(userId) and fetched freinds for em")
+                        await friendsDataManager.fetchFriends(for: userId)
+                        print("Current user is: \(userId)")
                     } else {
                         print("Current user id is nil")
                     }
                 }
+                for friendsLocation in friendsDataManager.friends {
+                    print(friendsLocation.full_name)
+                }
             }
         }
+    }
+    
+    private func refreshData() async {
+        guard let userId = friendsDataManager.currentUser?.id else { return }
+        await friendsDataManager.fetchFriends(for: userId)
     }
 
     // Custom Header View
