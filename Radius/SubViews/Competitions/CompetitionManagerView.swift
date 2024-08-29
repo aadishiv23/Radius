@@ -144,7 +144,7 @@ struct CompetitionManagerView: View {
                         points: maxPoints,
                         groupIds: Array(selectedGroups)
                     )
-                    alertMessage = "Competition '\(competition.competitionName)' created with max points \(competition.maxPoints ?? 0)"
+                    alertMessage = "Competition '\(competition.competition_name)' created with max points \(competition.max_points ?? 0)"
                     showAlert = true
                     isCreatingCompetition = false
                     competitionName = ""

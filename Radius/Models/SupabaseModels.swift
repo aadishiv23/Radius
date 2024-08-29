@@ -77,7 +77,24 @@ extension DateFormatter {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
+    
+    static let zoneExitSupabaseFormat: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
 }
+//extension DateFormatter {
+//    static let customSupabaseFormat: DateFormatter = {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+//        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+//        formatter.locale = Locale(identifier: "en_US_POSIX")
+//        return formatter
+//    }()
+//}
 
 
 struct Group: Codable, Identifiable, Hashable {
@@ -219,19 +236,42 @@ struct ZoneExit: Identifiable, Codable {
     var profile_id: UUID
     var zone_id: UUID
     var exit_time: Date
+    
+    enum CodingKeys: String, CodingKey {
+        case id, profile_id, zone_id, exit_time
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        profile_id = try container.decode(UUID.self, forKey: .profile_id)
+        zone_id = try container.decode(UUID.self, forKey: .zone_id)
+        
+        let dateString = try container.decode(String.self, forKey: .exit_time)
+        if let date = DateFormatter.zoneExitSupabaseFormat.date(from: dateString) {
+            exit_time = date
+        } else {
+            throw DecodingError.dataCorruptedError(forKey: .exit_time, in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
+    }
 }
 
 struct GroupCompetition: Identifiable, Codable {
     var id: UUID
-    var competitionName: String
-    var competitionDate: Date
-    var maxPoints: Int?
-    var createdAt: Date
+    var competition_name: String
+    var competition_date: Date
+    var max_points: Int?
+    var created_at: Date
 }
 
 struct GroupCompetitionLink: Identifiable, Codable {
     var id: UUID
-    var competitionId: UUID
-    var groupId: UUID
+    var competition_id: UUID
+    var group_id: UUID
 }
 
+struct FriendRelation: Codable {
+    let friendship_id: UUID
+    let profile_id1: UUID
+    let profile_id2: UUID
+}

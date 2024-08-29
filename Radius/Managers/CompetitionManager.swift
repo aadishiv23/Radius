@@ -26,10 +26,10 @@ class CompetitionManager {
     func createCompetition(competitionName: String, competitionDate: Date, maxPoints: Int, groupIds: [UUID]) async throws -> GroupCompetition {
         let competition = GroupCompetition(
             id: UUID(),
-            competitionName: competitionName,
-            competitionDate: competitionDate,
-            maxPoints: maxPoints,
-            createdAt: Date()
+            competition_name: competitionName,
+            competition_date: competitionDate,
+            max_points: maxPoints,
+            created_at: Date()
         )
         
         // Insert competition
@@ -40,7 +40,7 @@ class CompetitionManager {
         
         // Link groups to the competition
         for groupId in groupIds {
-            let link = GroupCompetitionLink(id: UUID(), competitionId: competition.id, groupId: groupId)
+            let link = GroupCompetitionLink(id: UUID(), competition_id: competition.id, group_id: groupId)
             try await supabaseClient
                 .from("group_competition_links")
                 .insert(link)
@@ -51,10 +51,10 @@ class CompetitionManager {
         let profileCount = try await fetchProfileCount(for: competition.id)
         let updatedCompetition = GroupCompetition(
             id: competition.id,
-            competitionName: competition.competitionName,
-            competitionDate: competition.competitionDate,
-            maxPoints: profileCount,
-            createdAt: competition.createdAt
+            competition_name: competition.competition_name,
+            competition_date: competition.competition_date,
+            max_points: profileCount,
+            created_at: competition.created_at
         )
         
         try await supabaseClient
@@ -66,9 +66,9 @@ class CompetitionManager {
         return updatedCompetition
     }
     
-    private func fetchProfileCount(for competitionId: UUID) async throws -> Int {
+    private func fetchProfileCount(for competition_id: UUID) async throws -> Int {
         let profileCountResponse: Int = try await supabaseClient
-            .rpc("count_profiles_in_competition", params: ["competition_id": competitionId.uuidString])
+            .rpc("count_profiles_in_competition", params: ["competition_id": competition_id.uuidString])
             .execute()
             .value
         
