@@ -11,27 +11,24 @@ import MapKit
 
 struct CustomView: View {
 
-    @Binding var percentage: Double // or some value binded
-    @State private var heightMultiplier: CGFloat = 1.0
+    @Binding var value: Double
+    let minValue: Double
+    let maxValue: Double
 
     var body: some View {
         GeometryReader { geometry in
-            // TODO: - there might be a need for horizontal and vertical alignments
             ZStack(alignment: .leading) {
                 Rectangle()
                     .foregroundColor(.gray)
                 Rectangle()
                     .foregroundColor(.accentColor)
-                    .frame(width: geometry.size.width * CGFloat(self.percentage / 100))
+                    .frame(width: geometry.size.width * CGFloat((value - minValue) / (maxValue - minValue)))
             }
             .cornerRadius(12)
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged({ value in
-                    // TODO: - maybe use other logic here
-                    let newHeightMultiplier = min(max(1, heightMultiplier + (value.translation.height / geometry.size.height)), 2) // Limiting height to double the original
-                    let newPercentage = min(max(0, Double(value.location.x / geometry.size.width * 100)), 100)
-                    self.percentage = newPercentage
-                    self.heightMultiplier = newHeightMultiplier
+                    let newValue = minValue + (maxValue - minValue) * Double(value.location.x / geometry.size.width)
+                    self.value = min(max(minValue, newValue), maxValue)
                 }))
         }
     }
@@ -47,37 +44,58 @@ struct ZoneEditorView: View {
     @State private var mapRegion: MKCoordinateRegion = MKCoordinateRegion.defaultRegion
     @State private var zoneName: String = ""
     @FocusState private var isTextFieldFocused: Bool
-    
+    @State private var isSliderFocused: Bool = false
+
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack {
+                    Button(action: {
+                        showAddressEntry = true
+                    }) {
+                        Text("Enter Address")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                    .padding()
+
                     TextField("Zone name", text: $zoneName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                         .focused($isTextFieldFocused)
-                    
+
                     MapView(region: $mapRegion, location: $newZoneLocation, radius: $zoneRadius)
                         .frame(height: 300)
                         .padding()
 
-                    //Slider(value: $zoneRadius, in: 10...500, step: 5)
-                    CustomView(percentage: $zoneRadius)
+                    CustomView(value: $zoneRadius, minValue: 0, maxValue: 500)
+                        .scaleEffect(isSliderFocused ? 1.2 : 1.0)
                         .padding()
-                    
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged({ _ in
+                                isSliderFocused = true
+                            })
+                            .onEnded({ _ in
+                                isSliderFocused = false
+                            }))
+
                     Text("Radius: \(zoneRadius, specifier: "%.1f") meters")
                         .padding()
                         .contentTransition(.numericText())
-                        //.contentTransition(.numericTransition())
                         .animation(.easeInOut, value: zoneRadius)
-                    
-                    Button("Enter Address") {
-                        showAddressEntry = true
-                    }
-                    .padding()
-                    
-                    Button("Save Zone") {
+
+                    Button(action: {
                         saveZone()
+                    }) {
+                        Text("Save Zone")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
                     }
                     .disabled(newZoneLocation == nil || zoneName.isEmpty)
                     .padding()
@@ -107,7 +125,7 @@ struct ZoneEditorView: View {
             }
         }
     }
-    
+
     private func saveZone() {
         if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
             let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: zoneRadius, profile_id: currentUser.id)
