@@ -13,9 +13,9 @@ struct HomeView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Assuming this contains your friendsLocations
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject private var locationManager = LocationManager.shared
-    
+        
     @State private var region =  MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
+        center: CLLocationCoordinate2D(latitude: 42.278378215221565, longitude: -83.74388859636869),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
@@ -28,7 +28,6 @@ struct HomeView: View {
     @State private var isPresentingFriendRequests = false
     
     @State private var userZones: [Zone] = []
-    private let initialCenter = CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
     
     @State private var animateGradient = false
@@ -142,10 +141,9 @@ struct HomeView: View {
         .onAppear {
             locationManager.checkIfLocationServicesIsEnabled()
             locationManager.plsInitiateLocationUpdates()
-            region = MKCoordinateRegion(center:
-                CLLocationCoordinate2D(latitude: friendsDataManager.currentUser?.latitude ?? 40.7128,
-                   longitude: friendsDataManager.currentUser?.longitude ?? -74.0060),
-                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            if let userLocation = locationManager.userLocation?.coordinate {
+                region.center = userLocation
+            }
             Task {
                 if let userId = friendsDataManager.currentUser?.id {
                     await friendsDataManager.fetchFriends(for: userId)
@@ -318,16 +316,18 @@ struct HomeView: View {
     }
     
     private func checkDistance() {
-        let currentLocation = CLLocation(latitude: region.center.latitude, longitude: region.center.longitude)
-        let initialLocation = CLLocation(latitude: initialCenter.latitude, longitude: initialCenter.longitude)
-        let distance = currentLocation.distance(from: initialLocation)
+        guard let currentLocation = locationManager.userLocation else { return }
+        let initialLocation = CLLocation(latitude: currentLocation.coordinate.latitude, longitude: currentLocation.coordinate.longitude)
+        let distance = initialLocation.distance(from: initialLocation)
         showRecenterButton = distance > 500
     }
-    
+
     private func recenterMap() {
-        region.center = initialCenter
-        region.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        showRecenterButton = false
+        if let userLocation = locationManager.userLocation {
+            region.center = userLocation.coordinate
+            region.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            showRecenterButton = false
+        }
     }
 }
 

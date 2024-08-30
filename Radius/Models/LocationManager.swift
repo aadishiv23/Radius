@@ -15,20 +15,17 @@ class LocationManager: NSObject, ObservableObject {
     private var lastUploadedLocation: CLLocation?
     private let locationUpdateInterval: TimeInterval = 60
     private let minimumDistance: CLLocationDistance = 50
-
+    
     let zoneUpdateManager: ZoneUpdateManager
     private let fdm: FriendsDataManager
-
+    
     @Published var userZones: [Zone] = []
     @Published var userLocation: CLLocation?
     
-    private var zoneStates: [String: Bool] = [:] // true for satisfied, false for unsatisfied
-
-
     override init() {
         self.zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)
         self.fdm = FriendsDataManager(supabaseClient: supabase)
-
+        
         super.init()
         self.locationManager.delegate = self
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -45,20 +42,20 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     func checkIfLocationServicesIsEnabled() {
-       if CLLocationManager.locationServicesEnabled() {
-           checkLocationAuthorization()
-       } else {
-           print("Location services are disabled")
-           locationManager.requestWhenInUseAuthorization()
-       }
-   }
-
-    func plsInitiateLocationUpdates() {
-       locationManager.startUpdatingLocation()
+        if CLLocationManager.locationServicesEnabled() {
+            checkLocationAuthorization()
+        } else {
+            print("Location services are disabled")
+            locationManager.requestWhenInUseAuthorization()
+        }
     }
-
+    
+    func plsInitiateLocationUpdates() {
+        locationManager.startUpdatingLocation()
+    }
+    
     func stopUpdating() {
-       locationManager.stopUpdatingLocation()
+        locationManager.stopUpdatingLocation()
     }
     
     private func checkLocationAuthorization() {
@@ -75,74 +72,59 @@ class LocationManager: NSObject, ObservableObject {
             break
         }
     }
-
+    
     private func fetchUserZones() async {
         await fdm.fetchCurrentUserProfile()
         guard let currentUser = fdm.currentUser else { return }
         self.userZones = currentUser.zones
-        
-        // Initialize all zone states as unsatisfied
-       for zone in userZones {
-           zoneStates[zone.id.uuidString] = false
-       }
     }
-
+    
     private func setupMonitor() async {
-            monitor = await CLMonitor("ZoneMonitor")
+        monitor = await CLMonitor("ZoneMonitor")
+        
+        for zone in userZones {
+            let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
+            let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
             
-            for zone in userZones {
-                let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
-                let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
-                
-                await monitor?.add(condition, identifier: zone.id.uuidString, assuming: .unsatisfied)
+            await monitor?.add(condition, identifier: zone.id.uuidString, assuming: .unsatisfied)
+        }
+        
+        Task {
+            guard let monitor = monitor else { return }
+            for try await event in await monitor.events {
+                handleMonitorEvent(event)
             }
-            
+        }
+    }
+    
+    private func handleMonitorEvent(_ event: CLMonitor.Event) {
+        if event.state == .unsatisfied {
+            // User has exited the zone
             Task {
-                guard let monitor = monitor else { return }
-                for try await event in await monitor.events {
-                    handleMonitorEvent(event)
-                }
+                await zoneUpdateManager.handleZoneExits(for: fdm.currentUser?.id ?? UUID(), zoneIds: [UUID(uuidString: event.identifier)!], at: Date())
             }
         }
-
-        private func handleMonitorEvent(_ event: CLMonitor.Event) {
-            let zoneId = event.identifier
-            let newState = event.state == .satisfied
-            
-            if let oldState = zoneStates[zoneId], oldState != newState {
-                if !newState {  // Zone exit
-                    Task {
-                        await zoneUpdateManager.handleZoneExits(for: fdm.currentUser?.id ?? UUID(), zoneIds: [UUID(uuidString: zoneId)!], at: Date())
-                    }
-                    print("User exited zone: \(zoneId)")
-                } else {
-                    print("User entered zone: \(zoneId)")
-                }
-            }
-            
-            // Update the state
-            zoneStates[zoneId] = newState
-        }
-
+    }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }
-
+        
         self.userLocation = newLocation
         if shouldUploadLocation(newLocation) {
             uploadLocation(newLocation)
         }
     }
-
+    
     private func shouldUploadLocation(_ newLocation: CLLocation) -> Bool {
         guard let lastLocation = lastUploadedLocation else {
             return true
         }
-
+        
         let timeInterval = newLocation.timestamp.timeIntervalSince(lastLocation.timestamp)
         let distance = newLocation.distance(from: lastLocation)
         return timeInterval >= locationUpdateInterval || distance >= minimumDistance
     }
-
+    
     private func uploadLocation(_ newLocation: CLLocation) {
         let locationArr = [
             "latitude": newLocation.coordinate.latitude,
@@ -160,7 +142,7 @@ class LocationManager: NSObject, ObservableObject {
                     .update(locationArr)
                     .eq("id", value: currentUser.id.uuidString)
                     .execute()
-
+                
                 DispatchQueue.main.async {
                     self.lastUploadedLocation = newLocation
                 }
@@ -199,7 +181,7 @@ extension LocationManager {
         )
         NotificationCenter.default.post(name: .zoneExited, object: localZoneExit)
     }
-
+    
     private func checkZoneBoundaries(for location: CLLocation) {
         for zone in userZones {
             let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
@@ -228,11 +210,11 @@ extension LocationManager {
 //                }
 //            }
 //            .subscribe()
-//        
+//
 //        // Store the subscription if you need to manage it (e.g., unsubscribe later)
 //        supabaseSubscriptions["locationUpdates"] = subscription
 //    }
-//    
+//
 //    private func handleRealtimeLocationUpdate(_ newLocationData: [String: Any]) {
 //        guard let latitude = newLocationData["latitude"] as? Double,
 //              let longitude = newLocationData["longitude"] as? Double,
@@ -240,23 +222,23 @@ extension LocationManager {
 //              let friendIndex = fdm.friends.firstIndex(where: { $0.id == friendId }) else {
 //            return
 //        }
-//        
+//
 //        let newLocation = CLLocation(latitude: latitude, longitude: longitude)
-//        
+//
 //        // Update the friend's location in FriendsDataManager
 //        DispatchQueue.main.async {
 //            self.fdm.friends[friendIndex].latitude = newLocation.coordinate.latitude
 //            self.fdm.friends[friendIndex].longitude = newLocation.coordinate.longitude
-//            
+//
 //        }
 //    }
-//    
+//
 //    private func checkFriendZoneBoundaries(for location: CLLocation, friendId: UUID) {
 //        // Optionally, implement logic to handle friend's movement in/out of zones
 //        for zone in userZones {
 //            let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
 //            let distance = location.distance(from: zoneCenter)
-//            
+//
 //            if distance > zone.radius {
 //                // Handle friend exiting a zone if necessary
 //                Task {
@@ -266,7 +248,7 @@ extension LocationManager {
 //            }
 //        }
 //    }
-//    
+//
 //    func unsubscribeFromRealtimeLocationUpdates() {
 //        if let subscription = supabaseSubscriptions["locationUpdates"] {
 //            subscription.unsubscribe()
@@ -281,11 +263,11 @@ extension LocationManager {
 //    @Published var showRecenterButton = false
 //    private let initialCenter: CLLocationCoordinate2D
 //    private var currentCenter: CLLocationCoordinate2D?
-//    
+//
 //    init(initialCenter: CLLocationCoordinate2D) {
 //        self.initialCenter = initialCenter
 //    }
-//    
+//
 //    func updateRegion(_ region: MKCoordinateRegion) {
 //        let newCenter = region.center
 //        if let currentCenter = currentCenter, currentCenter.distance(from: newCenter) > 500 {
