@@ -12,7 +12,7 @@ struct PasswordProtectedDebugMenuView: View {
     @State private var password: String = ""
     @State private var isAuthenticated: Bool = false
     @State private var showAlert: Bool = false
-    private let correctPassword: String = "testing123" // Replace with your desired password
+    private let correctPassword: String = "debug" // Replace with your desired password
 
     var body: some View {
         if isAuthenticated {
