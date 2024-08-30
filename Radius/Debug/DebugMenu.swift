@@ -17,6 +17,8 @@ struct DebugMenuView: View {
     @State private var localZoneExits: [LocalZoneExit] = []
     @State private var isLoading = false
     @State private var zones: [Zone] = []
+    @State private var isZonesSectionExpanded = false
+
 
     var body: some View {
         List {
@@ -64,23 +66,48 @@ struct DebugMenuView: View {
                 }
             }
             Section(header: Text("Zone Exits")) {
-                if isLoading {
-                    ProgressView()
-                } else if zoneExits.isEmpty {
-                    Text("No zone exits recorded")
-                } else {
-                    ForEach(zoneExits, id: \.id) { exit in
-                        VStack(alignment: .leading) {
-                            Text("Zone ID: \(exit.zone_id)")
-                            Text("Exit Time: \(formatDate(exit.exit_time))")
+                DisclosureGroup("Zones", isExpanded: $isZonesSectionExpanded) {
+                    if isLoading {
+                        ProgressView()
+                    } else if zoneExits.isEmpty {
+                        Text("No zone exits recorded")
+                    } else {
+                        ForEach(zoneExits, id: \.id) { exit in
+                            VStack(alignment: .leading) {
+                                Text("Zone ID: \(exit.zone_id)")
+                                Text("Exit Time: \(formatDate(exit.exit_time))")
+                            }
                         }
                     }
                 }
+            }
+            
+            Section(header: Text("All Zones")) {
+                DisclosureGroup("Zones", isExpanded: $isZonesSectionExpanded) {
+                    if isLoading {
+                        ProgressView()
+                    } else if zones.isEmpty {
+                        Text("No zones available")
+                    } else {
+                        ForEach(zones, id: \.id) { zone in
+                            VStack(alignment: .leading) {
+                                Text("Zone Id:  \(zone.id)")
+                                Text("Zone Name: \(zone.name)")
+                                Text("Latitude: \(zone.latitude)")
+                                Text("Longitude: \(zone.longitude)")
+                                Text("Radius: \(zone.radius)")
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
             }
         }
         .navigationTitle("Debug Menu")
         .onAppear {
             fetchZoneExitsForCurrentUser()
+            fetchAllZones()
             zoneExitObserver.startObserving()
         }
         .onDisappear {
@@ -92,6 +119,31 @@ struct DebugMenuView: View {
         .refreshable {
             await friendsDataManager.fetchCurrentUserProfile()
             fetchZoneExitsForCurrentUser()
+            fetchAllZones()
+        }
+    }
+
+    private func fetchAllZones() {
+        isLoading = true
+        
+        Task {
+            do {
+                let fetchedZones: [Zone] = try await supabase
+                    .from("zones")
+                    .select()
+                    .execute()
+                    .value
+                
+                DispatchQueue.main.async {
+                    self.zones = fetchedZones
+                    self.isLoading = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
+                print("Failed to fetch zones: \(error)")
+            }
         }
     }
 
