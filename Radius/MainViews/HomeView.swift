@@ -19,6 +19,7 @@ struct HomeView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
+    @State private var selectedFriend: Profile?
     @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
     @State private var buttonScale: CGFloat = 1.0
@@ -117,6 +118,9 @@ struct HomeView: View {
                         }
                     }
             }
+            .sheet(item: $selectedFriend) { friend in
+               FriendDetailView(friend: friend)
+           }
             .sheet(isPresented: $isPresentingDebugMenu) {
                 NavigationView {
                     PasswordProtectedDebugMenuView()
@@ -275,6 +279,9 @@ struct HomeView: View {
         .shadow(color: Color.black.opacity(0.03), radius: 3, x: 0, y: 1)
         .padding(.horizontal)
         .padding(.vertical, 4)
+        .onTapGesture {
+            selectedFriend = friend
+        }
     }
     
     private var noFriendsRow: some View {
