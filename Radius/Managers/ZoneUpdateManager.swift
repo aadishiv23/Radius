@@ -33,11 +33,14 @@ final class ZoneUpdateManager {
     }
     
     func handleZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async {
-        let dateFormatter = ISO8601DateFormatter()
+        // Create a DateFormatter for EDT
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "EDT") // Set to Eastern Daylight Time
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // Customize the date format as needed
+
         let exitTime = dateFormatter.string(from: time)
         let currentDateString = dateFormatter.string(from: time)
 
-        
         do {
             // Get the current count of exits for today to determine the global exit order
             let exitCountResponse: [DailyZoneExit] = try await supabaseClient
@@ -46,16 +49,16 @@ final class ZoneUpdateManager {
                 .eq("date", value: currentDateString)
                 .execute()
                 .value
-            
+
             let globalExitOrder = exitCountResponse.count + 1  // Next exit order
 
             for (index, zoneId) in zoneIds.enumerated() {
                 let zoneExit = [
                     "profile_id": profileId.uuidString,
                     "zone_id": zoneId.uuidString,
-                    "exit_time": exitTime
+                    "exit_time": exitTime // Store the time in EDT
                 ]
-                
+
                 let insertedZoneExit: ZoneExit = try await supabaseClient
                     .from("zone_exits")
                     .insert(zoneExit)
@@ -63,28 +66,29 @@ final class ZoneUpdateManager {
                     .single()
                     .execute()
                     .value
-                
+
                 // Insert into daily_zone_exits
                 let dailyZoneExit = DailyZoneExit(
                     id: UUID(),  // Generate a new UUID for this entry
-                    date: Date(),
+                    date: Date(), // Store the current date in EDT
                     profileId: profileId,
                     zoneExitId: insertedZoneExit.id,
                     exitOrder: globalExitOrder + 1,
                     pointsEarned: calculatePoints(for: globalExitOrder)
                 )
-                
+
                 try await supabaseClient
                     .from("daily_zone_exits")
                     .insert(dailyZoneExit)
                     .execute()
-                
+
                 print("Daily zone exit recorded successfully for zone \(zoneId)")
             }
         } catch {
             print("Failed to record zone exits: \(error)")
         }
     }
+
     
     private func calculatePoints(for exitOrder: Int) -> Int {
            // Assuming points decrease by 1 with each subsequent exit
