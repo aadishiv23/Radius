@@ -51,24 +51,75 @@ struct FullScreenMapView: View {
 
 struct FriendAnnotationView: View {
     let friend: Profile
+    
+    @State private var isExpanded = false
 
     var body: some View {
         ZStack {
-            Circle()
-                .fill(Color.white)
-                .frame(width: 40, height: 40)
-            
-            Circle()
-                .fill(Color.gray)
-                .frame(width: 34, height: 34)
-            
-            Text(String(friend.full_name.prefix(1)))
-                .foregroundColor(.white)
-                .font(.system(size: 20, weight: .bold))
+            if isExpanded {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.blue, Color.yellow]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 150, height: 40)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.white, lineWidth: 2)
+                    )
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 40, height: 40)
+                    
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.blue, Color.yellow]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 34, height: 34)
+                    
+                    if !isExpanded {
+                        Text(String(friend.full_name.prefix(1)))
+                            .foregroundColor(.white)
+                            .font(.system(size: 20, weight: .bold))
+                            .transition(.opacity)
+                    }
+                }
+            }
+
+            if isExpanded {
+                Text(friend.full_name)
+                    .foregroundColor(.white)
+                    .font(.system(size: 16, weight: .bold))
+                    .transition(.opacity)
+            }
+        }
+        .frame(width: isExpanded ? 150 : 40, height: 40)
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isExpanded.toggle()
+            }
+
+            // Automatically toggle back to the circle after a delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isExpanded = false
+                }
+            }
         }
         .shadow(radius: 3)
     }
 }
+
+
 
 
 /*
