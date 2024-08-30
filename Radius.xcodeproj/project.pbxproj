@@ -82,6 +82,7 @@
 		AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
 		AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerView.swift; sourceTree = "<group>"; };
 		AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerViewModel.swift; sourceTree = "<group>"; };
+		AC6817A32C811D9E0010909C /* SimulateGeofencing.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SimulateGeofencing.gpx; sourceTree = "<group>"; };
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
@@ -326,6 +327,7 @@
 			children = (
 				ACF5DA842C28DD5200123843 /* DebugMenu.swift */,
 				ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */,
+				AC6817A32C811D9E0010909C /* SimulateGeofencing.gpx */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
