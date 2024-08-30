@@ -19,7 +19,6 @@ struct HomeView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
-    @State private var selectedFriend: Profile?
     @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
     @State private var buttonScale: CGFloat = 1.0
@@ -118,9 +117,6 @@ struct HomeView: View {
                         }
                     }
             }
-            .sheet(item: $selectedFriend) { friend in
-                FriendDetailView(friend: friend)
-            }
             .sheet(isPresented: $isPresentingDebugMenu) {
                 NavigationView {
                     PasswordProtectedDebugMenuView()
@@ -175,12 +171,7 @@ struct HomeView: View {
         ZStack(alignment: .top) {
             Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }) { friendLocation in
                 MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
-                    Circle()
-                        .fill(Color(hex: friendLocation.color) ?? .blue)
-                        .frame(width: 20, height: 20)
-                        .onTapGesture {
-                            selectedFriend = friendLocation
-                        }
+                    FriendAnnotationView(friend: friendLocation)
                 }
             }
             .frame(height: 300)
@@ -211,9 +202,8 @@ struct HomeView: View {
                 .padding(.top, 20)
             }
         }
-        .sheet(isPresented: $showFullScreenMap) {
-            FullScreenMapView(region: $region, selectedFriend: $selectedFriend, isPresented: $showFullScreenMap)
-                .environmentObject(friendsDataManager)
+        .fullScreenCover(isPresented: $showFullScreenMap) {
+            FullScreenMapView()
         }
     }
     
@@ -285,9 +275,6 @@ struct HomeView: View {
         .shadow(color: Color.black.opacity(0.03), radius: 3, x: 0, y: 1)
         .padding(.horizontal)
         .padding(.vertical, 4)
-        .onTapGesture {
-            selectedFriend = friend
-        }
     }
     
     private var noFriendsRow: some View {
