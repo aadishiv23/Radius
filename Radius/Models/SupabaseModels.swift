@@ -112,6 +112,15 @@ struct Group2: Codable, Identifiable {
     let password: String
 }
 
+enum ZoneCategory: String, Codable, CaseIterable {
+    case home = "home"
+    case school = "school"
+    case gym = "gym"
+    case food = "food"
+    case social = "social"
+    case other = "other"
+}
+
 struct Zone: Codable, Identifiable {
     let id: UUID
     let name: String
@@ -119,7 +128,18 @@ struct Zone: Codable, Identifiable {
     let longitude: Double
     let radius: Double
     let profile_id: UUID
-    
+    let category: ZoneCategory
+
+    // Provide a default value for the category if not initialized
+    init(id: UUID = UUID(), name: String, latitude: Double, longitude: Double, radius: Double, profile_id: UUID, category: ZoneCategory = .other) {
+        self.id = id
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+        self.radius = radius
+        self.profile_id = profile_id
+        self.category = category
+    }
 }
 
 struct Profile: Codable, Identifiable {
@@ -260,7 +280,7 @@ struct GroupCompetition: Identifiable, Codable {
     var id: UUID
     var competition_name: String
     var competition_date: Date
-    var max_points: Int?
+    var max_points: Int
     var created_at: Date
 }
 

@@ -14,9 +14,10 @@ struct InfoView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Access the shared data
     @State private var isPresentingCreateGroupView = false
     @State private var isPresentingJoinGroupView = false
-    @State private var isPresentingCompetitionManagerView = false
     @State private var isShownDemo: Bool = false
     @State private var animateGradient = false
+    @State private var isPresentingCompetitionManagerView = false
+    @State private var userCompetitions: [GroupCompetition] = []
 
     var body: some View {
         NavigationView {
@@ -84,6 +85,16 @@ struct InfoView: View {
                             }
                         }
                     }
+                    
+                    Section(header: headerView(title: "Competitions")) {
+                        if userCompetitions.isEmpty {
+                            emptyCompetitionsView()
+                        } else {
+                            ForEach(userCompetitions) { competition in
+                                CompetitionCard(competition: competition)
+                            }
+                        }
+                    }
                 }
                 .padding(.top) // Add padding to the top
             }
@@ -139,7 +150,9 @@ struct InfoView: View {
             .onAppear {
                 Task {
                     await friendsDataManager.fetchFriendsAndGroups()
+                    await fetchUserCompetitions()
                 }
+                
                 
                 Task {
                     if let userId = friendsDataManager.currentUser?.id {
@@ -159,6 +172,14 @@ struct InfoView: View {
     private func refreshData() async {
         guard let userId = friendsDataManager.currentUser?.id else { return }
         await friendsDataManager.fetchFriends(for: userId)
+    }
+    
+    private func fetchUserCompetitions() async {
+        do {
+            userCompetitions = try await friendsDataManager.fetchUserCompetitions()
+        } catch {
+            print("Error fetching user competitions: \(error)")
+        }
     }
 
     // Custom Header View
@@ -191,7 +212,38 @@ struct InfoView: View {
         )
         .padding(.horizontal)
     }
-
+    
+    private func emptyCompetitionsView() -> some View {
+       VStack {
+           Image(systemName: "flag.2.crossed.fill")
+               .font(.system(size: 50))
+               .foregroundColor(.gray)
+           Text("No active competitions")
+               .font(.headline)
+               .foregroundColor(.secondary)
+           Text("Join or create a competition to get started!")
+               .font(.subheadline)
+               .foregroundColor(.secondary)
+               .multilineTextAlignment(.center)
+       }
+       .frame(maxWidth: .infinity)
+       .padding()
+       .background(
+           LinearGradient(
+               gradient: Gradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.1)]),
+               startPoint: .topLeading,
+               endPoint: .bottomTrailing
+           )
+           .cornerRadius(10)
+       )
+       .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)  // Softer shadow for subtle elevation
+       .overlay(
+           RoundedRectangle(cornerRadius: 10)
+               .stroke(Color.white.opacity(0.2), lineWidth: 1)
+       )
+       .cornerRadius(12)
+       .padding(.horizontal)
+   }
 }
 
 struct InfoView_Previews: PreviewProvider {
@@ -200,6 +252,78 @@ struct InfoView_Previews: PreviewProvider {
     }
 }
 
+struct CompetitionCard: View {
+    let competition: GroupCompetition
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "flag.2.crossed.fill")
+                    .font(.title2)
+                    .foregroundColor(.yellow)
+                Text(competition.competition_name)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                Spacer()
+                Text(formattedDate(competition.competition_date))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Max Points")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(competition.max_points)")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                }
+                Spacer()
+                Button(action: {
+                    // Action to view competition details
+                }) {
+                    Text("View Details")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.white.opacity(0.5), .clear]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+        )
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+        .padding(.horizontal)
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy"
+        return formatter.string(from: date)
+    }
+}
 
 //                Section(header: Text("Demos")) {
 //                    HStack {
