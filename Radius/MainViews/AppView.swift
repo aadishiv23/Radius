@@ -19,15 +19,19 @@ struct AppView: View {
     var body: some View {
         NavigationStack {
             if authViewModel.isAuthenticated {
-                MainTabView()  // View for authenticated users
-                    .onAppear {
-                        Task {
-                            await friendsDataManager.fetchCurrentUserProfile()
-                            if let userId = friendsDataManager.currentUser?.id {
-                                LocationManager.shared.plsInitiateLocationUpdates()
+                if authViewModel.needsProfileSetup {
+                    ProfileSetupView()
+                } else {
+                    MainTabView()  // View for authenticated users
+                        .onAppear {
+                            Task {
+                                await friendsDataManager.fetchCurrentUserProfile()
+                                if let userId = friendsDataManager.currentUser?.id {
+                                    LocationManager.shared.plsInitiateLocationUpdates()
+                                }
                             }
                         }
-                    }
+                }
             } else {
                 AuthView()
             }

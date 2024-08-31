@@ -12,6 +12,7 @@ import SwiftUI
 
 class AuthViewModel: ObservableObject {
     @Published var isAuthenticated = false
+    @Published var needsProfileSetup = false
     private var cancellables = Set<AnyCancellable>()
     var friendsDataManager: FriendsDataManager?
 
@@ -29,6 +30,12 @@ class AuthViewModel: ObservableObject {
                         if self.isAuthenticated {
                             Task {
                                 await self.friendsDataManager?.fetchCurrentUserProfile()
+                                if let profile = self.friendsDataManager?.currentUser,
+                                   profile.full_name.isEmpty || profile.username.isEmpty {
+                                    self.needsProfileSetup = true
+                                } else {
+                                    self.needsProfileSetup = false
+                                }
                             }
                         }
                     }

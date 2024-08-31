@@ -13,6 +13,8 @@
 		AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */; };
 		AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */; };
 		AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */; };
+		AC1A99C62C8371E100ED5D1B /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */; };
+		AC1A99C92C8373B900ED5D1B /* VisionGlassViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */; };
 		AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1B00532BF4753C000BB30B /* AuthViewModel.swift */; };
 		AC3989562C705637002F84E6 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989552C705637002F84E6 /* DataController.swift */; };
 		AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupViewModel.swift */; };
@@ -71,6 +73,8 @@
 		AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendProfileView.swift; sourceTree = "<group>"; };
 		AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModifiers.swift; sourceTree = "<group>"; };
 		AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendDetailMapView.swift; sourceTree = "<group>"; };
+		AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
+		AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionGlassViewModifier.swift; sourceTree = "<group>"; };
 		AC1B00532BF4753C000BB30B /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		AC3989552C705637002F84E6 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		AC39895B2C70592C002F84E6 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
@@ -152,6 +156,7 @@
 		AC0AC6FE2BDB0EE4000418B8 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				AC1A99C42C8371CC00ED5D1B /* Auth */,
 				AC5DB4D62C7D7FDF00A1019E /* Competitions */,
 				AC0AC7032BDB0F9B000418B8 /* FriendDetailView.swift */,
 				AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */,
@@ -161,8 +166,6 @@
 				AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */,
 				AC5855FF2BDF1925009C490B /* MapView.swift */,
 				AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */,
-				AC9BD1D22BEB101B00D23123 /* AuthView.swift */,
-				AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */,
 				ACEB24E92C11698800D9693F /* AddGroupView.swift */,
 				ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */,
 				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
@@ -192,6 +195,24 @@
 				AC1B00532BF4753C000BB30B /* AuthViewModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		AC1A99C42C8371CC00ED5D1B /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				AC9BD1D22BEB101B00D23123 /* AuthView.swift */,
+				AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */,
+				AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		AC1A99C72C8373AF00ED5D1B /* VIewModifier */ = {
+			isa = PBXGroup;
+			children = (
+				AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */,
+			);
+			path = VIewModifier;
 			sourceTree = "<group>";
 		};
 		AC5DB4D62C7D7FDF00A1019E /* Competitions */ = {
@@ -234,6 +255,7 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				AC1A99C72C8373AF00ED5D1B /* VIewModifier */,
 				ACD4812B2C326E74004653A1 /* CoreData */,
 				ACF5DA832C28DD4B00123843 /* Debug */,
 				ACF5DA802C27E89A00123843 /* AppIntents */,
@@ -439,6 +461,7 @@
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
+				AC1A99C92C8373B900ED5D1B /* VisionGlassViewModifier.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
@@ -459,6 +482,7 @@
 				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
 				AC5DB4D52C7D7F0100A1019E /* CompetitionManager.swift in Sources */,
+				AC1A99C62C8371E100ED5D1B /* ProfileSetupView.swift in Sources */,
 				ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
