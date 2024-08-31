@@ -77,7 +77,6 @@ struct SupabaseProfileView: View {
         VStack(spacing: 15) {
             ProfileTextField(title: "Username", text: $username, icon: "person")
             ProfileTextField(title: "Full Name", text: $fullName, icon: "person.text.rectangle")
-            ProfileTextField(title: "Website", text: $website, icon: "link")
         }
         .padding()
         .background(Color(UIColor.secondarySystemBackground))

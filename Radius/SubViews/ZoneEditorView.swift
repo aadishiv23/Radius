@@ -43,6 +43,7 @@ struct ZoneEditorView: View {
     @State private var showAddressEntry: Bool = false
     @State private var mapRegion: MKCoordinateRegion = MKCoordinateRegion.defaultRegion
     @State private var zoneName: String = ""
+    @State private var selectedCategory: ZoneCategory = .other
     @FocusState private var isTextFieldFocused: Bool
     @State private var isSliderFocused: Bool = false
 
@@ -66,6 +67,14 @@ struct ZoneEditorView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                         .focused($isTextFieldFocused)
+
+                    Picker("Zone Category", selection: $selectedCategory) {
+                        ForEach(ZoneCategory.allCases, id: \.self) { category in
+                            Text(category.rawValue.capitalized).tag(category)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .padding()
 
                     MapView(region: $mapRegion, location: $newZoneLocation, radius: $zoneRadius)
                         .frame(height: 300)
@@ -128,7 +137,7 @@ struct ZoneEditorView: View {
 
     private func saveZone() {
         if let location = newZoneLocation, let currentUser = friendsDataManager.currentUser {
-            let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: zoneRadius, profile_id: currentUser.id)
+            let newZone = Zone(id: UUID(), name: zoneName, latitude: location.latitude, longitude: location.longitude, radius: zoneRadius, profile_id: currentUser.id, category: selectedCategory)
             self.userZones.append(newZone)
             self.isPresenting = false
         }
