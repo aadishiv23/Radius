@@ -96,6 +96,7 @@ struct DebugMenuView: View {
                                 Text("Latitude: \(zone.latitude)")
                                 Text("Longitude: \(zone.longitude)")
                                 Text("Radius: \(zone.radius)")
+                                Text("Category: \(zone.category)")
                             }
                             .padding(.vertical, 4)
                         }
