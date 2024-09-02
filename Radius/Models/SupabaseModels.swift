@@ -282,10 +282,55 @@ struct GroupCompetition: Identifiable, Codable {
     var competition_date: Date
     var max_points: Int
     var created_at: Date
+
     enum CodingKeys: String, CodingKey {
         case id, competition_name, competition_date, max_points, created_at
     }
+
+    init(id: UUID, competition_name: String, competition_date: Date, max_points: Int, created_at: Date) {
+        self.id = id
+        self.competition_name = competition_name
+        self.competition_date = competition_date
+        self.max_points = max_points
+        self.created_at = created_at
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(UUID.self, forKey: .id)
+        competition_name = try container.decode(String.self, forKey: .competition_name)
+        max_points = try container.decode(Int.self, forKey: .max_points)
+        
+        // Custom date decoding
+        let dateString = try container.decode(String.self, forKey: .competition_date)
+        let createdAtString = try container.decode(String.self, forKey: .created_at)
+        
+        let isoDateFormatter = DateFormatter()
+        isoDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        isoDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        let simpleDateFormatter = DateFormatter()
+        simpleDateFormatter.dateFormat = "yyyy-MM-dd"
+        simpleDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        if let competitionDate = simpleDateFormatter.date(from: dateString) {
+            self.competition_date = competitionDate
+        } else if let competitionDate = isoDateFormatter.date(from: dateString) {
+            self.competition_date = competitionDate
+        } else {
+            throw DecodingError.dataCorruptedError(forKey: .competition_date, in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
+
+        if let createdAtDate = isoDateFormatter.date(from: createdAtString) {
+            self.created_at = createdAtDate
+        } else {
+            throw DecodingError.dataCorruptedError(forKey: .created_at, in: container, debugDescription: "Invalid date format: \(createdAtString)")
+        }
+    }
 }
+
+
 
 
 struct GroupCompetitionLink: Identifiable, Codable {

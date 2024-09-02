@@ -210,92 +210,6 @@
             endingLineNumber = "88"
             landmarkName = "handleZoneExits(for:zoneIds:at:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "7A4D030E-969F-4CD9-B94C-25869743A360 - f88a8fdc083fbf23"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for Radius.ZoneUpdateManager.handleZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88">
-               </Location>
-               <Location
-                  uuid = "7A4D030E-969F-4CD9-B94C-25869743A360 - 5f64dd291340fb21"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for Radius.ZoneUpdateManager.handleZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88">
-               </Location>
-               <Location
-                  uuid = "7A4D030E-969F-4CD9-B94C-25869743A360 - b7d6e8861a683727"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(7) suspend resume partial function for Radius.ZoneUpdateManager.handleZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88">
-               </Location>
-               <Location
-                  uuid = "7A4D030E-969F-4CD9-B94C-25869743A360 - fa79112d611d9124"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(8) suspend resume partial function for Radius.ZoneUpdateManager.handleZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88">
-               </Location>
-               <Location
-                  uuid = "7A4D030E-969F-4CD9-B94C-25869743A360 - e8007d3e4b17325"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(9) suspend resume partial function for Radius.ZoneUpdateManager.handleZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88">
-               </Location>
-               <Location
-                  uuid = "7A4D030E-969F-4CD9-B94C-25869743A360 - df6bce0380f6ff23"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(10) suspend resume partial function for Radius.ZoneUpdateManager.handleZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -343,22 +257,6 @@
             startingLineNumber = "45"
             endingLineNumber = "45"
             landmarkName = "checkIfLocationServicesIsEnabled()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "76230B23-6631-43E9-9425-C15F5577F513"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/MainViews/InfoView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "179"
-            endingLineNumber = "179"
-            landmarkName = "fetchUserCompetitions()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -440,52 +338,6 @@
             endingLineNumber = "645"
             landmarkName = "fetchUserCompetitions()"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "5F06E936-584E-4398-9C1F-E417A9C52CD6"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/MainViews/InfoView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "180"
-            endingLineNumber = "180"
-            landmarkName = "fetchUserCompetitions()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "5F06E936-584E-4398-9C1F-E417A9C52CD6 - 90a487ea42e76c10"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for Radius.InfoView.fetchUserCompetitions() async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/InfoView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "180"
-                  endingLineNumber = "180">
-               </Location>
-               <Location
-                  uuid = "5F06E936-584E-4398-9C1F-E417A9C52CD6 - 90a487ea42e76c10"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for Radius.InfoView.fetchUserCompetitions() async -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/InfoView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "180"
-                  endingLineNumber = "180">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

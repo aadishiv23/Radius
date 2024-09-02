@@ -11,21 +11,16 @@ import MapKit
 
 // InfoView that lists all friends and navigates to their detail view
 struct InfoView: View {
-    @EnvironmentObject var friendsDataManager: FriendsDataManager  // Access the shared data
-    @State private var isPresentingCreateGroupView = false
-    @State private var isPresentingJoinGroupView = false
-    @State private var isShownDemo: Bool = false
-    @State private var animateGradient = false
-    @State private var isPresentingCompetitionManagerView = false
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var userCompetitions: [GroupCompetition] = []
 
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 16) {  // Add spacing between sections
+                VStack(spacing: 16) {
                     
                     // Friends Section
-                    Section(header: headerView(title: "Friends")) {
+                    CollapsibleSection(title: "Friends") {
                         ForEach(friendsDataManager.friends) { friend in
                             NavigationLink(destination: FriendProfileView(friend: friend)) {
                                 HStack {
@@ -62,12 +57,11 @@ struct InfoView: View {
                                 .cornerRadius(12)
                                 .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
                             }
-                            .padding(.horizontal)
                         }
                     }
-
+                    
                     // Groups Section
-                    Section(header: headerView(title: "Groups")) {
+                    CollapsibleSection(title: "Groups") {
                         if friendsDataManager.userGroups.isEmpty {
                             VStack {
                                 Image(systemName: "person.3.fill")
@@ -81,22 +75,25 @@ struct InfoView: View {
                         } else {
                             ForEach(friendsDataManager.userGroups, id: \.id) { group in
                                 GroupView(group: group)
-                                    .padding(.horizontal)
+                                    .frame(maxWidth: .infinity)
                             }
                         }
                     }
                     
-                    Section(header: headerView(title: "Competitions")) {
+                    // Competitions Section
+                    CollapsibleSection(title: "Competitions") {
                         if userCompetitions.isEmpty {
                             emptyCompetitionsView()
+                                .frame(maxWidth: .infinity)
                         } else {
                             ForEach(userCompetitions) { competition in
                                 CompetitionCard(competition: competition)
+                                    .frame(maxWidth: .infinity)
                             }
                         }
                     }
                 }
-                .padding(.top) // Add padding to the top
+                .padding(.top)
             }
             .navigationTitle("Friends Info")
             .refreshable {
@@ -111,59 +108,10 @@ struct InfoView: View {
                 )
                 .edgesIgnoringSafeArea(.all)
             )
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button(action: {
-                            // Navigate to Create Group View
-                            isPresentingCreateGroupView = true
-                        }) {
-                            Label("Create Group", systemImage: "person.3.fill")
-                        }
-                        Button(action: {
-                            // Navigate to Join Group View
-                            isPresentingJoinGroupView = true
-                        }) {
-                            Label("Join Group", systemImage: "person.crop.circle.badge.plus")
-                        }
-                        
-                        Button(action: {
-                            // Navigate to Competition Manager View
-                            isPresentingCompetitionManagerView = true
-                        }) {
-                            Label("Manage Competitions", systemImage: "flag.2.crossed")
-                        }
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-            .fullScreenCover(isPresented: $isPresentingCompetitionManagerView) {
-                CompetitionManagerView().environmentObject(friendsDataManager)
-            }
-            .fullScreenCover(isPresented: $isPresentingCreateGroupView) {
-                CreateGroupView(isPresented: $isPresentingCreateGroupView).environmentObject(friendsDataManager)
-            }
-            .fullScreenCover(isPresented: $isPresentingJoinGroupView) {
-                JoinGroupView(isPresented: $isPresentingJoinGroupView).environmentObject(friendsDataManager)
-            }
             .onAppear {
                 Task {
                     await friendsDataManager.fetchFriendsAndGroups()
                     await fetchUserCompetitions()
-                }
-                
-                
-                Task {
-                    if let userId = friendsDataManager.currentUser?.id {
-                        await friendsDataManager.fetchFriends(for: userId)
-                        print("Current user is: \(userId)")
-                    } else {
-                        print("Current user id is nil")
-                    }
-                }
-                for friendsLocation in friendsDataManager.friends {
-                    print(friendsLocation.full_name)
                 }
             }
         }
@@ -185,37 +133,6 @@ struct InfoView: View {
         }
     }
 
-    // Custom Header View
-    private func headerView(title: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(
-            LinearGradient(
-                gradient: Gradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.1)]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .cornerRadius(10)
-        )
-        .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)  // Softer shadow for subtle elevation
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(LinearGradient(
-                    gradient: Gradient(colors: [Color.white.opacity(0.2), Color.clear]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                ), lineWidth: 1)
-        )
-        .padding(.horizontal)
-    }
-    
     private func emptyCompetitionsView() -> some View {
        VStack {
            Image(systemName: "flag.2.crossed.fill")
@@ -239,7 +156,7 @@ struct InfoView: View {
            )
            .cornerRadius(10)
        )
-       .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)  // Softer shadow for subtle elevation
+       .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
        .overlay(
            RoundedRectangle(cornerRadius: 10)
                .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -248,6 +165,7 @@ struct InfoView: View {
        .padding(.horizontal)
    }
 }
+
 
 struct InfoView_Previews: PreviewProvider {
     static var previews: some View {
@@ -300,11 +218,13 @@ struct CompetitionCard: View {
         .padding()
         .background(
             LinearGradient(
-                gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
+                gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(
@@ -371,3 +291,56 @@ struct CompetitionCard: View {
 //                    NavigationLink("card demo1", destination: CardGradientView())
 //                    NavigationLink("card demo2", destination: CardGradientViewV2())
 //                }
+
+struct CollapsibleSection<Content: View>: View {
+    let title: String
+    @State private var isExpanded: Bool = true
+    let content: Content
+
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack {
+            Button(action: {
+                withAnimation(.none) {
+                    isExpanded.toggle()
+                }
+            }) {
+                HStack {
+                    Text(title)
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .padding()
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.1)]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .cornerRadius(10)
+                )
+                .frame(maxWidth: .infinity) // Ensure the header button takes full width
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            if isExpanded {
+                content
+                    .transition(.opacity)
+                    .animation(.easeInOut(duration: 1.0), value: isExpanded)
+                    .padding(.top, 5)
+                    .frame(maxWidth: .infinity) // Ensure the content takes full width
+            }
+        }
+        .padding(.horizontal)
+    }
+
+}
+
