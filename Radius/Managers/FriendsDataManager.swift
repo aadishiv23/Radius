@@ -624,7 +624,7 @@ extension FriendsDataManager {
         let userGroups: [GroupMember] = try await supabaseClient
             .from("group_members")
             .select("group_id, profile_id")
-            .eq("group_id", value: userId.uuidString)
+            .eq("profile_id", value: userId.uuidString)
             .execute()
             .value
         
@@ -633,18 +633,19 @@ extension FriendsDataManager {
         // Step 2: Fetch competitions linked to these groups
         let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
             .from("group_competition_links")
-            .select("competition_id")
-            .in("group_id", values: groupIds)
+            .select("*")
+            .eq("group_id", value: groupIds)
             .execute()
             .value
         
-        let competitionIds = Array(Set(groupCompetitionLinks.map { $0.competition_id.uuidString }))
+        let competitionIds = groupCompetitionLinks.map { $0.competition_id.uuidString }
+       // Array(Set(groupCompetitionLinks.map { $0.competition_id.uuidString }))
         
         // Step 3: Fetch the actual competition details
         let competitions: [GroupCompetition] = try await supabaseClient
             .from("group_competitions")
             .select("*")
-            .in("id", values: competitionIds)
+            .eq("id", value: competitionIds)
             .execute()
             .value
         
