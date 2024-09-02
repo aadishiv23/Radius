@@ -14,6 +14,7 @@ struct CompetitionManagerView: View {
     var body: some View {
         VStack {
             Form {
+                // Competition Details Section
                 Section(header: Text("Competition Details")
                     .font(.headline)
                     .foregroundColor(.primary)
@@ -40,6 +41,7 @@ struct CompetitionManagerView: View {
                 }
                 .listRowBackground(Color.clear)
 
+                // Select Groups Section
                 Section(header: Text("Select Groups")
                     .font(.headline)
                     .foregroundColor(.primary)
@@ -75,6 +77,7 @@ struct CompetitionManagerView: View {
             .cornerRadius(15)
             .padding()
 
+            // Create Competition Button
             Button(action: createCompetition) {
                 Text("Create Competition")
                     .foregroundColor(.white)
@@ -88,6 +91,7 @@ struct CompetitionManagerView: View {
             .padding(.horizontal)
             .disabled(competitionName.isEmpty || selectedGroups.isEmpty)
 
+            // Cancel Button
             Button(action: {
                 dismiss()
             }) {
@@ -112,7 +116,11 @@ struct CompetitionManagerView: View {
         )
         .navigationTitle("Create Competition")
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("Competition Created"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            Alert(title: Text("Competition Created"), message: Text(alertMessage), dismissButton: .default(Text("OK")) {
+                if !isCreatingCompetition { // Dismiss the view after the alert is shown
+                    dismiss()
+                }
+            })
         }
         .onAppear {
             viewModel.fetchGroups()
@@ -128,35 +136,28 @@ struct CompetitionManagerView: View {
     }
 
     private func createCompetition() {
-//            guard let maxPointsInt = Int(maxPoints), maxPointsInt > 0 else {
-//                alertMessage = "Please enter a valid number for max points."
-//                showAlert = true
-//                return
-//            }
-
-
-            isCreatingCompetition = true
-            Task {
-                do {
-                    let competition = try await viewModel.createCompetition(
-                        name: competitionName,
-                        date: competitionDate, 
-                        points: maxPoints,
-                        groupIds: Array(selectedGroups)
-                    )
-                    alertMessage = "Competition '\(competition.competition_name)' created with max points \(competition.max_points ?? 0)"
-                    showAlert = true
-                    isCreatingCompetition = false
-                    competitionName = ""
-                    selectedGroups = []
-                    maxPoints = 0  // Reset the max points field
-                } catch {
-                    alertMessage = "Failed to create competition: \(error.localizedDescription)"
-                    showAlert = true
-                    isCreatingCompetition = false
-                }
+        isCreatingCompetition = true
+        Task {
+            do {
+                let competition = try await viewModel.createCompetition(
+                    name: competitionName,
+                    date: competitionDate,
+                    points: maxPoints,
+                    groupIds: Array(selectedGroups)
+                )
+                alertMessage = "Competition '\(competition.competition_name)' created with max points \(competition.max_points ?? 0)"
+                showAlert = true
+                isCreatingCompetition = false
+                competitionName = ""
+                selectedGroups = []
+                maxPoints = 0  // Reset the max points field
+            } catch {
+                alertMessage = "Failed to create competition: \(error.localizedDescription)"
+                showAlert = true
+                isCreatingCompetition = false
             }
         }
+    }
 }
 
 struct CompetitionManagerView_Previews: PreviewProvider {

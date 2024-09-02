@@ -623,8 +623,8 @@ extension FriendsDataManager {
         // Step 1: Fetch the user's groups
         let userGroups: [GroupMember] = try await supabaseClient
             .from("group_members")
-            .select("group_id")
-            .eq("profile_id", value: userId.uuidString)
+            .select("group_id, profile_id")
+            .eq("group_id", value: userId.uuidString)
             .execute()
             .value
         

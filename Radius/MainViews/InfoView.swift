@@ -177,6 +177,9 @@ struct InfoView: View {
     private func fetchUserCompetitions() async {
         do {
             userCompetitions = try await friendsDataManager.fetchUserCompetitions()
+            for competition in userCompetitions {
+                print("[Competition] - id: \(competition.id), name: \(competition.competition_name), date: \(competition.competition_date), maxPoints: \(competition.max_points), createdAt: \(competition.created_at)")
+            }
         } catch {
             print("Error fetching user competitions: \(error)")
         }

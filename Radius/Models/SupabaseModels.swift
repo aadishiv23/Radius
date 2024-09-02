@@ -282,7 +282,11 @@ struct GroupCompetition: Identifiable, Codable {
     var competition_date: Date
     var max_points: Int
     var created_at: Date
+    enum CodingKeys: String, CodingKey {
+        case id, competition_name, competition_date, max_points, created_at
+    }
 }
+
 
 struct GroupCompetitionLink: Identifiable, Codable {
     var id: UUID

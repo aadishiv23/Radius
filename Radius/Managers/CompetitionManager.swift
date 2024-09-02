@@ -68,7 +68,7 @@ class CompetitionManager {
     
     private func fetchProfileCount(for competition_id: UUID) async throws -> Int {
         let profileCountResponse: Int = try await supabaseClient
-            .rpc("count_profiles_in_competition", params: ["competition_id": competition_id.uuidString])
+            .rpc("count_profiles_in_competition", params: ["comp_id": competition_id.uuidString])
             .execute()
             .value
         
