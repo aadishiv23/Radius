@@ -634,7 +634,7 @@ extension FriendsDataManager {
         let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
             .from("group_competition_links")
             .select("*")
-            .eq("group_id", value: groupIds)
+            .in("group_id", values: groupIds)
             .execute()
             .value
         

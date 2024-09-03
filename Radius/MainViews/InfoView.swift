@@ -201,17 +201,21 @@ struct CompetitionCard: View {
                         .foregroundColor(.primary)
                 }
                 Spacer()
-                Button(action: {
-                    // Action to view competition details
-                }) {
-                    Text("View Details")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.blue)
-                        .cornerRadius(8)
+                
+                NavigationLink(destination: CompetitionDetailView(competition: competition)) {
+                
+                    Button(action: {
+                        // Action to view competition details
+                    }) {
+                        Text("View Details")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                    }
                 }
             }
         }

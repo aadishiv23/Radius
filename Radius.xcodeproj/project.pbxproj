@@ -13,6 +13,8 @@
 		AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */; };
 		AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */; };
 		AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */; };
+		AC1A7AC02C86A8B000C00EA8 /* CompetitionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A7ABF2C86A8B000C00EA8 /* CompetitionDetailView.swift */; };
+		AC1A7AC22C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A7AC12C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift */; };
 		AC1A99C62C8371E100ED5D1B /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */; };
 		AC1A99C92C8373B900ED5D1B /* VisionGlassViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */; };
 		AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1B00532BF4753C000BB30B /* AuthViewModel.swift */; };
@@ -73,6 +75,8 @@
 		AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendProfileView.swift; sourceTree = "<group>"; };
 		AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModifiers.swift; sourceTree = "<group>"; };
 		AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendDetailMapView.swift; sourceTree = "<group>"; };
+		AC1A7ABF2C86A8B000C00EA8 /* CompetitionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailView.swift; sourceTree = "<group>"; };
+		AC1A7AC12C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailViewModel.swift; sourceTree = "<group>"; };
 		AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionGlassViewModifier.swift; sourceTree = "<group>"; };
 		AC1B00532BF4753C000BB30B /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
@@ -219,6 +223,8 @@
 			isa = PBXGroup;
 			children = (
 				AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */,
+				AC1A7ABF2C86A8B000C00EA8 /* CompetitionDetailView.swift */,
+				AC1A7AC12C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift */,
 				AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */,
 			);
 			path = Competitions;
@@ -449,6 +455,7 @@
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
 				ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */,
+				AC1A7AC22C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift in Sources */,
 				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
 				AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */,
 				ACC537302BF3258300BECF8A /* Stuff.swift in Sources */,
@@ -472,6 +479,7 @@
 				ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
 				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
+				AC1A7AC02C86A8B000C00EA8 /* CompetitionDetailView.swift in Sources */,
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,
 				AC9BD1B62BE2E9E600D23123 /* FriendsDataManager.swift in Sources */,
 				ACED0C912C2534DD00D30D15 /* AddressEntryMapViewModel.swift in Sources */,
