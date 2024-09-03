@@ -33,56 +33,61 @@ final class ZoneUpdateManager {
     }
     
     func handleZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async {
-        // Create a DateFormatter for EDT
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: "EDT") // Set to Eastern Daylight Time
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // Customize the date format as needed
-
+        dateFormatter.timeZone = TimeZone(abbreviation: "EDT")
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let exitTime = dateFormatter.string(from: time)
         let currentDateString = dateFormatter.string(from: time)
 
         do {
-            // Get the current count of exits for today to determine the global exit order
-            let exitCountResponse: [DailyZoneExit] = try await supabaseClient
-                .from("daily_zone_exits")
-                .select()
-                .eq("date", value: currentDateString)
-                .execute()
-                .value
+            // Fetch the user's group
+            let userGroups = try await fetchUserGroupsZum(for: profileId)
+            var globalExitOrder = 1
+            var totalUsers = 0  // Define totalUsers outside the conditional block
 
-            let globalExitOrder = exitCountResponse.count + 1  // Next exit order
+            for group in userGroups {
+                if let competition = try await fetchCompetitionZum(for: group.group_id) {
+                    // Calculate total users in competition
+                    totalUsers = try await fetchTotalUsersInCompetitionZum(competition.id)
+                    globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, totalUsers: totalUsers)
+                    break
+                } else {
+                    // Calculate total users in the group
+                    totalUsers = try await fetchTotalUsersInGroupZum(group.group_id)
+                    globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, totalUsers: totalUsers)
+                }
 
-            for (index, zoneId) in zoneIds.enumerated() {
-                let zoneExit = [
-                    "profile_id": profileId.uuidString,
-                    "zone_id": zoneId.uuidString,
-                    "exit_time": exitTime // Store the time in EDT
-                ]
+                for zoneId in zoneIds {
+                    let zoneExit = [
+                        "profile_id": profileId.uuidString,
+                        "zone_id": zoneId.uuidString,
+                        "exit_time": exitTime
+                    ]
 
-                let insertedZoneExit: ZoneExit = try await supabaseClient
-                    .from("zone_exits")
-                    .insert(zoneExit)
-                    .select()
-                    .single()
-                    .execute()
-                    .value
+                    let insertedZoneExit: ZoneExit = try await supabaseClient
+                        .from("zone_exits")
+                        .insert(zoneExit)
+                        .select()
+                        .single()
+                        .execute()
+                        .value
 
-                // Insert into daily_zone_exits
-                let dailyZoneExit = DailyZoneExit(
-                    id: UUID(),  // Generate a new UUID for this entry
-                    date: Date(), // Store the current date in EDT
-                    profileId: profileId,
-                    zoneExitId: insertedZoneExit.id,
-                    exitOrder: globalExitOrder + 1,
-                    pointsEarned: calculatePoints(for: globalExitOrder)
-                )
+                    let dailyZoneExit = DailyZoneExit(
+                        id: UUID(),
+                        date: Date(),
+                        profileId: profileId,
+                        zoneExitId: insertedZoneExit.id,
+                        exitOrder: globalExitOrder,
+                        pointsEarned: calculatePoints(for: globalExitOrder, totalUsers: totalUsers) // Use totalUsers here
+                    )
 
-                try await supabaseClient
-                    .from("daily_zone_exits")
-                    .insert(dailyZoneExit)
-                    .execute()
+                    try await supabaseClient
+                        .from("daily_zone_exits")
+                        .insert(dailyZoneExit)
+                        .execute()
 
-                print("Daily zone exit recorded successfully for zone \(zoneId)")
+                    globalExitOrder += 1
+                }
             }
         } catch {
             print("Failed to record zone exits: \(error)")
@@ -90,9 +95,67 @@ final class ZoneUpdateManager {
     }
 
     
-    private func calculatePoints(for exitOrder: Int) -> Int {
-           // Assuming points decrease by 1 with each subsequent exit
-           let maxPoints = 12 // Adjust based on game rules
-           return max(maxPoints - exitOrder, 0)
-       }
+    private func fetchUserGroupsZum(for profileId: UUID) async throws -> [GroupMember] {
+        return try await supabaseClient
+            .from("group_members")
+            .select("group_id, profile_id")
+            .eq("profile_id", value: profileId.uuidString)
+            .execute()
+            .value
+    }
+    
+    private func fetchCompetitionZum(for groupId: UUID) async throws -> GroupCompetition? {
+        let competitions: [GroupCompetition] = try await supabaseClient
+            .from("group_competition_links")
+            .select("*")
+            .eq("group_id", value: groupId.uuidString)
+            .execute()
+            .value
+
+        return competitions.first
+    }
+    
+    private func fetchTotalUsersInGroupZum(_ groupId: UUID) async throws -> Int {
+        let groupMembers: [GroupMember] = try await supabaseClient
+            .from("group_members")
+            .select("profile_id")
+            .eq("group_id", value: groupId.uuidString)
+            .execute()
+            .value
+        
+        return groupMembers.count
+    }
+
+    private func fetchTotalUsersInCompetitionZum(_ competitionId: UUID) async throws -> Int {
+        let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
+            .from("group_competition_links")
+            .select("group_id")
+            .eq("competion_id", value: competitionId.uuidString)
+            .execute()
+            .value
+        
+        let groupIds = groupCompetitionLinks.map { $0.group_id}
+        
+        var totalUsers = 0
+        for groupId in groupIds {
+            totalUsers += try await fetchTotalUsersInGroupZum(groupId)
+        }
+
+        return totalUsers
+    }
+    
+    private func calculateGlobalExitOrder(dateString: String, totalUsers: Int) async throws -> Int {
+        let exitCountResponse: [DailyZoneExit] = try await supabaseClient
+            .from("daily_zone_exits")
+            .select("*")
+            .eq("date", value: dateString)
+            .execute()
+            .value
+
+        return exitCountResponse.count + 1  // Next exit order
+    }
+
+    private func calculatePoints(for exitOrder: Int, totalUsers: Int) -> Int {
+        return max(totalUsers - exitOrder, 0)
+    }
 }
