@@ -86,9 +86,11 @@ struct InfoView: View {
                             emptyCompetitionsView()
                                 .frame(maxWidth: .infinity)
                         } else {
-                            ForEach(userCompetitions) { competition in
-                                CompetitionCard(competition: competition)
-                                    .frame(maxWidth: .infinity)
+                            LazyVStack {
+                                ForEach(userCompetitions) { competition in
+                                    CompetitionCard(competition: competition)
+                                        .frame(maxWidth: .infinity)
+                                }
                             }
                         }
                     }
@@ -177,33 +179,32 @@ struct CompetitionCard: View {
     let competition: GroupCompetition
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "flag.2.crossed.fill")
-                    .font(.title2)
-                    .foregroundColor(.yellow)
-                Text(competition.competition_name)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                Spacer()
-                Text(formattedDate(competition.competition_date))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Max Points")
+        NavigationLink(destination: CompetitionDetailView(competition: competition)) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: "flag.2.crossed.fill")
+                        .font(.title2)
+                        .foregroundColor(.yellow)
+                    Text(competition.competition_name)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                    Spacer()
+                    Text(formattedDate(competition.competition_date))
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("\(competition.max_points)")
-                        .font(.headline)
-                        .foregroundColor(.primary)
                 }
-                Spacer()
                 
-                NavigationLink(destination: CompetitionDetailView(competition: competition)) {
-                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Max Points")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("\(competition.max_points)")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
+                    Spacer()
+                    
                     Button(action: {
                         // Action to view competition details
                     }) {
@@ -242,7 +243,6 @@ struct CompetitionCard: View {
         )
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
-        .padding(.horizontal)
     }
 
     private func formattedDate(_ date: Date) -> String {

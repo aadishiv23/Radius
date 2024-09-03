@@ -241,13 +241,14 @@ struct HomeView: View {
     func friendRow(_ friend: Profile) -> some View {
         HStack(spacing: 16) {
             Circle()
-                .fill(Color(hex: friend.color) ?? .white)
+                .fill(Color.white.opacity(0.4))
                 .frame(width: 50, height: 50)
                 .overlay(
                     Text(friend.full_name.prefix(1))
                         .font(.title2.bold())
                         .foregroundColor(.purple.opacity(0.4))
                 )
+                .overlay(Circle().stroke(Color.white, lineWidth: 2))
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
             
             VStack(alignment: .leading, spacing: 4) {
@@ -270,7 +271,13 @@ struct HomeView: View {
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
-        .background(Color(UIColor.systemBackground).opacity(0.8))
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -286,19 +293,31 @@ struct HomeView: View {
     
     private var noFriendsRow: some View {
         HStack(spacing: 16) {
-            Image(systemName: "face.smiling.inverse")
-                .font(.largeTitle)
-                .foregroundColor(.secondary)
+            Circle()
+                .fill(Color.white.opacity(0.4))
+                .frame(width: 50, height: 50)
+                .overlay(
+                    Image(systemName: "face.smiling.inverse")
+                        .font(.largeTitle)
+                        .foregroundColor(.gray.opacity(0.7))
+                )
+                .overlay(Circle().stroke(Color.white, lineWidth: 2))
             
-            Text("😢 Boohoo! You have no friends. Add some now!")
+            Text("😢 You have no friends, loser.")
                 .font(.headline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.primary)
             
             Spacer()
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
-        .background(Color(UIColor.systemBackground).opacity(0.8))
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
