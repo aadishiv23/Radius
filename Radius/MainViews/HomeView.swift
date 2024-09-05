@@ -159,10 +159,11 @@ struct HomeView: View {
     }
     
     private func handleManualZoneExit(for zone: Zone) {
-        guard let profileId = friendsDataManager.currentUser?.id else { return }
+        /*guard let profileId = friendsDataManager.currentUser?.id else { return }
         Task {
             await locationManager.zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zone.id], at: Date())
-        }
+        }*/
+        print("silly boy add thsi back")
     }
     
     private func refreshData() async {

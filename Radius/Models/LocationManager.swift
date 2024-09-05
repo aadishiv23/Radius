@@ -101,7 +101,13 @@ class LocationManager: NSObject, ObservableObject {
         if event.state == .unsatisfied {
             // User has exited the zone
             Task {
-                await zoneUpdateManager.handleZoneExits(for: fdm.currentUser?.id ?? UUID(), zoneIds: [UUID(uuidString: event.identifier)!], at: Date())
+                guard let currentUserId = fdm.currentUser?.id else { return }
+                
+                // Upload zone exit first
+                try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [UUID(uuidString: event.identifier)!], at: Date())
+                
+                // Handle daily zone exits and points
+                try await zoneUpdateManager.handleDailyZoneExits(for: currentUserId, zoneIds: [UUID(uuidString: event.identifier)!], at: Date())
             }
         }
     }
@@ -180,21 +186,6 @@ extension LocationManager {
             longitude: location.coordinate.longitude
         )
         NotificationCenter.default.post(name: .zoneExited, object: localZoneExit)
-    }
-    
-    private func checkZoneBoundaries(for location: CLLocation) {
-        for zone in userZones {
-            let zoneCenter = CLLocation(latitude: zone.latitude, longitude: zone.longitude)
-            let distance = location.distance(from: zoneCenter)
-            
-            if distance > zone.radius {
-                // User has exited the zone
-                Task {
-                    await zoneUpdateManager.handleZoneExits(for: fdm.currentUser?.id ?? UUID(), zoneIds: [zone.id], at: Date())
-                }
-                notifyZoneExit(zone: zone, location: location)
-            }
-        }
     }
 }
 //

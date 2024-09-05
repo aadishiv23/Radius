@@ -31,23 +31,54 @@ final class ZoneUpdateManager {
             throw error
         }
     }
-    
-    func handleZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async {
+
+    func uploadZoneExit(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
+        // Create a DateFormatter for UTC
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: "EDT")
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let exitTime = dateFormatter.string(from: time)
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Use UTC
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+        let exitTimeUTC = dateFormatter.string(from: time)
+
+        for zoneId in zoneIds {
+            let zoneExit = [
+                "profile_id": profileId.uuidString,
+                "zone_id": zoneId.uuidString,
+                "exit_time": exitTimeUTC // Store the time in UTC
+            ]
+
+            do {
+                // Insert the zone exit record
+                _ = try await supabaseClient
+                    .from("zone_exits")
+                    .insert(zoneExit)
+                    .select()
+                    .single()
+                    .execute()
+
+                print("Zone exit uploaded successfully for zone \(zoneId)")
+            } catch {
+                print("Failed to upload zone exit: \(error)")
+                throw error
+            }
+        }
+    }
+
+
+    func handleDailyZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // UTC
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         let currentDateString = dateFormatter.string(from: time)
 
         do {
-            // Fetch the user's group
+            // Fetch the user's groups
             let userGroups = try await fetchUserGroupsZum(for: profileId)
             var globalExitOrder = 1
-            var totalUsers = 0  // Define totalUsers outside the conditional block
+            var totalUsers = 0
 
             for group in userGroups {
                 if let competition = try await fetchCompetitionZum(for: group.group_id) {
-                    // Calculate total users in competition
+                    // Calculate total users in the competition
                     totalUsers = try await fetchTotalUsersInCompetitionZum(competition.id)
                     globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, totalUsers: totalUsers)
                     break
@@ -56,45 +87,52 @@ final class ZoneUpdateManager {
                     totalUsers = try await fetchTotalUsersInGroupZum(group.group_id)
                     globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, totalUsers: totalUsers)
                 }
-
-                for zoneId in zoneIds {
-                    let zoneExit = [
-                        "profile_id": profileId.uuidString,
-                        "zone_id": zoneId.uuidString,
-                        "exit_time": exitTime
-                    ]
-
-                    let insertedZoneExit: ZoneExit = try await supabaseClient
-                        .from("zone_exits")
-                        .insert(zoneExit)
-                        .select()
-                        .single()
-                        .execute()
-                        .value
-
-                    let dailyZoneExit = DailyZoneExit(
-                        id: UUID(),
-                        date: Date(),
-                        profileId: profileId,
-                        zoneExitId: insertedZoneExit.id,
-                        exitOrder: globalExitOrder,
-                        pointsEarned: calculatePoints(for: globalExitOrder, totalUsers: totalUsers) // Use totalUsers here
-                    )
-
-                    try await supabaseClient
-                        .from("daily_zone_exits")
-                        .insert(dailyZoneExit)
-                        .execute()
-
-                    globalExitOrder += 1
-                }
             }
+
+            // For each zone, calculate points and insert into daily_zone_exits
+            for zoneId in zoneIds {
+                let exitOrder = globalExitOrder
+                let pointsEarned = calculatePoints(for: exitOrder, totalUsers: totalUsers)
+
+                // Fetch the corresponding `zone_exit_id` from the previous insertion
+                let insertedZoneExit: ZoneExit = try await supabaseClient
+                    .from("zone_exits")
+                    .select("*")
+                    .eq("profile_id", value: profileId.uuidString)
+                    .eq("zone_id", value: zoneId.uuidString)
+                    .order("exit_time", ascending: false)
+                    .limit(1)
+                    .single()
+                    .execute()
+                    .value
+
+                let dailyZoneExit = DailyZoneExit(
+                    id: UUID(),
+                    date: Date(),
+                    profile_id: profileId,
+                    zone_exit_id: insertedZoneExit.id,  // Use the existing zone exit ID
+                    exit_order: exitOrder,  // Update this to match your column name
+                    points_earned: pointsEarned
+                )
+
+                try await supabaseClient
+                    .from("daily_zone_exits")
+                    .insert(dailyZoneExit)
+                    .execute()
+
+                globalExitOrder += 1
+            }
+
+            print("Daily zone exit recorded successfully.")
         } catch {
-            print("Failed to record zone exits: \(error)")
+            print("Failed to handle daily zone exits: \(error)")
+            throw error
         }
     }
 
-    
+
+
+
     private func fetchUserGroupsZum(for profileId: UUID) async throws -> [GroupMember] {
         let userGroups: [GroupMember] = try await supabaseClient
             .from("group_members")
