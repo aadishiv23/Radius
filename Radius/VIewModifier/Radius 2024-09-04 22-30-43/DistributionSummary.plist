@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Radius.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>bitcode</key>
+			<false/>
+			<key>buildNumber</key>
+			<string>2</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>F4F45CF7F4F2713435B72546D3254F1DD1384231</string>
+				<key>dateExpires</key>
+				<string>3/25/25</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>8VNWQXUY4G.aadishivmalhotra.Radius</string>
+				<key>beta-reports-active</key>
+				<true/>
+				<key>com.apple.developer.applesignin</key>
+				<array>
+					<string>Default</string>
+				</array>
+				<key>com.apple.developer.team-identifier</key>
+				<string>8VNWQXUY4G</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>Radius.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>1d63d903-9d8c-4915-ae79-f11792e2fe88</string>
+				<key>dateExpires</key>
+				<string>3/25/25</string>
+				<key>name</key>
+				<string>iOS Team Store Provisioning Profile: aadishivmalhotra.Radius</string>
+			</dict>
+			<key>symbols</key>
+			<true/>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>8VNWQXUY4G</string>
+				<key>name</key>
+				<string>Aadi-Shiv Malhotra</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>

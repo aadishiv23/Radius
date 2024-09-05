@@ -32,6 +32,7 @@ struct HomeView: View {
     
     @State private var animateGradient = false
     @State private var showZoneExitActionSheet = false
+    @State private var userPoints: Int? = nil  // To hold the user's points
 
     
 //    @StateObject private var mapRegionObserver: MapRegionObserver
@@ -69,6 +70,7 @@ struct HomeView: View {
             )
             .navigationTitle("Home")
             .toolbar {
+                // Plus button with a dropdown menu
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
@@ -76,19 +78,19 @@ struct HomeView: View {
                         } label: {
                             Label("Add Zones", systemImage: "mappin.and.ellipse")
                         }
-                        
+
                         Button {
                             isPresentingDebugMenu = true
                         } label: {
                             Label("Debug Menu", systemImage: "ladybug")
                         }
-                        
+
                         Button {
                             isPresentingFriendRequests = true
                         } label: {
                             Label("Friend Requests", systemImage: "person.crop.circle.badge.plus")
                         }
-                        
+
                         Button {
                             showZoneExitActionSheet = true
                         } label: {
@@ -97,8 +99,12 @@ struct HomeView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-
                 }
+
+                // Points pill to show next to the plus button
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    PointsPillView(points: userPoints)  // Reuse the PointsPillView created earlier
+//                }
             }
             .actionSheet(isPresented: $showZoneExitActionSheet) {
                 ActionSheet(
@@ -139,6 +145,7 @@ struct HomeView: View {
             await refreshData()
         }
         .onAppear {
+            fetchUserPoints()
             locationManager.checkIfLocationServicesIsEnabled()
             locationManager.plsInitiateLocationUpdates()
             if let userLocation = locationManager.userLocation?.coordinate {
@@ -343,6 +350,15 @@ struct HomeView: View {
             showRecenterButton = false
         }
     }
+    
+    private func fetchUserPoints() {
+            // Fetch points logic (mocked here)
+            Task {
+                // Example logic to fetch user points, replace with actual data fetching
+                // userPoints = try await fetchPointsForCurrentUser()
+                userPoints = 500  // Mock value, replace with actual logic
+            }
+        }
 }
 
 struct HomeView_Previews: PreviewProvider {

@@ -52,6 +52,7 @@
 		AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D82BEB3EB000D23123 /* AppView.swift */; };
 		ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */; };
 		ACA85ABA2C87D3740086C484 /* RadiusGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA85AB92C87D3740086C484 /* RadiusGlass.swift */; };
+		ACA85ABC2C8951130086C484 /* PointsPillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA85ABB2C8951130086C484 /* PointsPillView.swift */; };
 		ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */; };
 		ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */; };
 		ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFE2C193F8500E12E0B /* GroupView.swift */; };
@@ -112,6 +113,7 @@
 		AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Radius.entitlements; sourceTree = "<group>"; };
 		ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DTransformer.swift; sourceTree = "<group>"; };
 		ACA85AB92C87D3740086C484 /* RadiusGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusGlass.swift; sourceTree = "<group>"; };
+		ACA85ABB2C8951130086C484 /* PointsPillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointsPillView.swift; sourceTree = "<group>"; };
 		ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupView.swift; sourceTree = "<group>"; };
 		ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGroupView.swift; sourceTree = "<group>"; };
 		ACAEFDFE2C193F8500E12E0B /* GroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupView.swift; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				AC0AC7092BDB10C2000418B8 /* ButtonModifiers.swift */,
+				ACA85ABB2C8951130086C484 /* PointsPillView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -473,6 +476,7 @@
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
 				AC1A99C92C8373B900ED5D1B /* VisionGlassViewModifier.swift in Sources */,
+				ACA85ABC2C8951130086C484 /* PointsPillView.swift in Sources */,
 				AC0AC7082BDB1049000418B8 /* FriendProfileView.swift in Sources */,
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
