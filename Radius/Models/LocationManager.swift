@@ -99,18 +99,28 @@ class LocationManager: NSObject, ObservableObject {
     
     private func handleMonitorEvent(_ event: CLMonitor.Event) {
         if event.state == .unsatisfied {
-            // User has exited the zone
             Task {
-                guard let currentUserId = fdm.currentUser?.id else { return }
+                guard let currentUserId = fdm.currentUser?.id, let zoneId = UUID(uuidString: event.identifier) else { return }
                 
-                // Upload zone exit first
-                try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [UUID(uuidString: event.identifier)!], at: Date())
-                
-                // Handle daily zone exits and points
-                try await zoneUpdateManager.handleDailyZoneExits(for: currentUserId, zoneIds: [UUID(uuidString: event.identifier)!], at: Date())
+                // Fetch zone details before proceeding
+                let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
+
+                // Check if the zone is categorized as "home" and if it has already been exited today
+                let hasAlreadyExitedToday = try await zoneUpdateManager.hasAlreadyExitedToday(for: currentUserId, zoneId: zoneId, category: zone.category)
+
+                if !hasAlreadyExitedToday {
+                    // Upload zone exit first
+                    try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: Date())
+
+                    // Handle daily zone exits and points
+                    try await zoneUpdateManager.handleDailyZoneExits(for: currentUserId, zoneIds: [zoneId], at: Date())
+                } else {
+                    print("Zone \(zone.name) has already been exited today. Skipping exit update.")
+                }
             }
         }
     }
+
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }

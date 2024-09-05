@@ -214,3 +214,41 @@ final class ZoneUpdateManager {
         return max(totalUsers - exitOrder, 0)
     }
 }
+
+extension ZoneUpdateManager {
+    
+    func fetchZone(for zoneId: UUID) async throws -> Zone {
+        let zone: Zone = try await supabaseClient
+            .from("zones")
+            .select("*")
+            .eq("id", value: zoneId.uuidString)
+            .single()
+            .execute()
+            .value
+        
+        return zone
+    }
+
+    func hasAlreadyExitedToday(for profileId: UUID, zoneId: UUID, category: ZoneCategory?) async throws -> Bool {
+        // Only perform the check for "home" zones
+        if category == .home {
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let currentDateString = dateFormatter.string(from: Date())
+
+            let existingExit: [DailyZoneExit] = try await supabaseClient
+                .from("daily_zone_exits")
+                .select("*")
+                .eq("profile_id", value: profileId.uuidString)
+                .eq("zone_id", value: zoneId.uuidString)
+                .eq("date", value: currentDateString)
+                .execute()
+                .value
+
+            return !existingExit.isEmpty
+        }
+        // If it's not a "home" zone, always return false
+        return false
+    }
+}
