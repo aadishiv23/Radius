@@ -276,7 +276,7 @@ struct ZoneExit: Identifiable, Codable {
     }
 }
 
-struct GroupCompetition: Identifiable, Codable {
+struct GroupCompetition: Identifiable, Hashable, Codable {
     var id: UUID
     var competition_name: String
     var competition_date: Date

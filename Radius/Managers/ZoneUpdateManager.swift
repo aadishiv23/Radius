@@ -96,29 +96,46 @@ final class ZoneUpdateManager {
 
     
     private func fetchUserGroupsZum(for profileId: UUID) async throws -> [GroupMember] {
-        return try await supabaseClient
+        let userGroups: [GroupMember] = try await supabaseClient
             .from("group_members")
-            .select("group_id, profile_id")
+            .select("*")
             .eq("profile_id", value: profileId.uuidString)
             .execute()
             .value
+        
+        return userGroups
     }
     
     private func fetchCompetitionZum(for groupId: UUID) async throws -> GroupCompetition? {
-        let competitions: [GroupCompetition] = try await supabaseClient
+        // Step 1: Fetch the competition link
+        let competitionLinks: [GroupCompetitionLink] = try await supabaseClient
             .from("group_competition_links")
             .select("*")
             .eq("group_id", value: groupId.uuidString)
             .execute()
             .value
-
+        
+        // Step 2: If there is a competition link, use it to fetch the actual competition
+        guard let competitionLink = competitionLinks.first else {
+            return nil  // No competition linked to this group
+        }
+        
+        // Fetch the actual competition
+        let competitions: [GroupCompetition] = try await supabaseClient
+            .from("group_competitions")
+            .select("*")
+            .eq("id", value: competitionLink.competition_id.uuidString)
+            .execute()
+            .value
+        
         return competitions.first
     }
+
     
     private func fetchTotalUsersInGroupZum(_ groupId: UUID) async throws -> Int {
         let groupMembers: [GroupMember] = try await supabaseClient
             .from("group_members")
-            .select("profile_id")
+            .select("*")
             .eq("group_id", value: groupId.uuidString)
             .execute()
             .value
@@ -129,8 +146,8 @@ final class ZoneUpdateManager {
     private func fetchTotalUsersInCompetitionZum(_ competitionId: UUID) async throws -> Int {
         let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
             .from("group_competition_links")
-            .select("group_id")
-            .eq("competion_id", value: competitionId.uuidString)
+            .select("*")
+            .eq("competition_id", value: competitionId.uuidString)
             .execute()
             .value
         

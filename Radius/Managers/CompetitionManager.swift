@@ -74,4 +74,49 @@ class CompetitionManager {
         
         return profileCountResponse
     }
+    
+    func fetchDailyPoints(for profileId: UUID, groupId: UUID) async throws -> Int {
+        let pointsResponse: DailyPoints = try await supabaseClient
+            .from("daily_points")
+            .select("*")
+            .eq("profile_id", value: profileId.uuidString)
+            .eq("group_id", value: groupId.uuidString)
+            .execute()
+            .value
+        
+        return pointsResponse.points
+    }
+
+    func fetchCompetitionPoints(for profileId: UUID, competitionId: UUID) async throws -> Int {
+        let pointsResponse: Int = try await supabaseClient
+            .rpc("fetch_competition_points", params: ["comp_id": competitionId.uuidString, "profile_id": profileId.uuidString])
+            .execute()
+            .value
+        
+        return pointsResponse
+    }
+
+    func fetchCompetitors(for competitionId: UUID) async throws -> [GroupMember] {
+        let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
+            .from("group_competition_links")
+            .select("group_id")
+            .eq("competition_id", value: competitionId.uuidString)
+            .execute()
+            .value
+        
+        let groupIds = groupCompetitionLinks.map { $0.group_id }
+        return try await fetchCompetitorsFromGroups(groupIds)
+    }
+
+    private func fetchCompetitorsFromGroups(_ groupIds: [UUID]) async throws -> [GroupMember] {
+        let groupMembers: [GroupMember] = try await supabaseClient
+            .from("group_members")
+            .select("profile_id, group_id, profiles(full_name)")
+            .in("group_id", values: groupIds.map { $0.uuidString })
+            .execute()
+            .value
+        
+        return groupMembers
+    }
+
 }
