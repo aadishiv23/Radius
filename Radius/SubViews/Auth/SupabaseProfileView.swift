@@ -32,12 +32,25 @@ struct SupabaseProfileView: View {
                         Divider()
                         
                         signOutButton
+                        
+                        Divider()
+                        
+                        Text("v1.0")
                     }
                     .padding()
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: LocationSettingsView()) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.primary)
+                    }
+                }
+            }
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.large)
+
         }
         .task {
             await getInitialProfile()

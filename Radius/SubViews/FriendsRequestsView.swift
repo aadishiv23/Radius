@@ -22,11 +22,18 @@ struct FriendRequestsView: View {
             
             List(friendsDataManager.pendingRequests) { request in
                 HStack {
-                    Text("Request from \(request.sender_id)")
+                    // Display the sender's username instead of sender_id
+                   // if let senderProfile = friendsDataManager.getProfile(for: request.sender_id) {
+                    //    Text("Request from \(senderProfile.username)")
+                  //  } else {
+                        Text("Request from \(request.sender_id)")  // Fallback if profile not found
+                    // }
                     Spacer()
                     Button("Accept") {
                         Task {
                             await friendsDataManager.acceptFriendRequest(request)
+                            // Remove the accepted request from the pendingRequests list
+                            friendsDataManager.removePendingRequest(request)
                         }
                     }
                 }
@@ -89,3 +96,4 @@ struct FriendRequestsView: View {
         .padding(.top, 50)  // Adjust the padding to position the popup correctly
     }
 }
+

@@ -12,17 +12,9 @@ import SwiftUI
 import CryptoKit
 import Supabase
 
-/*
- rather than load friends can also call swift fr directly in view
- @FetchRequest(
- entity: FriendLocationEntity.entity(),
- sortDescriptors: [NSSortDescriptor(keyPath: \FriendLocationEntity.name, ascending: true)]
- ) var friends: FetchedResults<FriendLocationEntity>
- */
-
 class FriendsDataManager: ObservableObject {
     private var supabaseClient: SupabaseClient
-    private var channel: RealtimeChannelV2?
+    private var locationSubscription: RealtimeChannelV2?
     
     @Published var friends: [Profile] = []
     @Published var currentUser: Profile!
@@ -33,74 +25,51 @@ class FriendsDataManager: ObservableObject {
 
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
-        setupRealtime()
         Task {
             await fetchCurrentUserProfile()
         }
     }
-    
-    private func setupRealtime() {
+
+    /// Start listening for real-time location updates
+    func startRealtimeLocationUpdates() {
         Task {
-            channel = await supabaseClient.realtimeV2.channel("public:profiles")
-
-            let insertions = await channel!.postgresChange(InsertAction.self, schema: "public", table: "profiles")
-            let updates = await channel!.postgresChange(UpdateAction.self, table: "profiles")
-            let deletions = await channel!.postgresChange(DeleteAction.self, table: "profiles")
-
-            await channel?.subscribe()
-
-            Task {
-                for await insertion in insertions {
-                    handleInsertedChannel(insertion)
-                }
-            }
-            Task {
-                for await update in updates {
-                    handleUpdatedChannel(update)
-                }
-            }
-            Task {
-                for await deletion in deletions {
-                    handleDeletionChannel(deletion)
-                }
-            }
+           await subscribeToRealtimeLocationUpdates()
+       }
+    }
+    
+    func stopRealtimeLocationUpdates() async {
+        Task {
+            await locationSubscription?.unsubscribe()
+            locationSubscription = nil
         }
     }
     
-    private func handleInsertedChannel(_ action: InsertAction) {
+    func subscribeToRealtimeLocationUpdates() async {
+        guard let userId = userId else { return }
+        
+        locationSubscription = await supabaseClient.realtimeV2.channel("public:profiles")
+        
+        // Listen explicitly for only updates to latitude and longitude
+        let updates = await locationSubscription!.postgresChange(UpdateAction.self, table: "profiles")
+     
+        await locationSubscription?.subscribe()
+        
+        for await update in await updates {
+            await handleRealtimeLocationUpdate(update)
+        }
+    }
+    
+    private func handleRealtimeLocationUpdate(_ update: UpdateAction) async {
         do {
-            let newProfile = try action.decodeRecord(decoder: decoder) as Profile
+            let updatedProfile = try update.decodeRecord(decoder: decoder) as Profile
             DispatchQueue.main.async {
-                self.friends.append(newProfile)
-            }
-        } catch {
-            print("Failed to handle InsertedChannel due to \(error)")
-        }
-    }
-    
-    private func handleUpdatedChannel(_ action: UpdateAction) {
-        do {
-            let updatedProfile = try action.decodeRecord(decoder: decoder) as Profile
-            if let index = friends.firstIndex(where: { $0.id == updatedProfile.id }) {
-                DispatchQueue.main.async {
-                    self.friends[index] = updatedProfile
+                if let index = self.friends.firstIndex(where: { $0.id == updatedProfile.id }) {
+                    self.friends[index].latitude = updatedProfile.latitude
+                    self.friends[index].longitude = updatedProfile.longitude
                 }
             }
         } catch {
-            print("Failed to handle updated channel due to \(error)")
-        }
-    }
-    
-    private func handleDeletionChannel(_ action: DeleteAction) {
-        do {
-            let profileToDelete = try action.decodeOldRecord(decoder: decoder) as Profile
-            if let index = friends.firstIndex(where: { $0.id == profileToDelete.id }) {
-                DispatchQueue.main.async {
-                    self.friends.remove(at: index)
-                }
-            }
-        } catch {
-            print("Failed to handle deleted channel update due to \(error)")
+            print("[Real-time Location] - Failed to handle real-time location update: \(error)")
         }
     }
     
@@ -160,25 +129,25 @@ class FriendsDataManager: ObservableObject {
                 // First, fetch friend relationships
                 let friendRelations: [FriendRelation] = try await supabaseClient
                     .from("friends")
-                    .select("friendship_id, profile_id1, profile_id2")
+                    .select("*")
                     .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
                     .execute()
                     .value
 
                 // Extract friend IDs
-                let friendIds = friendRelations.compactMap { relation -> UUID? in
+                let friendIds = Set(friendRelations.compactMap { relation -> UUID? in
                     if relation.profile_id1 == userId {
                         return relation.profile_id2
                     } else if relation.profile_id2 == userId {
                         return relation.profile_id1
                     }
                     return nil
-                }
+                })
 
                 // Now fetch the actual friend profiles
                 let friendProfiles: [Profile] = try await supabaseClient
                     .from("profiles")
-                    .select("id, username, full_name, color, latitude, longitude, phone_num")
+                    .select("*")
                     .in("id", values: friendIds.map { $0.uuidString })
                     .execute()
                     .value
@@ -651,4 +620,14 @@ extension FriendsDataManager {
         
         return competitions
     }
+    
+    func removePendingRequest(_ request: FriendRequest) {
+        if let index = pendingRequests.firstIndex(where: { $0.id == request.id }) {
+            pendingRequests.remove(at: index)
+        }
+    }
+
+//    func getProfile(for profileId: UUID) -> Profile? {
+//        return profiles.first(where: { $0.id == profileId })
+//    }
 }

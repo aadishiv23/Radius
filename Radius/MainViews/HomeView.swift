@@ -58,7 +58,7 @@ struct HomeView: View {
                     } else {
                         print("Current user id is nil")
                     }
-                }
+                }                
             }
             .background(
                 LinearGradient(
@@ -311,7 +311,7 @@ struct HomeView: View {
                 )
                 .overlay(Circle().stroke(Color.white, lineWidth: 2))
             
-            Text("😢 You have no friends, loser.")
+            Text("😢 You have no friends, add by clicking '+'!")
                 .font(.headline)
                 .foregroundColor(.primary)
             

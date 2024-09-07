@@ -7,6 +7,19 @@
 import CoreLocation
 import Supabase
 
+enum LocationAccuracyMode: String {
+    case highAccuracy = "HighAccuracy"
+    case balanced = "Balanced"
+    case lowPower = "LowPower"
+    
+    // Initialize from a string or return a default value
+    static func from(rawValue: String?) -> LocationAccuracyMode {
+        guard let rawValue = rawValue else { return .balanced }
+        return LocationAccuracyMode(rawValue: rawValue) ?? .balanced
+    }
+}
+
+
 @available(iOS 17.0, *)
 class LocationManager: NSObject, ObservableObject {
     static let shared = LocationManager()
@@ -15,6 +28,12 @@ class LocationManager: NSObject, ObservableObject {
     private var lastUploadedLocation: CLLocation?
     private let locationUpdateInterval: TimeInterval = 60
     private let minimumDistance: CLLocationDistance = 50
+    private let userDefaultsKey = "LocationAccuracyMode"
+    private var lastBroadcastTime: Date?
+   // private var broadcastChannel: RealtimeChannelV2
+
+    
+
     
     let zoneUpdateManager: ZoneUpdateManager
     private let fdm: FriendsDataManager
@@ -27,9 +46,10 @@ class LocationManager: NSObject, ObservableObject {
         self.fdm = FriendsDataManager(supabaseClient: supabase)
         
         super.init()
+        let savedMode = UserDefaults.standard.string(forKey: userDefaultsKey)
+        self.accuracyMode = LocationAccuracyMode.from(rawValue: savedMode)
         self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager.distanceFilter = 10
+        self.applyAccuracySettings()
         self.locationManager.allowsBackgroundLocationUpdates = true
         self.locationManager.pausesLocationUpdatesAutomatically = false
         
@@ -38,6 +58,40 @@ class LocationManager: NSObject, ObservableObject {
         Task {
             await fetchUserZones()
             await setupMonitor()
+            // await initializeRealtimeBroadcastChannel()
+        }
+    }
+    
+    
+    private func saveUserPreference() {
+        UserDefaults.standard.set(accuracyMode.rawValue, forKey: userDefaultsKey)
+    }
+    
+//    func initializeRealtimeBroadcastChannel() async {
+//        Task {
+//            broadcastChannel = await supabase.channel("location-update-room")
+//        }
+//    }
+    
+    
+    @Published var accuracyMode: LocationAccuracyMode = .balanced {
+        didSet {
+            saveUserPreference()
+            applyAccuracySettings()
+        }
+    }
+    
+    private func applyAccuracySettings() {
+        switch accuracyMode {
+        case .highAccuracy:
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.distanceFilter = 25 // frequent updates
+        case .balanced:
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            locationManager.distanceFilter = 100 // moderate updates
+        case .lowPower:
+            locationManager.desiredAccuracy = kCLLocationAccuracyReduced
+            locationManager.distanceFilter = 500 // infrequent updates
         }
     }
     
@@ -138,7 +192,7 @@ class LocationManager: NSObject, ObservableObject {
         
         let timeInterval = newLocation.timestamp.timeIntervalSince(lastLocation.timestamp)
         let distance = newLocation.distance(from: lastLocation)
-        return timeInterval >= locationUpdateInterval || distance >= minimumDistance
+        return timeInterval >= locationUpdateInterval || distance >= locationManager.distanceFilter
     }
     
     private func uploadLocation(_ newLocation: CLLocation) {

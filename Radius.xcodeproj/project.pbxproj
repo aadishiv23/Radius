@@ -62,6 +62,7 @@
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */; };
 		ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACD4812C2C326E98004653A1 /* CoreDataModel.xcdatamodeld */; };
+		ACE5AEA72C8B8EB000DB562B /* LocationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */; };
 		ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB24E92C11698800D9693F /* AddGroupView.swift */; };
 		ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */; };
 		ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */; };
@@ -124,6 +125,7 @@
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectedDebugView.swift; sourceTree = "<group>"; };
 		ACD4812D2C326E98004653A1 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
+		ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsView.swift; sourceTree = "<group>"; };
 		ACEB24E92C11698800D9693F /* AddGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGroupView.swift; sourceTree = "<group>"; };
 		ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressResult+AnnotationItem.swift"; sourceTree = "<group>"; };
 		ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryViewModel.swift; sourceTree = "<group>"; };
@@ -168,6 +170,7 @@
 				AC5DB4D62C7D7FDF00A1019E /* Competitions */,
 				AC0AC7032BDB0F9B000418B8 /* FriendDetailView.swift */,
 				AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */,
+				ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */,
 				AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */,
 				AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */,
 				AC5855FB2BDF1391009C490B /* AddressEntryView.swift */,
@@ -461,6 +464,7 @@
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
 				ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */,
+				ACE5AEA72C8B8EB000DB562B /* LocationSettingsView.swift in Sources */,
 				AC1A7AC22C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift in Sources */,
 				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
 				AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */,

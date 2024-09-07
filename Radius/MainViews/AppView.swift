@@ -15,6 +15,7 @@ import Supabase
 struct AppView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
         NavigationStack {
@@ -28,6 +29,15 @@ struct AppView: View {
                                 await friendsDataManager.fetchCurrentUserProfile()
                                 if let userId = friendsDataManager.currentUser?.id {
                                     LocationManager.shared.plsInitiateLocationUpdates()
+                                }
+                            }
+                        }
+                        .onChange(of: scenePhase) { newPhase in
+                            if newPhase == .active {
+                                friendsDataManager.startRealtimeLocationUpdates()
+                            } else {
+                                Task {
+                                    await friendsDataManager.stopRealtimeLocationUpdates()
                                 }
                             }
                         }
