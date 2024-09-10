@@ -58,11 +58,16 @@ class LocationManager: NSObject, ObservableObject {
         Task {
             await fetchUserZones()
             await setupMonitor()
+            startMonitoringSignificantLocationChanges()
             // await initializeRealtimeBroadcastChannel()
         }
     }
     
-    
+    // Ensure the app keeps tracking location when terminated or suspended
+    private func startMonitoringSignificantLocationChanges() {
+        locationManager.startMonitoringSignificantLocationChanges()
+    }
+
     private func saveUserPreference() {
         UserDefaults.standard.set(accuracyMode.rawValue, forKey: userDefaultsKey)
     }
