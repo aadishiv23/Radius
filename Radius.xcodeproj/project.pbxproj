@@ -18,6 +18,7 @@
 		AC1A99C62C8371E100ED5D1B /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */; };
 		AC1A99C92C8373B900ED5D1B /* VisionGlassViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */; };
 		AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1B00532BF4753C000BB30B /* AuthViewModel.swift */; };
+		AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC245A7E2C9151F4009B7A0D /* MyProfileView.swift */; };
 		AC3989562C705637002F84E6 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989552C705637002F84E6 /* DataController.swift */; };
 		AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupViewModel.swift */; };
 		AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */; };
@@ -83,6 +84,7 @@
 		AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		AC1A99C82C8373B900ED5D1B /* VisionGlassViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionGlassViewModifier.swift; sourceTree = "<group>"; };
 		AC1B00532BF4753C000BB30B /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		AC245A7E2C9151F4009B7A0D /* MyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileView.swift; sourceTree = "<group>"; };
 		AC3989552C705637002F84E6 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		AC39895B2C70592C002F84E6 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
 		AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneUpdateManager.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
 				ACAEFDFE2C193F8500E12E0B /* GroupView.swift */,
 				AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */,
+				AC245A7E2C9151F4009B7A0D /* MyProfileView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -485,6 +488,7 @@
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
+				AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */,
 				ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,

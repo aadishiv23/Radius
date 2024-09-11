@@ -29,6 +29,8 @@ struct SupabaseProfileView: View {
                         
                         updateProfileButton
                         
+                        myProfileButton
+                        
                         Divider()
                         
                         signOutButton
@@ -114,6 +116,18 @@ struct SupabaseProfileView: View {
             .cornerRadius(10)
         }
         .disabled(isLoading)
+    }
+    
+    private var myProfileButton: some View {  // New Button for MyProfileView
+        NavigationLink(destination: MyProfileView()) {
+            Text("My Profile")
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+        }
     }
     
     private var signOutButton: some View {
