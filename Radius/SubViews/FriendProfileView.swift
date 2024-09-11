@@ -13,94 +13,28 @@ import MapKit
 struct FriendProfileView: View {
     var friend: Profile
     @State private var editingZoneId: UUID? = nil
-    @State private var zoneName: String = ""
-    @EnvironmentObject var friendsDataManager: FriendsDataManager
-    @State private var iconTapped: Bool = false
-    @State private var rotationAngle: Double = 0
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            Spacer().frame(height: 20)
-            VStack {
-                ZStack {
-                   Circle()
-                       .foregroundStyle(LinearGradient(colors: [.red, .pink, .blue], startPoint: .leading, endPoint: .trailing))
-                       .frame(width: iconTapped ? 100 : 60, height: iconTapped ? 100 : 60)
-                       .rotationEffect(.degrees(rotationAngle))
-                       .onTapGesture {
-                           withAnimation(.spring()) {
-                               iconTapped.toggle()
-                               rotationAngle += 360
-                           }
-                       }
-                   Text(friend.full_name.prefix(1))
-                       .font(.largeTitle)
-                       .fontWeight(.bold)
-                       .foregroundStyle(Color.white)
-                       .shadow(radius: iconTapped ? 10 : 5)
-               }
-            }
-            .frame(maxWidth: .infinity)
-            Text("Coordinates: \(friend.latitude), \(friend.longitude)")
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .center)
-            Spacer()
-            underConstructionSection
-            Spacer()
-            
-//            ScrollView(.horizontal, showsIndicators: false) {
-//                LazyHStack {
-//                    ForEach(0..<10) { i in
-//                        RoundedRectangle(cornerRadius: 25)
-//                            .fill(Color(hue: Double(i) / 10, saturation: 1, brightness: 1).gradient)
-//                            .frame(width: 300, height: 100)
-//                    }
-//                }
-//                .scrollTargetLayout()
-//            }
-//            .scrollTargetBehavior(.viewAligned)
-//            .safeAreaPadding(.horizontal, 40)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack {
-                    ProfileCard(title: "Username", value: friend.username)
-                    ProfileCard(title: "Full Name", value: friend.full_name)
-                    ProfileCard(title: "Phone Number", value: friend.phone_num)
-                    ProfileCard(title: "Zones", value: "\(friend.zones.count)")
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.yellow.opacity(0.3)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 20) {
+                    friendInfoSection // Name, Username, Coordinates, Number of Zones
+                        .visionGlass()
+                    
+                    zonesSection // List of Zones
+                        .visionGlass()
                 }
-                .scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .safeAreaPadding(.horizontal, 40)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 20) {
-                    ForEach(friend.zones) { zone in
-                        PolaroidCard(zone: zone)
-                            .padding(.vertical, 10)
-                    }
-                }
-                .scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .safeAreaPadding(.horizontal, 40)
-            
-            NavigationLink(destination: FriendDetailMapView(friend: friend)) {
-                ZStack(alignment: .center) {
-                    Rectangle()
-                        .background(Color(hue: Double(6) / 10, saturation: 1, brightness: 1).gradient)
-                        .frame(width: 275, height: 275)
-                        .cornerRadius(25)
-                        .shadow(radius: 5)
-                    Map(initialPosition: MapCameraPosition.automatic)
-                        .frame(width: 250, height: 250)
-                        .cornerRadius(15)
-                        .shadow(radius: 5)
-                }
+                .padding(.top, 40)
             }
         }
-        //.padding()
         .navigationTitle(friend.full_name)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -114,35 +48,43 @@ struct FriendProfileView: View {
         }
     }
     
-    private var underConstructionSection: some View {
-            HStack {
-                Image(systemName: "hammer")
-                    .font(.title2)
-                    .foregroundColor(.black)
-                Text("Under Construction")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
-            }
-            .padding()
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.yellow, Color.black]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .cornerRadius(10)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(LinearGradient(
-                        gradient: Gradient(colors: [Color.black, Color.yellow]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ), lineWidth: 5)
-            )
-            .shadow(radius: 5)
+    // Friend's Name, Username, Coordinates, and Number of Zones
+    private var friendInfoSection: some View {
+        VStack(spacing: 10) {
+            Text("Name: \(friend.full_name)")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("Username: \(friend.username)")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("Coordinates: \(friend.latitude), \(friend.longitude)")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("Number of Zones: \(friend.zones.count)")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding()
+    }
+    
+    // List of Zones with modified Polaroid Card
+    private var zonesSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Zones")
+                .font(.headline)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 20) {
+                    ForEach(friend.zones) { zone in
+                        PolaroidCard(zone: zone)
+                    }
+                }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 15)
+            }
+        }
+        .padding()
+    }
 }
 
 struct ProfileCard: View {
@@ -169,34 +111,35 @@ struct ProfileCard: View {
 
 struct PolaroidCard: View {
     var zone: Zone
-    
+
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             MapViewForPolaroid(coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
-                .frame(height: 200)
+                .frame(width: 165, height: 165)  // Slightly wider and taller
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.white, lineWidth: 4)
+                        .stroke(Color.white, lineWidth: 2)
                 )
             
             VStack {
                 Text("\(zone.name)")
                     .font(.headline)
-                    .padding(.bottom, 5)
                     .foregroundColor(.black)
                     .lineLimit(1)
+                    .padding(.vertical, 5)
             }
             .frame(maxWidth: .infinity)
             .background(Color.white)
         }
         .padding(5)
-        .frame(width: 200)
         .background(Color.white)
         .cornerRadius(15)
-        .shadow(radius: 5, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 4)
+        .frame(width: 180, height: 200)  // Adjusted frame to make the card taller and wider
     }
 }
+
 
 struct MapViewForPolaroid: UIViewRepresentable {
     var coordinate: CLLocationCoordinate2D
