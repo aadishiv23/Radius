@@ -117,6 +117,7 @@ class FriendsDataManager: ObservableObject {
         }
     }
     
+    @MainActor
     func fetchFriendsAndGroups() async {
         guard let userId = self.userId else { return }
         
@@ -124,12 +125,16 @@ class FriendsDataManager: ObservableObject {
         await fetchUserGroups()
     }
     
-    func fetchFriends(for userId: UUID) async {
+    func fetchFriends(for userId: UUID, retryCount: Int = 3) async {
+        var attempts = 0
+        var success = false
+        
+        while attempts < retryCount && !success {
             do {
-                // First, fetch friend relationships
+                // Fetch friend relationships where profile_id1 or profile_id2 equals userId
                 let friendRelations: [FriendRelation] = try await supabaseClient
                     .from("friends")
-                    .select("*")
+                    .select("friendship_id, profile_id1, profile_id2")
                     .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
                     .execute()
                     .value
@@ -144,7 +149,7 @@ class FriendsDataManager: ObservableObject {
                     return nil
                 })
 
-                // Now fetch the actual friend profiles
+                // Fetch the actual friend profiles
                 let friendProfiles: [Profile] = try await supabaseClient
                     .from("profiles")
                     .select("*")
@@ -155,10 +160,22 @@ class FriendsDataManager: ObservableObject {
                 DispatchQueue.main.async {
                     self.friends = friendProfiles
                 }
+
+                // Mark the operation as successful
+                success = true
+
             } catch {
-                print("Failed to fetch friends: \(error)")
+                attempts += 1
+                print("Attempt \(attempts) failed with error: \(error)")
+                if attempts >= retryCount {
+                    print("Failed to fetch friends after \(retryCount) attempts.")
+                }
+                // Add a short delay before retrying (exponential backoff strategy)
+                await Task.sleep(1_000_000_000 * UInt64(attempts)) // Sleep for attempts seconds
             }
         }
+    }
+
 
     func fetchPendingFriendRequests() async {
         do {
@@ -457,7 +474,7 @@ class FriendsDataManager: ObservableObject {
         do {
             let groupMembers: [GroupMember] = try await supabaseClient
                 .from("group_members")
-                .select("group_id, profile_id")
+                .select("*")
                 .eq("profile_id", value: userId.uuidString)
                 .execute()
                 .value

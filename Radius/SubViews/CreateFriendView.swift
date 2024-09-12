@@ -10,7 +10,7 @@ import SwiftUI
 import CoreLocation
 
 struct CreateFriendView: View {
-    @EnvironmentObject var friendDataManager: FriendsDataManager
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
     @Environment(\.presentationMode) var presentationMode
 
     @State private var friendName: String
@@ -50,7 +50,7 @@ struct CreateFriendView: View {
                     }
                     .sheet(isPresented: $isPresentingZoneEditor) {
                         ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $zones)
-                            .environmentObject(friendDataManager)
+                            .environmentObject(friendsDataManager)
                     }
                 } header: {
                     Text("Zones")

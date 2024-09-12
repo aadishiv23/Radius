@@ -98,10 +98,10 @@ extension DateFormatter {
 
 
 struct Group: Codable, Identifiable, Hashable {
-    let id: UUID
-    let name: String
-    let description: String?
-    let password: String
+    var id: UUID
+    var name: String
+    var description: String?
+    var password: String
 }
 
 
@@ -340,7 +340,7 @@ struct GroupCompetitionLink: Identifiable, Codable {
 }
 
 struct FriendRelation: Codable {
-    let friendship_id: UUID
-    let profile_id1: UUID
-    let profile_id2: UUID
+    var friendship_id: UUID
+    var profile_id1: UUID
+    var profile_id2: UUID
 }
