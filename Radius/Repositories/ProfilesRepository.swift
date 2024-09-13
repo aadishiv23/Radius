@@ -8,7 +8,7 @@
 import Foundation
 import Supabase
 
-class ProfilesRepository {
+class ProfilesRepository: Observable {
     private var cache: [UUID: Profile] = [:]
     private var supabaseClient: SupabaseClient
     
