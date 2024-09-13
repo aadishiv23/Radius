@@ -8,29 +8,37 @@
 import Foundation
 import Supabase
 
-class ZonesRepository {
-    private var cache: [UUID: [Zone]] = [:] // In-memory cache for zones
-    private var supabaseClient: SupabaseClient
+class ZonesRepository: ObservableObject {
+    @Published var zones: [Zone] = []
+    private var cache: [UUID: CachedData<[Zone]>] = [:] // In-memory cache for zones
+    private let zoneService: ZoneService
     
-    init(supabaseClient: SupabaseClient) {
-        self.supabaseClient = supabaseClient
+    init(zoneService: ZoneService) {
+        self.zoneService = zoneService
     }
+
     
     // Fetch zones from cache or Supabase
-    func fetchZones(for userId: UUID) async throws -> [Zone] {
-        if let cachedZones = cache[userId] {
-            return cachedZones
+    func fetchZones(for profileId: UUID) async throws -> [Zone] {
+        if let cachedZones = cache[profileId] {
+            return cachedZones.data
         }
         
-        let zones: [Zone] = try await supabaseClient
-            .from("zones")
-            .select("*")
-            .eq("profile_id", value: userId.uuidString)
-            .execute()
-            .value
+        let fetchedZones = try await zoneService.fetchZones(for: profileId)
+        cache[profileId] = CachedData(data: fetchedZones, timestamp: Date())
         
-        cache[userId] = zones
-        return zones
+        DispatchQueue.main.async {
+            self.zones = fetchedZones
+        }
+        return fetchedZones
+    }
+    
+    func addZone(to profileId: UUID, zone: Zone) async throws {
+        try await zoneService.insertZone(for: profileId, zone: zone)
+    }
+    
+    func removeZone(zoneId: UUID) async throws {
+        try await zoneService.deleteZone(zoneId: zoneId)
     }
     
     // Invalidate cache for zones
