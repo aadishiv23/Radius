@@ -8,35 +8,33 @@
 import Foundation
 import Supabase
 
-class FriendsRepository {
+class FriendsRepository: ObservableObject {
+    @Published var friends: [Profile] = []
+
     private var cache: [UUID: CachedData<[Profile]>] = [:]
-    private var cacheExpiration: TimeInterval = 300
-    private var supabaseClient: SupabaseClient
+    private var cacheExpiration: TimeInterval = 300 // 5 minutes
+    private let friendService: FriendService
+
     
-    init(supabaseClient: SupabaseClient) {
-        self.supabaseClient = supabaseClient
+    init(friendService: FriendService) {
+        self.friendService = friendService
     }
     
     /// Fetch friends from cache or supabase
     func fetchFriends(for userId: UUID) async throws -> [Profile] {
-            // Check if data is cached and not expired
-            if let cachedData = cache[userId], !isCacheExpired(cachedData.timestamp) {
-                return cachedData.data
-            }
-            
-            // If no valid cache, fetch data from Supabase
-            let friends: [Profile] = try await supabaseClient
-                .from("friends")
-                .select("profile_id2, profiles!inner(*)")
-                .eq("profile_id1", value: userId.uuidString)
-                .execute()
-                .value
-            
-            // Cache the result with the current timestamp
-            cache[userId] = CachedData(data: friends, timestamp: Date())
-            
-            return friends
+        if let cachedData = cache[userId], !isCacheExpired(cachedData.timestamp) {
+            return cachedData.data
         }
+        
+        let fetchedFriends = try await friendService.fetchFriends(for: userId)
+        cache[userId] = CachedData(data: fetchedFriends, timestamp: Date())
+        
+        DispatchQueue.main.async {
+            self.friends = fetchedFriends
+        }
+        
+        return fetchedFriends
+    }
     
     /// Invalidate cache for friends
     func invalidateFriendsCache(for userId: UUID) {
