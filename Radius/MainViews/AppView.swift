@@ -15,6 +15,11 @@ import Supabase
 struct AppView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var friendsDataManager: FriendsDataManager
+
+    @ObservedObject private var friendsRepository = FriendsRepository(friendService: FriendService(supabaseClient: supabase))
+    @ObservedObject private var groupsRepository = GroupsRepository(groupService: GroupService(supabaseClient: supabase))
+    @ObservedObject private var zonesRepository = ZonesRepository(zoneService: ZoneService(supabaseClient: supabase))
+
     @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
@@ -41,6 +46,9 @@ struct AppView: View {
                                 }
                             }
                         }
+                        .environmentObject(friendsRepository)
+                        .environmentObject(groupsRepository)
+                        .environmentObject(zonesRepository)
                 }
             } else {
                 AuthView()
