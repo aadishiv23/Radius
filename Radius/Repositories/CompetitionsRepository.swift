@@ -8,7 +8,7 @@
 import Foundation
 import Supabase
 
-class CompetitionsRepository {
+class CompetitionsRepository: ObservableObject {
     private var cache: [UUID: [GroupCompetition]] = [:] // In-memory cache for competitions
     private var supabaseClient: SupabaseClient
     
