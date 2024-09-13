@@ -240,7 +240,6 @@ class FriendsDataManager: ObservableObject {
                     .value
                 
                 if let profile = profile {
-                    await OldfetchFriends(for: userId)
                     print(profile.full_name)
                     print(profile.username)
                     print(user.email ?? "N/A")
@@ -254,32 +253,6 @@ class FriendsDataManager: ObservableObject {
             print("Failed to fetch current user profile: \(error)")
         }
     }
-        
-    func OldfetchFriends(for userId: UUID) async {
-        do {
-            let friends: [Profile] = try await supabaseClient
-                .from("profiles")
-                .select("*, zones(*)")
-                .eq("id", value: userId)
-                .execute()
-                .value
-            
-            var fetchedFriends = friends
-            
-            for i in 0..<fetchedFriends.count {
-                fetchedFriends[i].zones = try await fetchZones(for: fetchedFriends[i].id)
-            }
-            
-            DispatchQueue.main.async {
-                self.friends = fetchedFriends
-                self.currentUser = fetchedFriends.first { $0.id == self.userId }
-            }
-            
-        } catch {
-            print("Failed to fetch friends old: \(error)")
-        }
-    }
-
     
     func createGroup(name: String, description: String?, password: String) async {
         let hashedPassword = hashPassword(password)
