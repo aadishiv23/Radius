@@ -22,14 +22,37 @@ class CompetitionsRepository: ObservableObject {
             return cachedCompetitions
         }
         
-        let competitions: [GroupCompetition] = try await supabaseClient
-            .from("group_competitions")
-            .select("*")
+        // Step 1: Fetch the user's groups
+        let userGroups: [GroupMember] = try await supabaseClient
+            .from("group_members")
+            .select("group_id, profile_id")
             .eq("profile_id", value: userId.uuidString)
             .execute()
             .value
         
+        let groupIds = userGroups.map { $0.group_id.uuidString }
+        
+        // Step 2: Fetch competitions linked to these groups
+        let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
+            .from("group_competition_links")
+            .select("*")
+            .in("group_id", values: groupIds)
+            .execute()
+            .value
+        
+        let competitionIds = groupCompetitionLinks.map { $0.competition_id.uuidString }
+       // Array(Set(groupCompetitionLinks.map { $0.competition_id.uuidString }))
+        
+        // Step 3: Fetch the actual competition details
+        let competitions: [GroupCompetition] = try await supabaseClient
+            .from("group_competitions")
+            .select("*")
+            .in("id", values: competitionIds)
+            .execute()
+            .value
+        
         cache[userId] = competitions
+
         return competitions
     }
     
