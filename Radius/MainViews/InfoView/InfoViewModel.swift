@@ -7,7 +7,7 @@
 
 import Foundation
 
-class FriendsViewModel: ObservableObject {
+class InfoViewModel: ObservableObject {
     @Published var friends: [Profile] = []
     @Published var userGroups: [Group] = []
     @Published var userCompetitions: [GroupCompetition] = []
@@ -39,7 +39,7 @@ class FriendsViewModel: ObservableObject {
     func loadFriends() async {
         do {
             let fetchedFriends = try await friendsRepository.fetchFriends(for: userId)
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.friends = fetchedFriends
             }
         } catch {
@@ -50,7 +50,7 @@ class FriendsViewModel: ObservableObject {
     func loadGroups() async {
         do {
             let fetchedGroups = try await groupsRepository.fetchGroups(for: userId)
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.userGroups = fetchedGroups
             }
         } catch {
@@ -61,7 +61,7 @@ class FriendsViewModel: ObservableObject {
     func loadCompetitions() async {
         do {
             let fetchedCompetitions = try await competitionsRepository.fetchCompetitions(for: userId)
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.userCompetitions = fetchedCompetitions
             }
         } catch {
@@ -77,5 +77,7 @@ class FriendsViewModel: ObservableObject {
     
     func invalidateCache() {
         friendsRepository.invalidateFriendsCache(for: userId)
+        groupsRepository.invalidateGroupsCache(for: userId)
+        competitionsRepository.invalidateCompetitionsCache(for: userId)
     }
 }

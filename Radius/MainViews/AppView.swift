@@ -5,10 +5,6 @@
 //  Created by Aadi Shiv Malhotra on 5/8/24.
 //
 
-import Foundation
-import SwiftUI
-
-
 import SwiftUI
 import Supabase
 
@@ -19,6 +15,7 @@ struct AppView: View {
     @StateObject private var friendsRepository = FriendsRepository(friendService: FriendService(supabaseClient: supabase))
     @StateObject private var groupsRepository = GroupsRepository(groupService: GroupService(supabaseClient: supabase))
     @StateObject private var zonesRepository = ZonesRepository(zoneService: ZoneService(supabaseClient: supabase))
+    @StateObject private var competitionsRepository = CompetitionsRepository(supabaseClient: supabase) // Initialize CompetitionsRepository
 
     @Environment(\.scenePhase) var scenePhase
 
@@ -49,6 +46,7 @@ struct AppView: View {
                         .environmentObject(friendsRepository)
                         .environmentObject(groupsRepository)
                         .environmentObject(zonesRepository)
+                        .environmentObject(competitionsRepository) // Provide CompetitionsRepository as EnvironmentObject
                 }
             } else {
                 AuthView()
@@ -57,18 +55,38 @@ struct AppView: View {
     }
 }
 
-
 struct MainTabView: View {
+    @EnvironmentObject var friendsRepository: FriendsRepository
+    @EnvironmentObject var groupsRepository: GroupsRepository
+    @EnvironmentObject var competitionsRepository: CompetitionsRepository
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
+
     var body: some View {
         TabView {
             HomeView()
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-            InfoView()
+            
+            // Ensure that currentUser is available
+            if let userId = friendsDataManager.currentUser?.id {
+                InfoView(
+                    friendsRepository: friendsRepository,
+                    groupsRepository: groupsRepository,
+                    competitionsRepository: competitionsRepository,
+                    userId: userId
+                )
                 .tabItem {
                     Label("Info", systemImage: "info.circle")
                 }
+            } else {
+                // Handle the case where userId is not available
+                Text("Loading...")
+                    .tabItem {
+                        Label("Info", systemImage: "info.circle")
+                    }
+            }
+            
             LeaderboardView()
                 .tabItem {
                     Label("Leaderboard", systemImage: "list.number")

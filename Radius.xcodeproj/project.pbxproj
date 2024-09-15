@@ -39,6 +39,9 @@
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
+		AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140102C93C2CA000112D2 /* FriendService.swift */; };
+		AC9140132C93C31F000112D2 /* GroupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140122C93C31F000112D2 /* GroupService.swift */; };
+		AC9140152C93C51B000112D2 /* ZoneService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140142C93C51B000112D2 /* ZoneService.swift */; };
 		AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */; };
 		AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC98AE012BC0872E00879A25 /* ContentView.swift */; };
 		AC98AE042BC0873000879A25 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC98AE032BC0873000879A25 /* Assets.xcassets */; };
@@ -113,6 +116,9 @@
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
+		AC9140102C93C2CA000112D2 /* FriendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendService.swift; sourceTree = "<group>"; };
+		AC9140122C93C31F000112D2 /* GroupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupService.swift; sourceTree = "<group>"; };
+		AC9140142C93C51B000112D2 /* ZoneService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneService.swift; sourceTree = "<group>"; };
 		AC98ADFC2BC0872E00879A25 /* Radius.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Radius.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC98ADFF2BC0872E00879A25 /* RadiusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusApp.swift; sourceTree = "<group>"; };
 		AC98AE012BC0872E00879A25 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -297,6 +303,16 @@
 			path = Managers;
 			sourceTree = "<group>";
 		};
+		AC91400F2C93C2B9000112D2 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AC9140102C93C2CA000112D2 /* FriendService.swift */,
+				AC9140142C93C51B000112D2 /* ZoneService.swift */,
+				AC9140122C93C31F000112D2 /* GroupService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		AC98ADF32BC0872E00879A25 = {
 			isa = PBXGroup;
 			children = (
@@ -317,6 +333,7 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				AC91400F2C93C2B9000112D2 /* Services */,
 				AC36A7302C92891600840DDD /* Repositories */,
 				AC1A99C72C8373AF00ED5D1B /* VIewModifier */,
 				ACD4812B2C326E74004653A1 /* CoreData */,
@@ -509,6 +526,7 @@
 				AC5DB4DA2C7D800E00A1019E /* CompetitionManagerViewModel.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
 				AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */,
+				AC9140132C93C31F000112D2 /* GroupService.swift in Sources */,
 				AC0AC7062BDB0FC6000418B8 /* FullScreenMapView.swift in Sources */,
 				AC98AE002BC0872E00879A25 /* RadiusApp.swift in Sources */,
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
@@ -539,6 +557,7 @@
 				AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */,
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
+				AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */,
 				AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */,
 				ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
@@ -546,6 +565,7 @@
 				AC36A7322C92892200840DDD /* ProfilesRepository.swift in Sources */,
 				ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
+				AC9140152C93C51B000112D2 /* ZoneService.swift in Sources */,
 				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
 				AC1A7AC02C86A8B000C00EA8 /* CompetitionDetailView.swift in Sources */,
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,

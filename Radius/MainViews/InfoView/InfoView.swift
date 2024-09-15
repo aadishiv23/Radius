@@ -11,13 +11,30 @@ import MapKit
 
 // InfoView that lists all friends and navigates to their detail view
 struct InfoView: View {
-    @EnvironmentObject var friendsDataManager: FriendsDataManager
+    @StateObject var viewModel: InfoViewModel
     @State private var isPresentingCreateGroupView = false
-        @State private var isPresentingJoinGroupView = false
-        @State private var isShownDemo: Bool = false
-        @State private var animateGradient = false
-        @State private var isPresentingCompetitionManagerView = false
-    @State private var userCompetitions: [GroupCompetition] = []
+    @State private var isPresentingJoinGroupView = false
+    @State private var isPresentingCompetitionManagerView = false
+
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
+//    @EnvironmentObject var friendsRepository: FriendsRepository
+//    @EnvironmentObject var groupsRepository: GroupsRepository
+//    @EnvironmentObject var competitionsRepository: CompetitionsRepository
+    
+    //@State private var userCompetitions: [GroupCompetition] = []
+
+    
+//@State private var isShownDemo: Bool = false
+  //  @State private var animateGradient = false
+
+    init(friendsRepository: FriendsRepository, groupsRepository: GroupsRepository, competitionsRepository: CompetitionsRepository, userId: UUID) {
+        _viewModel = StateObject(wrappedValue: InfoViewModel(
+            friendsRepository: friendsRepository,
+            groupsRepository: groupsRepository,
+            competitionsRepository: competitionsRepository,
+            userId: userId
+        ))
+    }
 
     var body: some View {
         NavigationView {
@@ -26,7 +43,7 @@ struct InfoView: View {
                     
                     // Friends Section
                     CollapsibleSection(title: "Friends") {
-                        ForEach(friendsDataManager.friends) { friend in
+                        ForEach(viewModel.friends) { friend in
                             NavigationLink(destination: FriendProfileView(friend: friend)) {
                                 HStack {
                                     Circle()
@@ -67,7 +84,7 @@ struct InfoView: View {
                     
                     // Groups Section
                     CollapsibleSection(title: "Groups") {
-                        if friendsDataManager.userGroups.isEmpty {
+                        if viewModel.userGroups.isEmpty {
                             VStack {
                                 Image(systemName: "person.3.fill")
                                     .font(.largeTitle)
@@ -78,7 +95,7 @@ struct InfoView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                         } else {
-                            ForEach(friendsDataManager.userGroups, id: \.id) { group in
+                            ForEach(viewModel.userGroups, id: \.id) { group in
                                 GroupView(group: group)
                                     .frame(maxWidth: .infinity)
                             }
@@ -87,12 +104,12 @@ struct InfoView: View {
                     
                     // Competitions Section
                     CollapsibleSection(title: "Competitions") {
-                        if userCompetitions.isEmpty {
+                        if viewModel.userCompetitions.isEmpty {
                             emptyCompetitionsView()
                                 .frame(maxWidth: .infinity)
                         } else {
                             LazyVStack {
-                                ForEach(userCompetitions) { competition in
+                                ForEach(viewModel.userCompetitions) { competition in
                                     CompetitionCard(competition: competition)
                                         .frame(maxWidth: .infinity)
                                 }
@@ -104,7 +121,7 @@ struct InfoView: View {
             }
             .navigationTitle("Friends Info")
             .refreshable {
-                await refreshData()
+                await viewModel.refreshAllData()
             }
             .scrollContentBackground(.hidden)
             .background(
@@ -153,26 +170,9 @@ struct InfoView: View {
             }
             .onAppear {
                 Task {
-                    await friendsDataManager.fetchFriendsAndGroups()
-                    await fetchUserCompetitions()
+                    await viewModel.refreshAllData
                 }
             }
-        }
-    }
-    
-    private func refreshData() async {
-        guard let userId = friendsDataManager.currentUser?.id else { return }
-        await friendsDataManager.fetchFriends(for: userId)
-    }
-    
-    private func fetchUserCompetitions() async {
-        do {
-            userCompetitions = try await friendsDataManager.fetchUserCompetitions()
-            for competition in userCompetitions {
-                print("[Competition] - id: \(competition.id), name: \(competition.competition_name), date: \(competition.competition_date), maxPoints: \(competition.max_points), createdAt: \(competition.created_at)")
-            }
-        } catch {
-            print("Error fetching user competitions: \(error)")
         }
     }
 
@@ -210,11 +210,11 @@ struct InfoView: View {
 }
 
 
-struct InfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        InfoView()
-    }
-}
+//struct InfoView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        InfoView(, viewModel: Infov)
+//    }
+//}
 
 struct CompetitionCard: View {
     let competition: GroupCompetition

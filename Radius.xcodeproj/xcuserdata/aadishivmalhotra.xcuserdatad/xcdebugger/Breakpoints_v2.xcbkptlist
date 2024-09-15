@@ -210,36 +210,6 @@
             endingLineNumber = "45"
             landmarkName = "fetchDetails(for:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "574A1151-6677-4B23-94CB-5F971BBC238A - 1391fc13e1d3208f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for Radius.CompetitionDetailViewModel.fetchDetails(for: Radius.GroupCompetition) async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/SubViews/Competitions/CompetitionDetailViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "45"
-                  endingLineNumber = "45">
-               </Location>
-               <Location
-                  uuid = "574A1151-6677-4B23-94CB-5F971BBC238A - 72bd8f8149763087"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(9) suspend resume partial function for Radius.CompetitionDetailViewModel.fetchDetails(for: Radius.GroupCompetition) async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/SubViews/Competitions/CompetitionDetailViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "45"
-                  endingLineNumber = "45">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -300,8 +270,8 @@
             filePath = "Radius/Managers/FriendsDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "470"
-            endingLineNumber = "470"
+            startingLineNumber = "443"
+            endingLineNumber = "443"
             landmarkName = "fetchUserGroupMembers()"
             landmarkType = "7">
          </BreakpointContent>
@@ -336,36 +306,6 @@
             endingLineNumber = "124"
             landmarkName = "fetchFriendsAndGroups()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "294C7A78-1629-43B3-B87C-D71111F1A1DB - da684e9f7c5ac513"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for Radius.FriendsDataManager.fetchFriendsAndGroups() async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "124"
-                  endingLineNumber = "124">
-               </Location>
-               <Location
-                  uuid = "294C7A78-1629-43B3-B87C-D71111F1A1DB - ade387481e8183e8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for Radius.FriendsDataManager.fetchFriendsAndGroups() async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "124"
-                  endingLineNumber = "124">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -382,50 +322,6 @@
             endingLineNumber = "125"
             landmarkName = "fetchFriendsAndGroups()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "C794896B-6DAE-4DA0-A653-56766D72BEBF - ade387481e8183cb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for Radius.FriendsDataManager.fetchFriendsAndGroups() async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "125"
-                  endingLineNumber = "125">
-               </Location>
-               <Location
-                  uuid = "C794896B-6DAE-4DA0-A653-56766D72BEBF - f8bb35ef283651dc"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) await resume partial function for Radius.FriendsDataManager.fetchFriendsAndGroups() async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "125"
-                  endingLineNumber = "125">
-               </Location>
-               <Location
-                  uuid = "C794896B-6DAE-4DA0-A653-56766D72BEBF - 107591f56ed86e93"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for Radius.FriendsDataManager.fetchFriendsAndGroups() async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "125"
-                  endingLineNumber = "125">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -442,36 +338,6 @@
             endingLineNumber = "160"
             landmarkName = "fetchFriends(for:retryCount:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "7099726B-0438-4BD8-8DA9-B1F27AA5576B - eaf681ac281fe9d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for Radius.FriendsDataManager.fetchFriends(for: Foundation.UUID, retryCount: Swift.Int) async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "160"
-                  endingLineNumber = "160">
-               </Location>
-               <Location
-                  uuid = "7099726B-0438-4BD8-8DA9-B1F27AA5576B - fff4d1bbbd708a7f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 @Swift.MainActor @Sendable () -&gt; () in Radius.FriendsDataManager.fetchFriends(for: Foundation.UUID, retryCount: Swift.Int) async -&gt; ()"
-                  moduleName = "Radius"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/FriendsDataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "161"
-                  endingLineNumber = "161">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
