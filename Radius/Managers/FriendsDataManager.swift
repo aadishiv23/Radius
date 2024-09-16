@@ -560,7 +560,7 @@ class FriendsDataManager: ObservableObject {
 
                 let profiles: [Profile] = try await supabaseClient
                     .from("profiles")
-                    .select("*")
+                    .select("*, zones(*)")
                     .in("id", values: profileIDs.map { $0.uuidString })
                     .execute()
                     .value
