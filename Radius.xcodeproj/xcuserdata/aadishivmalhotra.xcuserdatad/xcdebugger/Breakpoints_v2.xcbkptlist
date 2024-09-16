@@ -270,8 +270,8 @@
             filePath = "Radius/Managers/FriendsDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "443"
-            endingLineNumber = "443"
+            startingLineNumber = "444"
+            endingLineNumber = "444"
             landmarkName = "fetchUserGroupMembers()"
             landmarkType = "7">
          </BreakpointContent>

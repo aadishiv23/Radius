@@ -262,7 +262,8 @@ class FriendsDataManager: ObservableObject {
                 .insert([
                     "name" : name,
                     "description" : description ?? "",
-                    "password" : hashedPassword
+                    "password" : hashedPassword,
+                    "plain_password": password
                 ])
                 .execute()
             

@@ -102,6 +102,7 @@ struct Group: Codable, Identifiable, Hashable {
     var name: String
     var description: String?
     var password: String
+    var plain_password: String?
 }
 
 
