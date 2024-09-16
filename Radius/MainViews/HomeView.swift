@@ -206,6 +206,8 @@ struct HomeView: View {
 
                 Button(action: {
                     showFullScreenMap.toggle()
+                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    generator.impactOccurred()
                 }) {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
                         .circularButtonStyle()
@@ -220,7 +222,7 @@ struct HomeView: View {
     }
     
     private var friendListSection: some View {
-       VStack(alignment: .leading, spacing: 16) {
+       VStack(alignment: .leading, spacing: 5) {
            // Me Section
            Section(header: Text("Me").font(.headline).padding(.leading)) {
                if let currentUser = friendsDataManager.currentUser {
@@ -242,7 +244,7 @@ struct HomeView: View {
                }
            }
        }
-       .padding(.top)
+       .padding(.top, 5)
    }
     
     @ViewBuilder
@@ -296,6 +298,9 @@ struct HomeView: View {
         .padding(.vertical, 4)
         .onTapGesture {
             selectedFriend = friend
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()  // Add haptic feedback
+
         }
     }
     
