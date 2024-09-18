@@ -10,21 +10,21 @@ import Supabase
 
 final class ZoneUpdateManager {
     private let supabaseClient: SupabaseClient
-    
+
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
     }
-    
+
     func fetchZoneExits(for profileId: UUID) async throws -> [ZoneExit] {
         do {
             let zoneExits: [ZoneExit] = try await supabaseClient
                 .from("zone_exits")
                 .select()
                 .eq("profile_id", value: profileId.uuidString)
-                .order("exit_time", ascending: false)  // Adjust sorting based on your needs
+                .order("exit_time", ascending: false) // Adjust sorting based on your needs
                 .execute()
                 .value
-            
+
             return zoneExits
         } catch {
             print("Failed to fetch zone exits for profile \(profileId): \(error)")
@@ -35,7 +35,7 @@ final class ZoneUpdateManager {
     func uploadZoneExit(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
         // Create a DateFormatter for UTC
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // Use UTC
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // Use UTC
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
         let exitTimeUTC = dateFormatter.string(from: time)
 
@@ -63,12 +63,15 @@ final class ZoneUpdateManager {
         }
     }
 
-
     func handleDailyZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)  // UTC
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // UTC
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let currentDateString = dateFormatter.string(from: time)
+
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)! // UTC
+        let startOfDay = calendar.startOfDay(for: time)
 
         do {
             // Fetch the user's groups
@@ -108,10 +111,10 @@ final class ZoneUpdateManager {
 
                 let dailyZoneExit = DailyZoneExit(
                     id: UUID(),
-                    date: Date(),
+                    date: startOfDay,
                     profile_id: profileId,
-                    zone_exit_id: insertedZoneExit.id,  // Use the existing zone exit ID
-                    exit_order: exitOrder,  // Update this to match your column name
+                    zone_exit_id: insertedZoneExit.id, // Use the existing zone exit ID
+                    exit_order: exitOrder, // Update this to match your column name
                     points_earned: pointsEarned
                 )
 
@@ -130,9 +133,6 @@ final class ZoneUpdateManager {
         }
     }
 
-
-
-
     private func fetchUserGroupsZum(for profileId: UUID) async throws -> [GroupMember] {
         let userGroups: [GroupMember] = try await supabaseClient
             .from("group_members")
@@ -140,10 +140,10 @@ final class ZoneUpdateManager {
             .eq("profile_id", value: profileId.uuidString)
             .execute()
             .value
-        
+
         return userGroups
     }
-    
+
     private func fetchCompetitionZum(for groupId: UUID) async throws -> GroupCompetition? {
         // Step 1: Fetch the competition link
         let competitionLinks: [GroupCompetitionLink] = try await supabaseClient
@@ -152,12 +152,12 @@ final class ZoneUpdateManager {
             .eq("group_id", value: groupId.uuidString)
             .execute()
             .value
-        
+
         // Step 2: If there is a competition link, use it to fetch the actual competition
         guard let competitionLink = competitionLinks.first else {
-            return nil  // No competition linked to this group
+            return nil // No competition linked to this group
         }
-        
+
         // Fetch the actual competition
         let competitions: [GroupCompetition] = try await supabaseClient
             .from("group_competitions")
@@ -165,11 +165,10 @@ final class ZoneUpdateManager {
             .eq("id", value: competitionLink.competition_id.uuidString)
             .execute()
             .value
-        
+
         return competitions.first
     }
 
-    
     private func fetchTotalUsersInGroupZum(_ groupId: UUID) async throws -> Int {
         let groupMembers: [GroupMember] = try await supabaseClient
             .from("group_members")
@@ -177,7 +176,7 @@ final class ZoneUpdateManager {
             .eq("group_id", value: groupId.uuidString)
             .execute()
             .value
-        
+
         return groupMembers.count
     }
 
@@ -188,9 +187,9 @@ final class ZoneUpdateManager {
             .eq("competition_id", value: competitionId.uuidString)
             .execute()
             .value
-        
-        let groupIds = groupCompetitionLinks.map { $0.group_id}
-        
+
+        let groupIds = groupCompetitionLinks.map { $0.group_id }
+
         var totalUsers = 0
         for groupId in groupIds {
             totalUsers += try await fetchTotalUsersInGroupZum(groupId)
@@ -198,7 +197,7 @@ final class ZoneUpdateManager {
 
         return totalUsers
     }
-    
+
     private func calculateGlobalExitOrder(dateString: String, totalUsers: Int) async throws -> Int {
         let exitCountResponse: [DailyZoneExit] = try await supabaseClient
             .from("daily_zone_exits")
@@ -207,7 +206,7 @@ final class ZoneUpdateManager {
             .execute()
             .value
 
-        return exitCountResponse.count + 1  // Next exit order
+        return exitCountResponse.count + 1 // Next exit order
     }
 
     private func calculatePoints(for exitOrder: Int, totalUsers: Int) -> Int {
@@ -216,7 +215,6 @@ final class ZoneUpdateManager {
 }
 
 extension ZoneUpdateManager {
-    
     func fetchZone(for zoneId: UUID) async throws -> Zone {
         let zone: Zone = try await supabaseClient
             .from("zones")
@@ -225,7 +223,7 @@ extension ZoneUpdateManager {
             .single()
             .execute()
             .value
-        
+
         return zone
     }
 
