@@ -10,7 +10,7 @@ import SwiftUI
 
 struct GroupView: View {
     var group: Group
-    @State private var isCopied = false  // Track when the password has been copied
+    @State private var isCopied = false // Track when the password has been copied
 
     var body: some View {
         NavigationLink(destination: GroupDetailView(group: group)) {
@@ -22,6 +22,7 @@ struct GroupView: View {
                     Text(group.name)
                         .font(.title3)
                         .fontWeight(.bold)
+                        .foregroundColor(.white)
                     Spacer()
                 }
 
@@ -38,7 +39,7 @@ struct GroupView: View {
 
                     Button(action: {
                         UIPasteboard.general.string = group.plain_password
-                        showCopiedStatus()  // Show "Copied!" when the password is copied
+                        showCopiedStatus() // Show "Copied!" when the password is copied
                     }) {
                         Text(isCopied ? "Copied!" : "Copy Password")
                             .font(.subheadline)
@@ -57,28 +58,7 @@ struct GroupView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            .padding()
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        LinearGradient(
-                            gradient: Gradient(colors: [.white.opacity(0.5), .clear]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 2
-                    )
-            )
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+            .blueCardStyle()
         }
     }
 
@@ -94,9 +74,6 @@ struct GroupView: View {
     }
 }
 
-
-
-
 struct GroupDetailView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     var group: Group
@@ -105,8 +82,8 @@ struct GroupDetailView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            groupInfoSection  // Displays group details and number of members
-            
+            groupInfoSection // Displays group details and number of members
+
             List {
                 if isLoading {
                     ProgressView("Loading...")
@@ -125,6 +102,7 @@ struct GroupDetailView: View {
     }
 
     // MARK: - Group Info Section
+
     private var groupInfoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Group Name: \(group.name)")
@@ -153,7 +131,7 @@ struct GroupDetailView: View {
                         .cornerRadius(8)
                 }
             }
-            
+
             Text("Description: \(group.description ?? "No description available")")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -169,6 +147,7 @@ struct GroupDetailView: View {
     }
 
     // MARK: - Group Members List
+
     @ViewBuilder private var groupMembersList: some View {
         ForEach(groupMembers, id: \.id) { member in
             NavigationLink(destination: FriendProfileView(friend: member)) {
@@ -184,6 +163,7 @@ struct GroupDetailView: View {
     }
 
     // MARK: - Fetch Group Members
+
     private func fetchGroupMembers() {
         Task {
             do {
