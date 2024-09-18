@@ -6,10 +6,11 @@
 //
 
 import Foundation
-import SwiftUI
 import MapKit
+import SwiftUI
 
 // InfoView that lists all friends and navigates to their detail view
+
 struct InfoView: View {
     @StateObject var viewModel: InfoViewModel
     @State private var isPresentingCreateGroupView = false
@@ -17,15 +18,7 @@ struct InfoView: View {
     @State private var isPresentingCompetitionManagerView = false
 
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-//    @EnvironmentObject var friendsRepository: FriendsRepository
-//    @EnvironmentObject var groupsRepository: GroupsRepository
-//    @EnvironmentObject var competitionsRepository: CompetitionsRepository
-    
-    //@State private var userCompetitions: [GroupCompetition] = []
-
-    
-//@State private var isShownDemo: Bool = false
-  //  @State private var animateGradient = false
+    // Other EnvironmentObjects...
 
     init(friendsRepository: FriendsRepository, groupsRepository: GroupsRepository, competitionsRepository: CompetitionsRepository, userId: UUID) {
         _viewModel = StateObject(wrappedValue: InfoViewModel(
@@ -40,76 +33,42 @@ struct InfoView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
-                    
                     // Friends Section
                     CollapsibleSection(title: "Friends") {
-                        ForEach(viewModel.friends) { friend in
-                            NavigationLink(destination: FriendProfileView(friend: friend)) {
-                                HStack {
-                                    Circle()
-                                        .fill(Color.white.opacity(0.4))
-                                        .frame(width: 50, height: 50)
-                                        .overlay(
-                                            Text(friend.full_name.prefix(1))
-                                                .font(.title2.bold())
-                                                .foregroundColor(.purple.opacity(0.4))
-                                        )
-                                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
-
-                                    VStack(alignment: .leading) {
-                                        Text(friend.full_name)
-                                            .font(.headline)
-                                            .foregroundColor(.primary)
-                                        Text("View Profile")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray)
+                        if $viewModel.filteredFriends.isEmpty && !viewModel.searchText.isEmpty {
+                            noResultsView(for: "Friends")
+                        } else {
+                            ForEach(viewModel.filteredFriends) { friend in
+                                NavigationLink(destination: FriendProfileView(friend: friend)) {
+                                    FriendRowView(friend: friend)
                                 }
-                                .padding()
-                                .background(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .cornerRadius(12)
-                                .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
                             }
                         }
                     }
-                    
+
                     // Groups Section
                     CollapsibleSection(title: "Groups") {
-                        if viewModel.userGroups.isEmpty {
-                            VStack {
-                                Image(systemName: "person.3.fill")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.gray)
-                                Text("It's lonely here, create a group!")
-                                    .foregroundColor(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
+                        if viewModel.filteredGroups.isEmpty && !viewModel.searchText.isEmpty {
+                            noResultsView(for: "Groups")
+                        } else if viewModel.filteredGroups.isEmpty {
+                            emptyGroupsView()
                         } else {
-                            ForEach(viewModel.userGroups, id: \.id) { group in
+                            ForEach(viewModel.filteredGroups, id: \.id) { group in
                                 GroupView(group: group)
                                     .frame(maxWidth: .infinity)
                             }
                         }
                     }
-                    
+
                     // Competitions Section
                     CollapsibleSection(title: "Competitions") {
-                        if viewModel.userCompetitions.isEmpty {
+                        if viewModel.filteredCompetitions.isEmpty && !viewModel.searchText.isEmpty {
+                            noResultsView(for: "Competitions")
+                        } else if viewModel.filteredCompetitions.isEmpty {
                             emptyCompetitionsView()
-                                .frame(maxWidth: .infinity)
                         } else {
                             LazyVStack {
-                                ForEach(viewModel.userCompetitions) { competition in
+                                ForEach(viewModel.filteredCompetitions) { competition in
                                     CompetitionCard(competition: competition)
                                         .frame(maxWidth: .infinity)
                                 }
@@ -120,8 +79,13 @@ struct InfoView: View {
                 .padding(.top)
             }
             .navigationTitle("Friends Info")
+            .searchable(text: $viewModel.searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search Friends, Groups, Competitions")
             .refreshable {
-                await viewModel.refreshAllData()
+                do {
+                    try await viewModel.refreshAllData()
+                } catch {
+                    print("fuck")
+                }
             }
             .scrollContentBackground(.hidden)
             .background(
@@ -170,51 +134,135 @@ struct InfoView: View {
             }
             .onAppear {
                 Task {
-                    await viewModel.refreshAllData
+                    do {
+                        try await viewModel.refreshAllData()
+                    } catch {
+                        print("fuck")
+                    }
                 }
             }
         }
     }
 
+    // Helper Views
+    private func noResultsView(for category: String) -> some View {
+        VStack {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 50))
+                .foregroundColor(.gray)
+            Text("No matching \(category.lowercased()) found")
+                .font(.headline)
+                .foregroundColor(.secondary)
+            Text("Try adjusting your search criteria.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.1)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .cornerRadius(10)
+        )
+        .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+        )
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+
+    private func FriendRowView(friend: Profile) -> some View {
+        HStack {
+            Circle()
+                .fill(Color.white.opacity(0.4))
+                .frame(width: 50, height: 50)
+                .overlay(
+                    Text(friend.full_name.prefix(1))
+                        .font(.title2.bold())
+                        .foregroundColor(.purple.opacity(0.4))
+                )
+                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+
+            VStack(alignment: .leading) {
+                Text(friend.full_name)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                Text("View Profile")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+    }
+
+    private func emptyGroupsView() -> some View {
+        VStack {
+            Image(systemName: "person.3.fill")
+                .font(.largeTitle)
+                .foregroundColor(.gray)
+            Text("It's lonely here, create a group!")
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+    }
+
     private func emptyCompetitionsView() -> some View {
-       VStack {
-           Image(systemName: "flag.2.crossed.fill")
-               .font(.system(size: 50))
-               .foregroundColor(.gray)
-           Text("No active competitions")
-               .font(.headline)
-               .foregroundColor(.secondary)
-           Text("Join or create a competition to get started!")
-               .font(.subheadline)
-               .foregroundColor(.secondary)
-               .multilineTextAlignment(.center)
-       }
-       .frame(maxWidth: .infinity)
-       .padding()
-       .background(
-           LinearGradient(
-               gradient: Gradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.1)]),
-               startPoint: .topLeading,
-               endPoint: .bottomTrailing
-           )
-           .cornerRadius(10)
-       )
-       .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
-       .overlay(
-           RoundedRectangle(cornerRadius: 10)
-               .stroke(Color.white.opacity(0.2), lineWidth: 1)
-       )
-       .cornerRadius(12)
-       .padding(.horizontal)
-   }
+        VStack {
+            Image(systemName: "flag.2.crossed.fill")
+                .font(.system(size: 50))
+                .foregroundColor(.gray)
+            Text("No active competitions")
+                .font(.headline)
+                .foregroundColor(.secondary)
+            Text("Join or create a competition to get started!")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.1)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .cornerRadius(10)
+        )
+        .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+        )
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
 }
 
-
-//struct InfoView_Previews: PreviewProvider {
+// struct InfoView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        InfoView(, viewModel: Infov)
 //    }
-//}
+// }
 
 struct CompetitionCard: View {
     let competition: GroupCompetition
@@ -229,12 +277,13 @@ struct CompetitionCard: View {
                     Text(competition.competition_name)
                         .font(.title3)
                         .fontWeight(.bold)
+                        .foregroundColor(.white)
                     Spacer()
                     Text(formattedDate(competition.competition_date))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
+
                 HStack {
                     VStack(alignment: .leading) {
                         Text("Max Points")
@@ -245,7 +294,7 @@ struct CompetitionCard: View {
                             .foregroundColor(.primary)
                     }
                     Spacer()
-                    
+
                     Button(action: {
                         // Action to view competition details
                     }) {
@@ -264,7 +313,7 @@ struct CompetitionCard: View {
         .padding()
         .background(
             LinearGradient(
-                gradient: Gradient(colors: [Color.blue.opacity(0.3)]),
+                gradient: Gradient(colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.4)]), // Adjusted for better contrast
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -331,7 +380,7 @@ struct CompetitionCard: View {
 //                        Spacer()
 //                    }.padding(16)
 //                }
-                
+
 //                Section(header: Text("card demo")) {
 //                    NavigationLink("card demo1", destination: CardGradientView())
 //                    NavigationLink("card demo2", destination: CardGradientViewV2())
@@ -375,7 +424,7 @@ struct CollapsibleSection<Content: View>: View {
                 .frame(maxWidth: .infinity) // Ensure the header button takes full width
             }
             .buttonStyle(PlainButtonStyle())
-            
+
             if isExpanded {
                 content
                     .transition(.opacity)
@@ -386,6 +435,4 @@ struct CollapsibleSection<Content: View>: View {
         }
         .padding(.horizontal)
     }
-
 }
-

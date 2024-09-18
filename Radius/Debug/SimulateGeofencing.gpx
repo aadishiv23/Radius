@@ -16,7 +16,7 @@
     <!-- Far location - 5 minutes after Finish -->
     <wpt lat="42.27788704703879" lon="-83.73501452747601">
         <name>Far</name>
-        <time>2014-09-24T15:00:27Z</time>
+        <time>2014-09-24T15:56:007Z</time>
     </wpt>
     
     <!-- New Location 1 - 2 minutes after Far, 500 meters east -->
