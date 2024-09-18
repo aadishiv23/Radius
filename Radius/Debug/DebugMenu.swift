@@ -5,20 +5,20 @@
 //  Created by Aadi Shiv Malhotra on 6/23/24.
 //
 
+import Combine
 import Foundation
 import SwiftUI
-import Combine
 
 // MARK: - DebugMenuView
+
 struct DebugMenuView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-    @StateObject private var zoneExitObserver = ZoneExitObserver()
+//    @StateObject private var zoneExitObserver = ZoneExitObserver()
     @State private var zoneExits: [ZoneExit] = []
-    @State private var localZoneExits: [LocalZoneExit] = []
+    // @State private var localZoneExits: [LocalZoneExit] = []
     @State private var isLoading = false
     @State private var zones: [Zone] = []
     @State private var isZonesSectionExpanded = false
-
 
     var body: some View {
         List {
@@ -51,20 +51,20 @@ struct DebugMenuView: View {
                     }
                 }
             }
-            Section(header: Text("Local Zone Exits")) {
-                if localZoneExits.isEmpty {
-                    Text("No local zone exits recorded")
-                } else {
-                    ForEach(localZoneExits.reversed(), id: \.id) { exit in
-                        VStack(alignment: .leading) {
-                            Text("Zone: \(exit.zoneName)")
-                            Text("Exit Time: \(formatDate(exit.exitTime))")
-                            Text("Latitude: \(exit.latitude)")
-                            Text("Longitude: \(exit.longitude)")
-                        }
-                    }
-                }
-            }
+//            Section(header: Text("Local Zone Exits")) {
+//                if localZoneExits.isEmpty {
+//                    Text("No local zone exits recorded")
+//                } else {
+//                    ForEach(localZoneExits.reversed(), id: \.id) { exit in
+//                        VStack(alignment: .leading) {
+//                            Text("Zone: \(exit.zoneName)")
+//                            Text("Exit Time: \(formatDate(exit.exitTime))")
+//                            Text("Latitude: \(exit.latitude)")
+//                            Text("Longitude: \(exit.longitude)")
+//                        }
+//                    }
+//                }
+//            }
             Section(header: Text("Zone Exits")) {
                 DisclosureGroup("Zones", isExpanded: $isZonesSectionExpanded) {
                     if isLoading {
@@ -81,7 +81,7 @@ struct DebugMenuView: View {
                     }
                 }
             }
-            
+
             Section(header: Text("All Zones")) {
                 DisclosureGroup("Zones", isExpanded: $isZonesSectionExpanded) {
                     if isLoading {
@@ -109,13 +109,6 @@ struct DebugMenuView: View {
         .onAppear {
             fetchZoneExitsForCurrentUser()
             fetchAllZones()
-            zoneExitObserver.startObserving()
-        }
-        .onDisappear {
-            zoneExitObserver.stopObserving()
-        }
-        .onReceive(zoneExitObserver.$localZoneExits) { newExits in
-            self.localZoneExits = newExits
         }
         .refreshable {
             await friendsDataManager.fetchCurrentUserProfile()
@@ -126,7 +119,7 @@ struct DebugMenuView: View {
 
     private func fetchAllZones() {
         isLoading = true
-        
+
         Task {
             do {
                 let fetchedZones: [Zone] = try await supabase
@@ -134,7 +127,7 @@ struct DebugMenuView: View {
                     .select()
                     .execute()
                     .value
-                
+
                 DispatchQueue.main.async {
                     self.zones = fetchedZones
                     self.isLoading = false
@@ -151,7 +144,7 @@ struct DebugMenuView: View {
     private func fetchZoneExitsForCurrentUser() {
         guard let currentUser = friendsDataManager.currentUser else { return }
         isLoading = true
-        
+
         Task {
             do {
                 let fetchedZoneExits = try await ZoneUpdateManager(supabaseClient: supabase)
@@ -177,25 +170,25 @@ struct DebugMenuView: View {
     }
 }
 
-class ZoneExitObserver: ObservableObject {
-    @Published var localZoneExits: [LocalZoneExit] = []
-    private var cancellables = Set<AnyCancellable>()
-
-    func startObserving() {
-        NotificationCenter.default.publisher(for: .zoneExited)
-            .sink { [weak self] notification in
-                if let zoneExit = notification.object as? LocalZoneExit {
-                    DispatchQueue.main.async {
-                        self?.localZoneExits.append(zoneExit)
-                        // Keep only the last 10 exits
-                        self?.localZoneExits = Array(self?.localZoneExits.suffix(10) ?? [])
-                    }
-                }
-            }
-            .store(in: &cancellables)
-    }
-
-    func stopObserving() {
-        cancellables.removeAll()
-    }
-}
+//class ZoneExitObserver: ObservableObject {
+//    @Published var localZoneExits: [LocalZoneExit] = []
+//    private var cancellables = Set<AnyCancellable>()
+//
+//    func startObserving() {
+//        NotificationCenter.default.publisher(for: .zoneExited)
+//            .sink { [weak self] notification in
+//                if let zoneExit = notification.object as? LocalZoneExit {
+//                    DispatchQueue.main.async {
+//                        self?.localZoneExits.append(zoneExit)
+//                        // Keep only the last 10 exits
+//                        self?.localZoneExits = Array(self?.localZoneExits.suffix(10) ?? [])
+//                    }
+//                }
+//            }
+//            .store(in: &cancellables)
+//    }
+//
+//    func stopObserving() {
+//        cancellables.removeAll()
+//    }
+//}

@@ -5,12 +5,12 @@
 //  Created by Aadi Shiv Malhotra on 5/1/24.
 //
 
-import Foundation
 import CoreData
 import CoreLocation
-import SwiftUI
 import CryptoKit
+import Foundation
 import Supabase
+import SwiftUI
 
 class FriendsDataManager: ObservableObject {
     private var supabaseClient: SupabaseClient
@@ -33,8 +33,8 @@ class FriendsDataManager: ObservableObject {
     /// Start listening for real-time location updates
     func startRealtimeLocationUpdates() {
         Task {
-           await subscribeToRealtimeLocationUpdates()
-       }
+            await subscribeToRealtimeLocationUpdates()
+        }
     }
     
     func stopRealtimeLocationUpdates() async {
@@ -119,7 +119,7 @@ class FriendsDataManager: ObservableObject {
     
     @MainActor
     func fetchFriendsAndGroups() async {
-        guard let userId = self.userId else { return }
+        guard let userId = userId else { return }
         
         await fetchFriends(for: userId)
         await fetchUserGroups()
@@ -176,7 +176,6 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-
     func fetchPendingFriendRequests() async {
         do {
             guard let userId = userId else { return }
@@ -196,7 +195,6 @@ class FriendsDataManager: ObservableObject {
             print("Failed to fetch pending friend requests: \(error)")
         }
     }
-
 
     // Method to accept a friend request
     func acceptFriendRequest(_ request: FriendRequest) async {
@@ -224,13 +222,12 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-    
     func fetchCurrentUserProfile() async {
         do {
             let user = try await supabaseClient.auth.session.user
-            self.userId = user.id
+            userId = user.id
             
-            if let userId = self.userId {
+            if let userId = userId {
                 let profile: Profile? = try await supabaseClient
                     .from("profiles")
                     .select("*, zones(*)") // Ensure zones are included in the query
@@ -244,9 +241,9 @@ class FriendsDataManager: ObservableObject {
                     print(profile.username)
                     print(user.email ?? "N/A")
                     
-                    DispatchQueue.main.async {
-                       self.currentUser = profile
-                   }
+                    DispatchQueue.main.sync {
+                        self.currentUser = profile
+                    }
                 }
             }
         } catch {
@@ -260,9 +257,9 @@ class FriendsDataManager: ObservableObject {
             let result = try await supabaseClient
                 .from("groups")
                 .insert([
-                    "name" : name,
-                    "description" : description ?? "",
-                    "password" : hashedPassword,
+                    "name": name,
+                    "description": description ?? "",
+                    "password": hashedPassword,
                     "plain_password": password
                 ])
                 .execute()
@@ -273,15 +270,14 @@ class FriendsDataManager: ObservableObject {
         }
     }
     
-    
     func joinGroup(groupName: String, password: String) async throws -> Bool {
         do {
             let result = try await supabaseClient
-                    .from("groups")
-                    .select("id, password")
-                    .eq("name", value: groupName)
-                    .execute()
-                    .response
+                .from("groups")
+                .select("id, password")
+                .eq("name", value: groupName)
+                .execute()
+                .response
 
             print("Response: \(result)")
 
@@ -321,15 +317,15 @@ class FriendsDataManager: ObservableObject {
                 return false
             }
             
-        }  catch DecodingError.keyNotFound(let key, let context) {
+        } catch let DecodingError.keyNotFound(key, context) {
             print("Could not find key \(key) in JSON: \(context)")
             return false
 
-        } catch DecodingError.typeMismatch(let type, let context) {
+        } catch let DecodingError.typeMismatch(type, context) {
             print("Type mismatch for type \(type) in JSON: \(context)")
             return false
 
-        } catch DecodingError.valueNotFound(let type, let context) {
+        } catch let DecodingError.valueNotFound(type, context) {
             print("Value not found for type \(type) in JSON: \(context)")
             return false
 
@@ -352,7 +348,6 @@ class FriendsDataManager: ObservableObject {
         print("Group members \(result)")
     }
     
-    
     func addFriend(name: String, color: String, profileId: UUID) async throws {
         try await supabaseClient
             .from("friends")
@@ -371,7 +366,6 @@ class FriendsDataManager: ObservableObject {
             .eq("id", value: friendId.uuidString)
             .execute()
     }
-    
     
     // Fetch the given zones for a friend
     func fetchZones(for profile_id: UUID) async throws -> [Zone] {
@@ -393,7 +387,7 @@ class FriendsDataManager: ObservableObject {
             .execute()
     }
     
-// Add zones to a friend
+    // Add zones to a friend
     func addZones(to friendId: UUID, zones: [Zone]) async throws {
         for zone in zones {
             try await insertZone(for: friendId, zone: zone)
@@ -478,8 +472,6 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-
-    
     func fetchUserGroups() async {
         guard let userId = userId else {
             print("User ID is not set")
@@ -508,7 +500,6 @@ class FriendsDataManager: ObservableObject {
         }
     }
 
-
 //    func fetchUserGroupMembers() async -> [GroupMember] {
 //        guard let userId = userId else {
 //            print("User ID is not set")
@@ -521,7 +512,7 @@ class FriendsDataManager: ObservableObject {
 //                .eq("profile_id", value: userId.uuidString)
 //                .execute()
 //                .value
-//            
+//
 //            return groupMembers
 //        } catch {
 //            print("Failed to fetch group members: \(error)")
@@ -544,35 +535,34 @@ class FriendsDataManager: ObservableObject {
 //        }
 //    }
     func fetchGroupMembersProfiles(groupId: UUID) async throws -> [Profile] {
-            do {
-                let groupMembers: [GroupMember] = try await supabaseClient
-                    .from("group_members")
-                    .select("group_id, profile_id")
-                    .eq("group_id", value: groupId.uuidString)
-                    .execute()
-                    .value
+        do {
+            let groupMembers: [GroupMember] = try await supabaseClient
+                .from("group_members")
+                .select("group_id, profile_id")
+                .eq("group_id", value: groupId.uuidString)
+                .execute()
+                .value
 
-                let profileIDs = groupMembers.map { $0.profile_id }
+            let profileIDs = groupMembers.map { $0.profile_id }
                 
-                guard !profileIDs.isEmpty else {
-                    return []
-                }
-
-                let profiles: [Profile] = try await supabaseClient
-                    .from("profiles")
-                    .select("*, zones(*)")
-                    .in("id", values: profileIDs.map { $0.uuidString })
-                    .execute()
-                    .value
-                
-                return profiles
-            } catch {
-                print("Failed to fetch group members' profiles: \(error)")
-                throw error
+            guard !profileIDs.isEmpty else {
+                return []
             }
-        }
-}
 
+            let profiles: [Profile] = try await supabaseClient
+                .from("profiles")
+                .select("*, zones(*)")
+                .in("id", values: profileIDs.map { $0.uuidString })
+                .execute()
+                .value
+                
+            return profiles
+        } catch {
+            print("Failed to fetch group members' profiles: \(error)")
+            throw error
+        }
+    }
+}
 
 extension FriendsDataManager {
     func fetchUserCompetitions() async throws -> [GroupCompetition] {
@@ -599,7 +589,7 @@ extension FriendsDataManager {
             .value
         
         let competitionIds = groupCompetitionLinks.map { $0.competition_id.uuidString }
-       // Array(Set(groupCompetitionLinks.map { $0.competition_id.uuidString }))
+        // Array(Set(groupCompetitionLinks.map { $0.competition_id.uuidString }))
         
         // Step 3: Fetch the actual competition details
         let competitions: [GroupCompetition] = try await supabaseClient
