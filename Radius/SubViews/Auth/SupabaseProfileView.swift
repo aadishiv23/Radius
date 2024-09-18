@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import SwiftUI
 import Supabase
+import SwiftUI
 
 struct SupabaseProfileView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
@@ -21,25 +21,23 @@ struct SupabaseProfileView: View {
     
     var body: some View {
         NavigationView {
-                
             ScrollView {
                 VStack(spacing: 20) {
-                    profileForm
+                    self.profileForm
                     
-                    userInfoSection
+                    self.userInfoSection
                         .visionGlass()
                     
-                    zonesSection // Reuse the zonesSection for the current user's zones
+                    self.zonesSection // Reuse the zonesSection for the current user's zones
                         .visionGlass()
 
-
-                    updateProfileButton
+                    self.updateProfileButton
                     
-                    myProfileButton
+                    self.myProfileButton
                     
                     Divider()
                     
-                    signOutButton
+                    self.signOutButton
                     
                     Divider()
                     
@@ -47,7 +45,7 @@ struct SupabaseProfileView: View {
                 }
                 .padding()
             }
-            .background(backgroundGradient)
+            .background(self.backgroundGradient)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: LocationSettingsView()) {
@@ -58,17 +56,16 @@ struct SupabaseProfileView: View {
             }
         }
         .task {
-            await getInitialProfile()
+            await self.getInitialProfile()
             // await friendsDataManager.fetchCurrentUserProfile()
-
         }
     }
     
     private var profileHStack: some View {
         HStack(alignment: .top, spacing: 20) {
-            profileHeader // On the left
+            self.profileHeader // On the left
                 .frame(maxWidth: 100) // Constrain the width of profileHeader
-            profileForm // On the right
+            self.profileForm // On the right
                 .frame(maxWidth: .infinity)
                 .layoutPriority(1) // Give profileForm higher priority to take up space
         }
@@ -87,54 +84,64 @@ struct SupabaseProfileView: View {
             Color.blue.opacity(0.2),
             Color.yellow.opacity(0.2)
         ]), startPoint: .topLeading, endPoint: .bottomTrailing)
-        .ignoresSafeArea()
+            .ignoresSafeArea()
     }
     
     private var profileHeader: some View {
-      VStack(alignment: .center, spacing: 8) {
-          Image(systemName: "person.crop.circle.fill")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 60, height: 60)
-              .foregroundColor(.blue)
-              .background(Circle().fill(Color.white).shadow(radius: 5))
+        VStack(alignment: .center, spacing: 8) {
+            Image(systemName: "person.crop.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60, height: 60)
+                .foregroundColor(.blue)
+                .background(Circle().fill(Color.white).shadow(radius: 5))
           
-          Text("@\(username)") // Only username is displayed
-              .font(.headline)
-              .foregroundColor(.secondary)
-      }
-      .frame(maxWidth: 100) // Constrain the width for profileHeader
-  }
+            Text("@\(self.username)") // Only username is displayed
+                .font(.headline)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: 100) // Constrain the width for profileHeader
+    }
   
-  private var profileForm: some View {
-       VStack(spacing: 15) {
-          ProfileTextField(title: "Username", text: $username, icon: "person")
-          ProfileTextField(title: "Full Name", text: $fullName, icon: "person.text.rectangle")
-       }
-       .padding()
-       .background(Color(UIColor.secondarySystemBackground))
-       .cornerRadius(15)
-       .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-   }
+    private var profileForm: some View {
+        VStack(spacing: 15) {
+            ProfileTextField(title: "Username", text: self.$username, icon: "person")
+            ProfileTextField(title: "Full Name", text: self.$fullName, icon: "person.text.rectangle")
+        }
+        .padding()
+        .background(Color(UIColor.secondarySystemBackground))
+        .cornerRadius(15)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+    }
     
     private var userInfoSection: some View {
         VStack(spacing: 10) {
-            Text("Name: \(friendsDataManager.currentUser.full_name)")
-                .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Username: \(friendsDataManager.currentUser.username)")
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Coordinates: \(friendsDataManager.currentUser.latitude), \(friendsDataManager.currentUser.longitude)")
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Number of Zones: \(friendsDataManager.currentUser.zones.count)")
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if let currentUser = friendsDataManager.currentUser {
+                Text("Name: \(currentUser.full_name.isEmpty ? "Unknown" : currentUser.full_name)")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text("Username: \(currentUser.username.isEmpty ? "Unavailable" : currentUser.username)")
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text("Coordinates: \(currentUser.latitude != 0 ? "\(currentUser.latitude), \(currentUser.longitude)" : "No coordinates available")")
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text("Number of Zones: \(currentUser.zones.isEmpty ? "No zones available" : "\(currentUser.zones.count)")")
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                // Display a loading message or placeholder content while currentUser is being fetched
+                Text("Loading user information...")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
         .padding()
     }
-    
+
     private var zonesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -149,10 +156,14 @@ struct SupabaseProfileView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 20) {
-                    ForEach(friendsDataManager.currentUser.zones) { zone in
-                        ZStack(alignment: .topTrailing) {
-                            PolaroidCard(zone: zone)
+                    if let currentUser = friendsDataManager.currentUser {
+                        ForEach(currentUser.zones) { zone in
+                            ZStack(alignment: .topTrailing) {
+                                PolaroidCard(zone: zone)
+                            }
                         }
+                    } else {
+                        ProgressView()
                     }
                 }
                 .padding(.vertical, 10)
@@ -162,11 +173,11 @@ struct SupabaseProfileView: View {
     }
     
     private var updateProfileButton: some View {
-        Button(action: updateProfileButtonTapped) {
+        Button(action: self.updateProfileButtonTapped) {
             HStack {
                 Text("Update Profile")
                     .fontWeight(.semibold)
-                if isLoading {
+                if self.isLoading {
                     Spacer()
                     ProgressView()
                 }
@@ -177,10 +188,10 @@ struct SupabaseProfileView: View {
             .foregroundColor(.white)
             .cornerRadius(10)
         }
-        .disabled(isLoading)
+        .disabled(self.isLoading)
     }
     
-    private var myProfileButton: some View {  // New Button for MyProfileView
+    private var myProfileButton: some View { // New Button for MyProfileView
         NavigationLink(destination: MyProfileView()) {
             Text("My Profile")
                 .fontWeight(.semibold)
@@ -209,28 +220,28 @@ struct SupabaseProfileView: View {
     }
     
     func getInitialProfile() async {
-       do {
-           let currentUser = try await supabase.auth.session.user
+        do {
+            let currentUser = try await supabase.auth.session.user
            
-           let profile: Profile = try await supabase
-               .from("profiles")
-               .select()
-               .eq("id", value: currentUser.id)
-               .single()
-               .execute()
-               .value
+            let profile: Profile = try await supabase
+                .from("profiles")
+                .select()
+                .eq("id", value: currentUser.id)
+                .single()
+                .execute()
+                .value
            
-           self.username = profile.username
-           self.fullName = profile.full_name
+            self.username = profile.username
+            self.fullName = profile.full_name
 
-         } catch {
-           debugPrint(error)
-         }
-   }
+        } catch {
+            debugPrint(error)
+        }
+    }
        
     func updateProfileButtonTapped() {
         Task {
-            isLoading = true
+            self.isLoading = true
             defer { isLoading = false }
             do {
                 let currentUser = try await supabase.auth.session.user
@@ -238,7 +249,7 @@ struct SupabaseProfileView: View {
                 try await supabase
                     .from("profiles")
                     .update(
-                        UpdateProfileParams(username: username, fullName: fullName)
+                        UpdateProfileParams(username: self.username, fullName: self.fullName)
                     )
                     .eq("id", value: currentUser.id)
                     .execute()
@@ -256,13 +267,13 @@ struct ProfileTextField: View {
     
     var body: some View {
         HStack {
-            Image(systemName: icon)
+            Image(systemName: self.icon)
                 .foregroundColor(.secondary)
                 .frame(width: 30)
             
-            TextField(title, text: $text)
-                .textContentType(title == "Full Name" ? .name : .username)
-                .autocapitalization(title == "Full Name" ? .words : .none)
+            TextField(self.title, text: self.$text)
+                .textContentType(self.title == "Full Name" ? .name : .username)
+                .autocapitalization(self.title == "Full Name" ? .words : .none)
         }
         .padding()
         .background(Color(UIColor.systemBackground))
