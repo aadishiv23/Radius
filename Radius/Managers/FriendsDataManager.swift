@@ -379,6 +379,41 @@ class FriendsDataManager: ObservableObject {
         return zones
     }
     
+    func fdmFetchZoneExits(for profileId: UUID) async throws -> [ZoneExit] {
+        do {
+            let zoneExits: [ZoneExit] = try await supabaseClient
+                .from("zone_exits")
+                .select()
+                .eq("profile_id", value: profileId.uuidString)
+                .order("exit_time", ascending: false) // Adjust sorting based on your needs
+                .execute()
+                .value
+
+            return zoneExits
+        } catch {
+            print("Failed to fetch zone exits for profile \(profileId): \(error)")
+            throw error
+        }
+    }
+    
+    func fetchZonesDict(for zoneIds: [UUID]) async throws -> [UUID: Zone] {
+        do {
+            let zones: [Zone] = try await supabaseClient
+                .from("zones")
+                .select("*")
+                .in("id", values: zoneIds.map { $0.uuidString }) // Fetch zones by IDs
+                .execute()
+                .value
+            
+            // Create a dictionary with zoneId as the key
+            let zoneDictionary = Dictionary(uniqueKeysWithValues: zones.map { ($0.id, $0) })
+            return zoneDictionary
+        } catch {
+            print("Failed to fetch zones: \(error)")
+            throw error
+        }
+    }
+
     // insert a zone
     func insertZone(for friendId: UUID, zone: Zone) async throws {
         try await supabaseClient

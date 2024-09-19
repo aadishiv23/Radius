@@ -30,6 +30,7 @@
 		AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupViewModel.swift */; };
 		AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */; };
 		AC39896A2C758E3D002F84E6 /* FriendsRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */; };
+		AC501BAF2C9BC8770013FE16 /* AllZonesExitsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC501BAE2C9BC8770013FE16 /* AllZonesExitsView.swift */; };
 		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
 		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
 		AC5856002BDF1925009C490B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FF2BDF1925009C490B /* MapView.swift */; };
@@ -106,6 +107,7 @@
 		AC39895B2C70592C002F84E6 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
 		AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneUpdateManager.swift; sourceTree = "<group>"; };
 		AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsRequestsView.swift; sourceTree = "<group>"; };
+		AC501BAE2C9BC8770013FE16 /* AllZonesExitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllZonesExitsView.swift; sourceTree = "<group>"; };
 		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
 		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
 		AC5855FF2BDF1925009C490B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -188,12 +190,12 @@
 		AC0AC6FE2BDB0EE4000418B8 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				ACA5B2872C9B2C3100EA4695 /* Friends */,
 				AC1A99C42C8371CC00ED5D1B /* Auth */,
 				AC5DB4D62C7D7FDF00A1019E /* Competitions */,
 				AC0AC7032BDB0F9B000418B8 /* FriendDetailView.swift */,
 				AC0AC7052BDB0FC6000418B8 /* FullScreenMapView.swift */,
 				ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */,
-				AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */,
 				AC0AC70B2BDB1FD0000418B8 /* FriendDetailMapView.swift */,
 				AC5855FB2BDF1391009C490B /* AddressEntryView.swift */,
 				AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */,
@@ -390,6 +392,15 @@
 			path = Utility;
 			sourceTree = "<group>";
 		};
+		ACA5B2872C9B2C3100EA4695 /* Friends */ = {
+			isa = PBXGroup;
+			children = (
+				AC0AC7072BDB1049000418B8 /* FriendProfileView.swift */,
+				AC501BAE2C9BC8770013FE16 /* AllZonesExitsView.swift */,
+			);
+			path = Friends;
+			sourceTree = "<group>";
+		};
 		ACD4812B2C326E74004653A1 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -547,6 +558,7 @@
 				AC36A7342C928A4500840DDD /* FriendsRepository.swift in Sources */,
 				ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */,
 				ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */,
+				AC501BAF2C9BC8770013FE16 /* AllZonesExitsView.swift in Sources */,
 				AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
