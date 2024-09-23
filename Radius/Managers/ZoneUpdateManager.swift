@@ -34,10 +34,8 @@ final class ZoneUpdateManager {
 
     func uploadZoneExit(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
         // Create a DateFormatter for UTC
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // Use UTC
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-        let exitTimeUTC = dateFormatter.string(from: time)
+        let exitTimeUTC = ISO8601DateFormatter.shared.string(from: time)
+
 
         for zoneId in zoneIds {
             let zoneExit = [
@@ -249,4 +247,13 @@ extension ZoneUpdateManager {
         // If it's not a "home" zone, always return false
         return false
     }
+}
+
+extension ISO8601DateFormatter {
+    static let shared: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
 }

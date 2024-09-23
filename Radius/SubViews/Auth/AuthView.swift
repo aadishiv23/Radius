@@ -5,10 +5,10 @@
 //  Created by Aadi Shiv Malhotra on 5/7/24.
 //
 
-import Foundation
-import SwiftUI
-import Supabase
 import AuthenticationServices
+import Foundation
+import Supabase
+import SwiftUI
 
 struct ChangePasswordView: View {
     @State private var email: String = ""
@@ -65,6 +65,7 @@ struct ChangePasswordView: View {
         }
     }
 }
+
 struct AuthView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var email: String = ""
@@ -77,7 +78,7 @@ struct AuthView: View {
         NavigationView {
             ZStack {
                 // Background gradient
-                LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.3)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.yellow.opacity(0.3)]), startPoint: .topLeading, endPoint: .bottomTrailing)
                     .edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 25) {
@@ -91,7 +92,7 @@ struct AuthView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 100, height: 100)
                         .foregroundColor(.blue)
-                        .shadow(color: .purple.opacity(0.3), radius: 10, x: 0, y: 5)
+                        .shadow(color: .yellow.opacity(0.3), radius: 10, x: 0, y: 5)
                         .rotationEffect(Angle(degrees: isLoading ? 360 : 0))
                         .animation(Animation.linear(duration: 2).repeatForever(autoreverses: true), value: isLoading)
                     
@@ -116,7 +117,7 @@ struct AuthView: View {
                             .frame(minWidth: 0, maxWidth: .infinity)
                             .padding()
                             .foregroundColor(.white)
-                            .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+                            .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.yellow]), startPoint: .leading, endPoint: .trailing))
                             .cornerRadius(15)
                             .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
                     }

@@ -12,6 +12,12 @@ struct MyProfileView: View {
     @State private var editing = false
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     
+    @Environment(\.dismiss) var dismiss
+
+    @State private var zoneExits: [ZoneExit] = []
+    @State private var zones: [UUID: Zone] = [:]
+    @State private var showAllZoneExits = false
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -19,6 +25,9 @@ struct MyProfileView: View {
                     .visionGlass()
                 
                 zonesSection
+                    .visionGlass()
+                
+                zoneExitsSection // New section for recent zone exits
                     .visionGlass()
             }
             .padding(.top, 40)
@@ -33,6 +42,24 @@ struct MyProfileView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                do {
+                    // Fetch the recent zone exits
+                    let fetchedZoneExits = try await friendsDataManager.fdmFetchZoneExits(for: friendsDataManager.currentUser.id)
+                    self.zoneExits = Array(fetchedZoneExits.prefix(5)) // Show only the top 5 most recent exits
+                    let zoneIds = fetchedZoneExits.map { $0.zone_id }
+                    self.zones = try await friendsDataManager.fetchZonesDict(for: zoneIds)
+                } catch {
+                    print("Failed to load zone exits and associated zones: \(error)")
+                }
+            }
+        }
+        .background(
+            NavigationLink(destination: AllZoneExitsView(friend: friendsDataManager.currentUser), isActive: $showAllZoneExits) {
+                EmptyView()
+            }
+        )
     }
     
     private var friendInfoSection: some View {
@@ -84,6 +111,40 @@ struct MyProfileView: View {
                     }
                 }
                 .padding(.vertical, 10)
+            }
+        }
+        .padding()
+    }
+    
+    // New section to display recent zone exits
+    private var zoneExitsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Recent Zone Exits")
+                    .font(.headline)
+                Spacer()
+                Button(action: {
+                    showAllZoneExits = true
+                }) {
+                    Text("See More")
+                        .foregroundColor(.blue)
+                }
+            }
+            
+            if zoneExits.isEmpty {
+                Text("No zone exits available.")
+                    .foregroundColor(.gray)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 20) {
+                        ForEach(zoneExits) { exit in
+                            if let zone = zones[exit.zone_id] {
+                                ZoneExitRow(zoneExit: exit, zone: zone)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 10)
+                }
             }
         }
         .padding()

@@ -130,7 +130,7 @@ class LocationManager: NSObject, ObservableObject {
                 do {
                     // Fetch zone details before proceeding
                     let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
-
+ 
                     // Upload zone exit
                     try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: Date())
 
