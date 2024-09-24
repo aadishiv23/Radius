@@ -9,12 +9,27 @@ import Foundation
 import Supabase
 
 class CompetitionManager {
+    @Published var competitions: [GroupCompetition] = []
+
     private let supabaseClient: SupabaseClient
     
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
     }
     
+    func fetchCompetitions() async throws {
+        let fetchedCompetitions: [GroupCompetition] = try await supabaseClient
+            .from("group_competitions")
+            .select("*")
+            .execute()
+            .value
+
+        // Update the published competitions property
+        DispatchQueue.main.async {
+            self.competitions = fetchedCompetitions
+        }
+    }
+
     func fetchAllGroups() async throws -> [Group] {
         try await supabaseClient
             .from("groups")
@@ -75,17 +90,30 @@ class CompetitionManager {
         return profileCountResponse
     }
     
-    func fetchDailyPoints(for profileId: UUID, groupId: UUID) async throws -> Int {
-        let pointsResponse: DailyPoints = try await supabaseClient
-            .from("daily_points")
+    func fetchDailyPoints(from date: Date, for profileId: UUID) async throws -> Int {
+        // Get the start of the day in UTC
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let currentDateString = dateFormatter.string(from: date)
+
+        // Fetch all relevant daily_zone_exits for the user on that specific day
+        let dailyZoneExits: [DailyZoneExit] = try await supabaseClient
+            .from("daily_zone_exits")
             .select("*")
             .eq("profile_id", value: profileId.uuidString)
-            .eq("group_id", value: groupId.uuidString)
+            .eq("date", value: currentDateString) // Filter by today's date
             .execute()
             .value
-        
-        return pointsResponse.points
+
+        // Sum up all points earned from the daily_zone_exits
+        let totalPoints = dailyZoneExits.reduce(0) { result, zoneExit in
+            result + zoneExit.points_earned
+        }
+
+        return totalPoints
     }
+
 
     func fetchCompetitionPoints(for profileId: UUID, competitionId: UUID) async throws -> Int {
         let pointsResponse: Int = try await supabaseClient
@@ -111,7 +139,7 @@ class CompetitionManager {
     private func fetchCompetitorsFromGroups(_ groupIds: [UUID]) async throws -> [GroupMember] {
         let groupMembers: [GroupMember] = try await supabaseClient
             .from("group_members")
-            .select("profile_id, group_id, profiles(full_name)")
+            .select("profile_id, group_id, profiles(full_name), groups(name)")
             .in("group_id", values: groupIds.map { $0.uuidString })
             .execute()
             .value
