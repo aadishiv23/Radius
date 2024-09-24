@@ -36,7 +36,6 @@ final class ZoneUpdateManager {
         // Create a DateFormatter for UTC
         let exitTimeUTC = ISO8601DateFormatter.shared.string(from: time)
 
-
         for zoneId in zoneIds {
             let zoneExit = [
                 "profile_id": profileId.uuidString,
@@ -76,17 +75,23 @@ final class ZoneUpdateManager {
             let userGroups = try await fetchUserGroupsZum(for: profileId)
             var globalExitOrder = 1
             var totalUsers = 0
+            var competitionExists = false
 
             for group in userGroups {
                 if let competition = try await fetchCompetitionZum(for: group.group_id) {
-                    // Calculate total users in the competition
+                    competitionExists = true
+                    // Calculate total users in the competition (across groups)
                     totalUsers = try await fetchTotalUsersInCompetitionZum(competition.id)
-                    globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, totalUsers: totalUsers)
+                    globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, competitionId: competition.id, totalUsers: totalUsers)
                     break
-                } else {
-                    // Calculate total users in the group
+                }
+            }
+
+            if !competitionExists {
+                // No competition, calculate based on group members only
+                for group in userGroups {
                     totalUsers = try await fetchTotalUsersInGroupZum(group.group_id)
-                    globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, totalUsers: totalUsers)
+                    globalExitOrder = try await calculateGlobalExitOrder(dateString: currentDateString, groupId: group.group_id, totalUsers: totalUsers)
                 }
             }
 
@@ -111,8 +116,8 @@ final class ZoneUpdateManager {
                     id: UUID(),
                     date: startOfDay,
                     profile_id: profileId,
-                    zone_exit_id: insertedZoneExit.id, // Use the existing zone exit ID
-                    exit_order: exitOrder, // Update this to match your column name
+                    zone_exit_id: insertedZoneExit.id,
+                    exit_order: exitOrder,
                     points_earned: pointsEarned
                 )
 
@@ -196,14 +201,37 @@ final class ZoneUpdateManager {
         return totalUsers
     }
 
-    private func calculateGlobalExitOrder(dateString: String, totalUsers: Int) async throws -> Int {
-        let exitCountResponse: [DailyZoneExit] = try await supabaseClient
-            .from("daily_zone_exits")
-            .select("*")
-            .eq("date", value: dateString)
-            .execute()
-            .value
+//    private func calculateGlobalExitOrder(dateString: String, totalUsers: Int) async throws -> Int {
+//        let exitCountResponse: [DailyZoneExit] = try await supabaseClient
+//            .from("daily_zone_exits")
+//            .select("*")
+//            .eq("date", value: dateString)
+//            .execute()
+//            .value
+//
+//        return exitCountResponse.count + 1 // Next exit order
+//    }
 
+    private func calculateGlobalExitOrder(dateString: String, competitionId: UUID? = nil, groupId: UUID? = nil, totalUsers: Int) async throws -> Int {
+        var query = supabaseClient.from("daily_zone_exits").select("*").eq("date", value: dateString)
+
+        if let competitionId = competitionId {
+            // Fetch exits across all groups in the competition
+            let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
+                .from("group_competition_links")
+                .select("*")
+                .eq("competition_id", value: competitionId.uuidString)
+                .execute()
+                .value
+
+            let groupIds = groupCompetitionLinks.map { $0.group_id.uuidString }
+            query = query.in("group_id", values: groupIds)
+        } else if let groupId = groupId {
+            // Fetch exits for a specific group
+            query = query.eq("group_id", value: groupId.uuidString)
+        }
+
+        let exitCountResponse: [DailyZoneExit] = try await query.execute().value
         return exitCountResponse.count + 1 // Next exit order
     }
 
