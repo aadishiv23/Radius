@@ -221,7 +221,15 @@ struct UpdateProfileParams: Encodable {
 struct GroupMember: Codable {
     let group_id: UUID
     let profile_id: UUID
+    let profile_name: String?
+    let group_name: String?
 }
+
+struct GroupMemberWoBS: Codable {
+    let group_id: UUID
+    let profile_id: UUID
+}
+
 
 struct DailyZoneExit: Identifiable, Codable {
     var id: UUID
