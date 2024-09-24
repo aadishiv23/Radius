@@ -10,9 +10,25 @@ import Supabase
 
 class FriendService {
     private let supabaseClient: SupabaseClient
+    private var userId: UUID?
     
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
+    }
+    
+    func fetchCurrentUserProfile() async throws -> Profile {
+        let user = try await supabase.auth.session.user
+        userId = user.id
+            
+        let profile: Profile = try await supabase
+            .from("profiles")
+            .select("*, zones(*)") // Ensure zones are included in the query
+            .eq("id", value: userId)
+            .single()
+            .execute()
+            .value
+                
+        return profile
     }
     
     // Method to fetch friends from Supabase
