@@ -10,12 +10,13 @@ import Supabase
 
 class FriendsRepository: ObservableObject {
     @Published var friends: [Profile] = []
+    @Published var currentUser: Profile? = nil
 
     private var cache: [UUID: CachedData<[Profile]>] = [:]
     private var cacheExpiration: TimeInterval = 300 // 5 minutes
     private let friendService: FriendService
+    private var userId: UUID?
 
-    
     init(friendService: FriendService) {
         self.friendService = friendService
     }
@@ -44,6 +45,17 @@ class FriendsRepository: ObservableObject {
     // Invalidate all cache (for example, on logout)
     func invalidateAllFriendsCache() {
         cache.removeAll()
+    }
+    
+    func fetchCurrentUser() async throws -> Profile? {
+//        if let currentUser = currentUser {
+//            return currentUser
+//        }
+        
+        let fetchedUser = try await friendService.fetchCurrentUserProfile()
+        currentUser = fetchedUser
+        
+        return fetchedUser
     }
     
     // Check if cache is expired
