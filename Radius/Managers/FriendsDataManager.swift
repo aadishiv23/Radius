@@ -571,7 +571,7 @@ class FriendsDataManager: ObservableObject {
 //    }
     func fetchGroupMembersProfiles(groupId: UUID) async throws -> [Profile] {
         do {
-            let groupMembers: [GroupMember] = try await supabaseClient
+            let groupMembers: [GroupMemberWoBS] = try await supabaseClient
                 .from("group_members")
                 .select("group_id, profile_id")
                 .eq("group_id", value: groupId.uuidString)
