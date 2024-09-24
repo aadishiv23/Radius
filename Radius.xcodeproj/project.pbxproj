@@ -74,6 +74,8 @@
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */; };
 		ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACD4812C2C326E98004653A1 /* CoreDataModel.xcdatamodeld */; };
+		ACDC65172CA237FE0087D8D3 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDC65162CA237FE0087D8D3 /* HomeViewModel.swift */; };
+		ACDC651A2CA23E6F0087D8D3 /* LeaderboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDC65192CA23E6F0087D8D3 /* LeaderboardViewModel.swift */; };
 		ACE5AEA72C8B8EB000DB562B /* LocationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */; };
 		ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB24E92C11698800D9693F /* AddGroupView.swift */; };
 		ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */; };
@@ -149,6 +151,8 @@
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectedDebugView.swift; sourceTree = "<group>"; };
 		ACD4812D2C326E98004653A1 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
+		ACDC65162CA237FE0087D8D3 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		ACDC65192CA23E6F0087D8D3 /* LeaderboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewModel.swift; sourceTree = "<group>"; };
 		ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsView.swift; sourceTree = "<group>"; };
 		ACEB24E92C11698800D9693F /* AddGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGroupView.swift; sourceTree = "<group>"; };
 		ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressResult+AnnotationItem.swift"; sourceTree = "<group>"; };
@@ -178,11 +182,11 @@
 		AC0AC6FD2BDB0EB8000418B8 /* MainViews */ = {
 			isa = PBXGroup;
 			children = (
+				ACDC65182CA23E640087D8D3 /* Leaderboard */,
+				ACDC65152CA237F50087D8D3 /* HomeView */,
 				AC36A73B2C928BBC00840DDD /* InfoView */,
-				AC6A55282BD98D4200706E01 /* HomeView.swift */,
 				AC98AE012BC0872E00879A25 /* ContentView.swift */,
 				AC9BD1D82BEB3EB000D23123 /* AppView.swift */,
-				ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */,
 			);
 			path = MainViews;
 			sourceTree = "<group>";
@@ -409,6 +413,24 @@
 			path = CoreData;
 			sourceTree = "<group>";
 		};
+		ACDC65152CA237F50087D8D3 /* HomeView */ = {
+			isa = PBXGroup;
+			children = (
+				AC6A55282BD98D4200706E01 /* HomeView.swift */,
+				ACDC65162CA237FE0087D8D3 /* HomeViewModel.swift */,
+			);
+			path = HomeView;
+			sourceTree = "<group>";
+		};
+		ACDC65182CA23E640087D8D3 /* Leaderboard */ = {
+			isa = PBXGroup;
+			children = (
+				ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */,
+				ACDC65192CA23E6F0087D8D3 /* LeaderboardViewModel.swift */,
+			);
+			path = Leaderboard;
+			sourceTree = "<group>";
+		};
 		ACED0C8A2C25328700D30D15 /* AddressEntryModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -543,6 +565,7 @@
 				AC0AC70A2BDB10C2000418B8 /* ButtonModifiers.swift in Sources */,
 				ACEB24EA2C11698800D9693F /* AddGroupView.swift in Sources */,
 				ACE5AEA72C8B8EB000DB562B /* LocationSettingsView.swift in Sources */,
+				ACDC65172CA237FE0087D8D3 /* HomeViewModel.swift in Sources */,
 				AC1A7AC22C86A8CD00C00EA8 /* CompetitionDetailViewModel.swift in Sources */,
 				AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */,
 				AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */,
@@ -571,6 +594,7 @@
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
 				AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */,
 				AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */,
+				ACDC651A2CA23E6F0087D8D3 /* LeaderboardViewModel.swift in Sources */,
 				ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,

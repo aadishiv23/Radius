@@ -5,16 +5,17 @@
 //  Created by Aadi Shiv Malhotra on 4/24/24.
 //
 
-import SwiftUI
-import MapKit
 import Combine
+import MapKit
+import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager  // Assuming this contains your friendsLocations
     @Environment(\.colorScheme) var colorScheme
+    @StateObject private var viewModel: HomeViewModel
     @ObservedObject private var locationManager = LocationManager.shared
         
-    @State private var region =  MKCoordinateRegion(
+    @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 42.278378215221565, longitude: -83.74388859636869),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
@@ -32,14 +33,17 @@ struct HomeView: View {
     
     @State private var animateGradient = false
     @State private var showZoneExitActionSheet = false
-    @State private var userPoints: Int? = nil  // To hold the user's points
+    @State private var userPoints: Int? = nil // To hold the user's points
 
-    
-//    @StateObject private var mapRegionObserver: MapRegionObserver
-//
-//    init() {
-//        _mapRegionObserver = StateObject(wrappedValue: MapRegionObserver(initialCenter: initialCenter))
-//    }
+    // Initialization with repositories
+    init(friendsRepository: FriendsRepository,
+         groupsRepository: GroupsRepository)
+    {
+        _viewModel = StateObject(wrappedValue: HomeViewModel(
+            friendsRepository: friendsRepository,
+            groupsRepository: groupsRepository
+        ))
+    }
     
     var body: some View {
         NavigationView {
@@ -52,13 +56,8 @@ struct HomeView: View {
             }
             .onAppear {
                 Task {
-                    if let userId = friendsDataManager.currentUser?.id {
-                        await friendsDataManager.fetchFriends(for: userId)
-                        print("Current user is: \(userId)")
-                    } else {
-                        print("Current user id is nil")
-                    }
-                }                
+                    await viewModel.refreshAllData()
+                }
             }
             .background(
                 LinearGradient(
@@ -125,8 +124,8 @@ struct HomeView: View {
                     }
             }
             .sheet(item: $selectedFriend) { friend in
-               FriendDetailView(friend: friend)
-           }
+                FriendDetailView(friend: friend)
+            }
             .sheet(isPresented: $isPresentingDebugMenu) {
                 NavigationView {
                     PasswordProtectedDebugMenuView()
@@ -166,10 +165,10 @@ struct HomeView: View {
     }
     
     private func handleManualZoneExit(for zone: Zone) {
-        /*guard let profileId = friendsDataManager.currentUser?.id else { return }
-        Task {
-            await locationManager.zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zone.id], at: Date())
-        }*/
+        /* guard let profileId = friendsDataManager.currentUser?.id else { return }
+         Task {
+             await locationManager.zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zone.id], at: Date())
+         } */
         print("silly boy add thsi back")
     }
     
@@ -222,30 +221,30 @@ struct HomeView: View {
     }
     
     private var friendListSection: some View {
-       VStack(alignment: .leading, spacing: 5) {
-           // Me Section
-           Section(header: Text("Me").font(.headline).padding(.leading)) {
-               if let currentUser = friendsDataManager.currentUser {
-                   friendRow(currentUser)
-               }
-           }
+        VStack(alignment: .leading, spacing: 5) {
+            // Me Section
+            Section(header: Text("Me").font(.headline).padding(.leading)) {
+                if let currentUser = friendsDataManager.currentUser {
+                    friendRow(currentUser)
+                }
+            }
            
-           Divider()
+            Divider()
            
-           // Friends Section
-           Section(header: Text("Friends").font(.headline).padding(.leading)) {
-               let friends = friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
-               if friends.isEmpty {
-                   noFriendsRow
-               } else {
-                   ForEach(friends, id: \.id) { friend in
-                       friendRow(friend)
-                   }
-               }
-           }
-       }
-       .padding(.top, 5)
-   }
+            // Friends Section
+            Section(header: Text("Friends").font(.headline).padding(.leading)) {
+                let friends = friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
+                if friends.isEmpty {
+                    noFriendsRow
+                } else {
+                    ForEach(friends, id: \.id) { friend in
+                        friendRow(friend)
+                    }
+                }
+            }
+        }
+        .padding(.top, 5)
+    }
     
     @ViewBuilder
     func friendRow(_ friend: Profile) -> some View {
@@ -299,8 +298,7 @@ struct HomeView: View {
         .onTapGesture {
             selectedFriend = friend
             let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()  // Add haptic feedback
-
+            generator.impactOccurred() // Add haptic feedback
         }
     }
     
@@ -357,23 +355,20 @@ struct HomeView: View {
     }
     
     private func fetchUserPoints() {
-            // Fetch points logic (mocked here)
-            Task {
-                // Example logic to fetch user points, replace with actual data fetching
-                // userPoints = try await fetchPointsForCurrentUser()
-                userPoints = 500  // Mock value, replace with actual logic
-            }
+        // Fetch points logic (mocked here)
+        Task {
+            // Example logic to fetch user points, replace with actual data fetching
+            // userPoints = try await fetchPointsForCurrentUser()
+            userPoints = 500 // Mock value, replace with actual logic
         }
-}
-
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
     }
 }
 
-
-
+//struct HomeView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        HomeView()
+//    }
+//}
 
 // nic code to controll swiping navigation view back even when .navigationbar is hidden
 extension UINavigationController: UIGestureRecognizerDelegate {

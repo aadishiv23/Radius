@@ -5,8 +5,8 @@
 //  Created by Aadi Shiv Malhotra on 5/8/24.
 //
 
-import SwiftUI
 import Supabase
+import SwiftUI
 
 struct AppView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -25,7 +25,7 @@ struct AppView: View {
                 if authViewModel.needsProfileSetup {
                     ProfileSetupView()
                 } else {
-                    MainTabView()  // View for authenticated users
+                    MainTabView() // View for authenticated users
                         .onAppear {
                             Task {
                                 await friendsDataManager.fetchCurrentUserProfile()
@@ -43,6 +43,7 @@ struct AppView: View {
                                 }
                             }
                         }
+                        .environmentObject(friendsDataManager)
                         .environmentObject(friendsRepository)
                         .environmentObject(groupsRepository)
                         .environmentObject(zonesRepository)
@@ -63,11 +64,21 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            HomeView()
+            if let userId = friendsDataManager.currentUser?.id {
+                HomeView(
+                    friendsRepository: friendsRepository,
+                    groupsRepository: groupsRepository
+                )
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-            
+            } else {
+                Text("Loading...")
+                    .tabItem {
+                        Label("Home", systemImage: "house.fill")
+                    }
+            }
+
             // Ensure that currentUser is available
             if let userId = friendsDataManager.currentUser?.id {
                 InfoView(
@@ -86,8 +97,8 @@ struct MainTabView: View {
                         Label("Info", systemImage: "info.circle")
                     }
             }
-            
-            LeaderboardView()
+
+            LeaderboardView(friendsDataManager: friendsDataManager, competitionManager: CompetitionManager(supabaseClient: supabase))
                 .tabItem {
                     Label("Leaderboard", systemImage: "list.number")
                 }
