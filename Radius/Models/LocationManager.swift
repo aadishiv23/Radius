@@ -144,6 +144,16 @@ class LocationManager: NSObject, ObservableObject {
             }
         }
     }
+    
+    // MARK: - Remove a geographic condition upon deletion of a zone
+    func removeGeographicCondition(for zoneId: UUID) async {
+        guard let monitor = monitor else { return }
+        
+        // Remove the monitored condition by accessing its identifier
+        await monitor.remove(zoneId.uuidString)
+        
+        print("Removed geographic condition for zone: \(zoneId)")
+    }
 
     // MARK: - Location Updates ⬅️ Changed: Updated location updates section
 

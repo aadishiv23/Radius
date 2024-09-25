@@ -435,6 +435,10 @@ class FriendsDataManager: ObservableObject {
             .delete()
             .eq("id", value: zoneId.uuidString)
             .execute()
+        
+        Task {
+            await LocationManager.shared.removeGeographicCondition(for: zoneId)
+        }
     }
 
     func renameZone(zoneId: UUID, newName: String) async throws {
