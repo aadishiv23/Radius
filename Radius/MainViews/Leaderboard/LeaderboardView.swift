@@ -67,8 +67,10 @@ struct LeaderboardView: View {
             }
         }
         .pickerStyle(MenuPickerStyle())
-        .onAppear {
-            print("User groups: \(viewModel.friendsDataManager.userGroups)")
+        .onChange(of: viewModel.selectedGroup) { newGroup in
+            if let group = newGroup {
+                viewModel.fetchLeaderboardData()  // Ensure fetching happens immediately after selection
+            }
         }
     }
 
