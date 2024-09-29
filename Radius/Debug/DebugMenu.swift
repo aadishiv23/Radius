@@ -6,6 +6,7 @@
 //
 
 import Combine
+import CoreLocation
 import Foundation
 import SwiftUI
 
@@ -19,6 +20,14 @@ struct DebugMenuView: View {
     @State private var isLoading = false
     @State private var zones: [Zone] = []
     @State private var isZonesSectionExpanded = false
+    @State private var isZonesExitsSectionExpanded = false
+    @State private var monitoredZones: [(UUID, Bool)] = []
+    @State private var isLoadingMonitoredZones = false
+
+    @State private var monitorEvents: [CLMonitor.Event] = []
+    @State private var monitorRecords: [(zoneId: UUID, record: CLMonitor.Record)] = []
+    @State private var isLoadingMonitorData = false
+    @State private var isLoadingMonitorRecordData = false
 
     var body: some View {
         List {
@@ -66,7 +75,7 @@ struct DebugMenuView: View {
 //                }
 //            }
             Section(header: Text("Zone Exits")) {
-                DisclosureGroup("Zones", isExpanded: $isZonesSectionExpanded) {
+                DisclosureGroup("Zones", isExpanded: $isZonesExitsSectionExpanded) {
                     if isLoading {
                         ProgressView()
                     } else if zoneExits.isEmpty {
@@ -104,16 +113,70 @@ struct DebugMenuView: View {
                 }
                 .padding(.vertical, 8)
             }
+
+            Section(header: Text("Monitored Zones")) {
+                if isLoadingMonitoredZones {
+                    ProgressView()
+                } else if monitoredZones.isEmpty {
+                    Text("No zones being monitored")
+                } else {
+                    ForEach(monitoredZones, id: \.0) { zone in
+                        VStack(alignment: .leading) {
+                            Text("Zone ID: \(zone.0.uuidString)")
+                            Text("Status: \(zone.1 ? "Monitored" : "Not Monitored")")
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+
+            Section(header: Text("Monitor Events")) {
+                if isLoadingMonitorData {
+                    ProgressView()
+                } else if monitorEvents.isEmpty {
+                    Text("No monitor events recorded")
+                } else {
+                    ForEach(monitorEvents, id: \.identifier) { event in
+                        VStack(alignment: .leading) {
+                            Text("Identifier: \(event.identifier)")
+                            Text("State: \(event.state == .satisfied ? "Satisfied" : "Unsatisfied")")
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+
+//            Section(header: Text("Monitor Records")) {
+//                if isLoadingMonitorData {
+//                    ProgressView()
+//                } else if monitorRecords.isEmpty {
+//                    Text("No monitor records found")
+//                } else {
+//                    ForEach(monitorRecords, id: \.zoneId) { recordPair in
+//                        VStack(alignment: .leading) {
+//                            Text("Zone ID: \(recordPair.zoneId.uuidString)")  // Access zoneId correctly from the tuple
+//                            Text("Record State: \(recordPair.record.state == .satisfied ? "Satisfied" : "Unsatisfied")")
+//                        }
+//                        .padding(.vertical, 4)
+//                    }
+//                }
+//            }
         }
         .navigationTitle("Debug Menu")
         .onAppear {
             fetchZoneExitsForCurrentUser()
             fetchAllZones()
+            fetchMonitoredZones()
+            fetchMonitorEvents()
+            fetchMonitorRecords()
         }
         .refreshable {
             await friendsDataManager.fetchCurrentUserProfile()
             fetchZoneExitsForCurrentUser()
             fetchAllZones()
+            fetchMonitoredZones()
+            fetchMonitorEvents()
+            fetchMonitorRecords()
         }
     }
 
@@ -162,6 +225,44 @@ struct DebugMenuView: View {
         }
     }
 
+    private func fetchMonitoredZones() {
+        isLoadingMonitoredZones = true
+
+        Task {
+            let monitoredZonesResult = await LocationManager.shared.getMonitoredZones()
+            DispatchQueue.main.async {
+                self.monitoredZones = monitoredZonesResult
+                self.isLoadingMonitoredZones = false
+            }
+        }
+    }
+
+    private func fetchMonitorEvents() {
+        isLoadingMonitorData = true
+
+        Task {
+            let fetchedEvents = try await LocationManager.shared.getMonitorEvents()
+
+            DispatchQueue.main.async {
+                self.monitorEvents = fetchedEvents
+                self.isLoadingMonitorData = false
+            }
+        }
+    }
+    
+    private func fetchMonitorRecords() {
+        isLoadingMonitorRecordData = true
+        
+        Task {
+            let fetchedRecords = await LocationManager.shared.getMonitorRecords()
+
+            DispatchQueue.main.async {
+                self.monitorRecords = fetchedRecords // Make sure this is [(UUID, CLMonitor.Record)]
+                self.isLoadingMonitorRecordData = false
+            }
+        }
+    }
+
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -170,7 +271,7 @@ struct DebugMenuView: View {
     }
 }
 
-//class ZoneExitObserver: ObservableObject {
+// class ZoneExitObserver: ObservableObject {
 //    @Published var localZoneExits: [LocalZoneExit] = []
 //    private var cancellables = Set<AnyCancellable>()
 //
@@ -191,4 +292,4 @@ struct DebugMenuView: View {
 //    func stopObserving() {
 //        cancellables.removeAll()
 //    }
-//}
+// }
