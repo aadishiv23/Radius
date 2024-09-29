@@ -11,22 +11,23 @@ import SwiftUI
 struct MyProfileView: View {
     @State private var editing = false
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-    
     @Environment(\.dismiss) var dismiss
 
     @State private var zoneExits: [ZoneExit] = []
     @State private var zones: [UUID: Zone] = [:]
     @State private var showAllZoneExits = false
-    
+    @State private var showDeleteConfirmation = false
+    @State private var zoneToDelete: Zone?
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 friendInfoSection
                     .visionGlass()
-                
+
                 zonesSection
                     .visionGlass()
-                
+
                 zoneExitsSection // New section for recent zone exits
                     .visionGlass()
             }
@@ -46,22 +47,38 @@ struct MyProfileView: View {
             Task {
                 do {
                     // Fetch the recent zone exits
-                    let fetchedZoneExits = try await friendsDataManager.fdmFetchZoneExits(for: friendsDataManager.currentUser.id)
-                    self.zoneExits = Array(fetchedZoneExits.prefix(5)) // Show only the top 5 most recent exits
-                    let zoneIds = fetchedZoneExits.map { $0.zone_id }
-                    self.zones = try await friendsDataManager.fetchZonesDict(for: zoneIds)
+                    let fetchedZoneExits = try await friendsDataManager
+                        .fdmFetchZoneExits(for: friendsDataManager.currentUser.id)
+                    zoneExits = Array(fetchedZoneExits.prefix(5)) // Show only the top 5 most recent exits
+                    let zoneIds = fetchedZoneExits.map(\.zone_id)
+                    zones = try await friendsDataManager.fetchZonesDict(for: zoneIds)
                 } catch {
                     print("Failed to load zone exits and associated zones: \(error)")
                 }
             }
         }
         .background(
-            NavigationLink(destination: AllZoneExitsView(friend: friendsDataManager.currentUser), isActive: $showAllZoneExits) {
+            NavigationLink(
+                destination: AllZoneExitsView(friend: friendsDataManager.currentUser),
+                isActive: $showAllZoneExits
+            ) {
                 EmptyView()
             }
         )
+        .confirmationDialog(
+            "Are you sure you want to delete \(zoneToDelete?.name ?? "this zone")?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let zone = zoneToDelete {
+                    deleteZone(zone)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
     }
-    
+
     private var friendInfoSection: some View {
         VStack(spacing: 10) {
             Text("Name: \(friendsDataManager.currentUser.full_name)")
@@ -79,7 +96,7 @@ struct MyProfileView: View {
         }
         .padding()
     }
-    
+
     private var zonesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -91,16 +108,16 @@ struct MyProfileView: View {
                         .foregroundColor(.blue)
                 }
             }
-            
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 20) {
                     ForEach(friendsDataManager.currentUser.zones) { zone in
                         ZStack(alignment: .topTrailing) {
                             PolaroidCard(zone: zone)
-                            
+
                             if editing {
                                 Button(action: {
-                                    removeZone(zone)
+                                    showDeleteConfirmation(for: zone)
                                 }) {
                                     Image(systemName: "minus.circle.fill")
                                         .foregroundColor(.red)
@@ -115,8 +132,8 @@ struct MyProfileView: View {
         }
         .padding()
     }
-    
-    // New section to display recent zone exits
+
+    /// New section to display recent zone exits
     private var zoneExitsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -130,7 +147,7 @@ struct MyProfileView: View {
                         .foregroundColor(.blue)
                 }
             }
-            
+
             if zoneExits.isEmpty {
                 Text("No zone exits available.")
                     .foregroundColor(.gray)
@@ -149,8 +166,13 @@ struct MyProfileView: View {
         }
         .padding()
     }
-    
-    private func removeZone(_ zone: Zone) {
+
+    private func showDeleteConfirmation(for zone: Zone) {
+        zoneToDelete = zone
+        showDeleteConfirmation = true
+    }
+
+    private func deleteZone(_ zone: Zone) {
         Task {
             try? await friendsDataManager.deleteZone(zoneId: zone.id)
             // Update the UI after deleting the zone
@@ -162,7 +184,9 @@ struct MyProfileView: View {
 struct ZoneGridView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var editing = false
-    
+    @State private var showDeleteConfirmation = false
+    @State private var zoneToDelete: Zone?
+
     var body: some View {
         VStack {
             HStack {
@@ -174,16 +198,16 @@ struct ZoneGridView: View {
                 }
             }
             .padding()
-            
+
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 20) {
                     ForEach(friendsDataManager.currentUser.zones) { zone in
                         ZStack(alignment: .topTrailing) {
                             PolaroidCard(zone: zone)
-                            
+
                             if editing {
                                 Button(action: {
-                                    removeZone(zone)
+                                    showDeleteConfirmation(for: zone)
                                 }) {
                                     Image(systemName: "minus.circle.fill")
                                         .foregroundColor(.red)
@@ -197,12 +221,38 @@ struct ZoneGridView: View {
             }
         }
         .navigationTitle("Zones")
+        .confirmationDialog(
+            "Are you sure you want to delete \(zoneToDelete?.name ?? "this zone")?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let zone = zoneToDelete {
+                    deleteZone(zone)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
     }
-    
-    private func removeZone(_ zone: Zone) {
+
+    private func showDeleteConfirmation(for zone: Zone) {
+        zoneToDelete = zone
+        showDeleteConfirmation = true
+    }
+
+    private func deleteZone(_ zone: Zone) {
         Task {
-            try? await friendsDataManager.deleteZone(zoneId: zone.id)
-            await friendsDataManager.fetchCurrentUserProfile()
+            do {
+                // Call delete function in the data manager
+                try await friendsDataManager.deleteZone(zoneId: zone.id)
+
+                // Optional: Trigger a local UI update (this is redundant if the profile is refetched)
+                if let index = friendsDataManager.currentUser.zones.firstIndex(where: { $0.id == zone.id }) {
+                    friendsDataManager.currentUser.zones.remove(at: index)
+                }
+            } catch {
+                print("Error deleting zone: \(error)")
+            }
         }
     }
 }
