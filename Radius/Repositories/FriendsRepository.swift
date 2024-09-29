@@ -47,6 +47,7 @@ class FriendsRepository: ObservableObject {
         cache.removeAll()
     }
     
+    @MainActor
     func fetchCurrentUser() async throws -> Profile? {
 //        if let currentUser = currentUser {
 //            return currentUser
