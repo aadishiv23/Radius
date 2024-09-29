@@ -10,16 +10,16 @@ import MapKit
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject var friendsDataManager: FriendsDataManager  // Assuming this contains your friendsLocations
+    @EnvironmentObject var friendsDataManager: FriendsDataManager // Assuming this contains your friendsLocations
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel: HomeViewModel
     @ObservedObject private var locationManager = LocationManager.shared
-        
+
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 42.278378215221565, longitude: -83.74388859636869),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
-    
+
     @State private var selectedFriend: Profile?
     @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
@@ -27,24 +27,25 @@ struct HomeView: View {
     @State private var isPresentingZoneEditor = false
     @State private var isPresentingDebugMenu = false
     @State private var isPresentingFriendRequests = false
-    
+
     @State private var userZones: [Zone] = []
     private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
-    
+
     @State private var animateGradient = false
     @State private var showZoneExitActionSheet = false
     @State private var userPoints: Int? = nil // To hold the user's points
 
-    // Initialization with repositories
-    init(friendsRepository: FriendsRepository,
-         groupsRepository: GroupsRepository)
-    {
+    /// Initialization with repositories
+    init(
+        friendsRepository: FriendsRepository,
+        groupsRepository: GroupsRepository
+    ) {
         _viewModel = StateObject(wrappedValue: HomeViewModel(
             friendsRepository: friendsRepository,
             groupsRepository: groupsRepository
         ))
     }
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -61,7 +62,11 @@ struct HomeView: View {
             }
             .background(
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.white.opacity(0.5), Color.yellow.opacity(0.5)]),
+                    gradient: Gradient(colors: [
+                        Color.blue.opacity(0.5),
+                        Color.white.opacity(0.5),
+                        Color.yellow.opacity(0.5)
+                    ]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -119,7 +124,10 @@ struct HomeView: View {
                 ZoneEditorView(isPresenting: $isPresentingZoneEditor, userZones: $userZones)
                     .onDisappear {
                         Task {
-                            try await friendsDataManager.addZones(to: friendsDataManager.currentUser.id, zones: userZones)
+                            try await friendsDataManager.addZones(
+                                to: friendsDataManager.currentUser.id,
+                                zones: userZones
+                            )
                         }
                     }
             }
@@ -135,7 +143,7 @@ struct HomeView: View {
                 FriendRequestsView()
                     .environmentObject(friendsDataManager)
             }
-            
+
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
             }
@@ -163,25 +171,34 @@ struct HomeView: View {
             }
         }
     }
-    
+
     private func handleManualZoneExit(for zone: Zone) {
-        /* guard let profileId = friendsDataManager.currentUser?.id else { return }
-         Task {
-             await locationManager.zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zone.id], at: Date())
-         } */
+        // guard let profileId = friendsDataManager.currentUser?.id else { return }
+        // Task {
+        //    await locationManager.zoneUpdateManager.handleZoneExits(for: profileId, zoneIds: [zone.id], at: Date())
+        // }
         print("silly boy add thsi back")
     }
-    
+
     private func refreshData() async {
-        guard let userId = friendsDataManager.currentUser?.id else { return }
+        guard let userId = friendsDataManager.currentUser?.id else {
+            return
+        }
         await friendsDataManager.fetchFriends(for: userId)
         await friendsDataManager.fetchUserGroups()
     }
-    
+
     private var mapSection: some View {
         ZStack(alignment: .top) {
-            Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }) { friendLocation in
-                MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: friendLocation.latitude, longitude: friendLocation.longitude)) {
+            Map(
+                coordinateRegion: $region,
+                showsUserLocation: true,
+                annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
+            ) { friendLocation in
+                MapAnnotation(coordinate: CLLocationCoordinate2D(
+                    latitude: friendLocation.latitude,
+                    longitude: friendLocation.longitude
+                )) {
                     FriendAnnotationView(friend: friendLocation)
                 }
             }
@@ -219,7 +236,7 @@ struct HomeView: View {
             FullScreenMapView()
         }
     }
-    
+
     private var friendListSection: some View {
         VStack(alignment: .leading, spacing: 5) {
             // Me Section
@@ -228,9 +245,9 @@ struct HomeView: View {
                     friendRow(currentUser)
                 }
             }
-           
+
             Divider()
-           
+
             // Friends Section
             Section(header: Text("Friends").font(.headline).padding(.leading)) {
                 let friends = friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
@@ -245,7 +262,7 @@ struct HomeView: View {
         }
         .padding(.top, 5)
     }
-    
+
     @ViewBuilder
     func friendRow(_ friend: Profile) -> some View {
         HStack(spacing: 16) {
@@ -259,7 +276,7 @@ struct HomeView: View {
                 )
                 .overlay(Circle().stroke(Color.white, lineWidth: 2))
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(friend.full_name)
                     .font(.headline)
@@ -272,9 +289,9 @@ struct HomeView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
                 .foregroundColor(.secondary)
         }
@@ -301,7 +318,7 @@ struct HomeView: View {
             generator.impactOccurred() // Add haptic feedback
         }
     }
-    
+
     private var noFriendsRow: some View {
         HStack(spacing: 16) {
             Circle()
@@ -313,11 +330,11 @@ struct HomeView: View {
                         .foregroundColor(.gray.opacity(0.7))
                 )
                 .overlay(Circle().stroke(Color.white, lineWidth: 2))
-            
+
             Text("😢 You have no friends, add by clicking '+'!")
                 .font(.headline)
                 .foregroundColor(.primary)
-            
+
             Spacer()
         }
         .padding(.vertical, 12)
@@ -338,10 +355,15 @@ struct HomeView: View {
         .padding(.horizontal)
         .padding(.vertical, 4)
     }
-    
+
     private func checkDistance() {
-        guard let currentLocation = locationManager.userLocation else { return }
-        let initialLocation = CLLocation(latitude: currentLocation.coordinate.latitude, longitude: currentLocation.coordinate.longitude)
+        guard let currentLocation = locationManager.userLocation else {
+            return
+        }
+        let initialLocation = CLLocation(
+            latitude: currentLocation.coordinate.latitude,
+            longitude: currentLocation.coordinate.longitude
+        )
         let distance = initialLocation.distance(from: initialLocation)
         showRecenterButton = distance > 500
     }
@@ -353,7 +375,7 @@ struct HomeView: View {
             showRecenterButton = false
         }
     }
-    
+
     private func fetchUserPoints() {
         // Fetch points logic (mocked here)
         Task {
@@ -364,13 +386,15 @@ struct HomeView: View {
     }
 }
 
-//struct HomeView_Previews: PreviewProvider {
+// MARK: - UINavigationController + UIGestureRecognizerDelegate
+
+// struct HomeView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        HomeView()
 //    }
-//}
+// }
 
-// nic code to controll swiping navigation view back even when .navigationbar is hidden
+/// nic code to controll swiping navigation view back even when .navigationbar is hidden
 extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     override open func viewDidLoad() {
         super.viewDidLoad()
