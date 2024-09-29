@@ -13,9 +13,11 @@ enum LocationAccuracyMode: String {
     case balanced = "Balanced"
     case lowPower = "LowPower"
 
-    // Initialize from a string or return a default value
+    /// Initialize from a string or return a default value
     static func from(rawValue: String?) -> LocationAccuracyMode {
-        guard let rawValue = rawValue else { return .balanced }
+        guard let rawValue else {
+            return .balanced
+        }
         return LocationAccuracyMode(rawValue: rawValue) ?? .balanced
     }
 }
@@ -75,8 +77,8 @@ class LocationManager: NSObject, ObservableObject {
 
     // MARK: - monitor signfiicant locaiton changes
 
-    // Ensure the app keeps tracking location when terminated or suspended
-    private func startMonitoringSignificantLocationChanges() {
+    /// Ensure the app keeps tracking location when terminated or suspended
+    func startMonitoringSignificantLocationChanges() {
         locationManager.startMonitoringSignificantLocationChanges()
     }
 
@@ -86,7 +88,11 @@ class LocationManager: NSObject, ObservableObject {
         await fdm.fetchCurrentUserProfile() // Await fetch
         print("fetched")
         guard let currentUser = fdm.currentUser else {
-            throw NSError(domain: "LocationManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Current user is nil"])
+            throw NSError(
+                domain: "LocationManager",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Current user is nil"]
+            )
         }
         DispatchQueue.main.async {
             self.userZones = currentUser.zones
@@ -108,7 +114,9 @@ class LocationManager: NSObject, ObservableObject {
         }
 
         Task {
-            guard let monitor = monitor else { return }
+            guard let monitor else {
+                return
+            }
             for try await event in await monitor.events { // ⬅️ Changed: Updated to use `for await`
                 handleMonitorEvent(event)
             }
@@ -130,7 +138,7 @@ class LocationManager: NSObject, ObservableObject {
                 do {
                     // Fetch zone details before proceeding
                     let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
- 
+
                     // Upload zone exit
                     try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: Date())
 
@@ -144,21 +152,26 @@ class LocationManager: NSObject, ObservableObject {
             }
         }
     }
-    
+
     // MARK: - Remove a geographic condition upon deletion of a zone
+
     func removeGeographicCondition(for zoneId: UUID) async {
-        guard let monitor = monitor else { return }
-        
+        guard let monitor else {
+            return
+        }
+
         // Remove the monitored condition by accessing its identifier
         await monitor.remove(zoneId.uuidString)
-        
+
         print("Removed geographic condition for zone: \(zoneId)")
     }
 
     // MARK: - Location Updates ⬅️ Changed: Updated location updates section
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let newLocation = locations.last else { return }
+        guard let newLocation = locations.last else {
+            return
+        }
 
         Task {
             await ensureProfileIsFetched() // Wait for profile fetch
@@ -285,8 +298,85 @@ class LocationManager: NSObject, ObservableObject {
     }
 }
 
+// MARK: - CLLocationManagerDelegate
+
 extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         checkLocationAuthorization()
+    }
+}
+
+extension LocationManager {
+    func getMonitoredZones() async -> [(zoneId: UUID, isMonitored: Bool)] {
+        var monitoredZones: [(UUID, Bool)] = []
+
+        // Fetch the list of monitored region identifiers
+        let monitoredIdentifiers = await monitor?.identifiers ?? []
+
+        for zone in userZones {
+            // Check if the zone ID is in the monitoredIdentifiers list
+            let isMonitored = monitoredIdentifiers.contains(zone.id.uuidString)
+            monitoredZones.append((zone.id, isMonitored))
+        }
+
+        return monitoredZones
+    }
+
+    func getMonitorEvents() async throws -> [CLMonitor.Event] {
+        var events: [CLMonitor.Event] = []
+        if let monitor {
+            for try await event in await monitor.events {
+                events.append(event)
+            }
+        }
+        return events
+    }
+
+    func getMonitorRecords() async -> [(zoneId: UUID, record: CLMonitor.Record)] {
+        var records: [(UUID, CLMonitor.Record)] = []
+        print("hello")
+        if let monitor {
+            for zone in userZones {
+                if let record = await monitor.record(for: zone.id.uuidString) {
+                    print("Record condition: \(record.condition)")
+                    print("Record last event: \(record.lastEvent)")
+                    records.append((zone.id, record))
+                } else {
+                    print("No record found for zone ID: \(zone.id)")
+                }
+            }
+        } else {
+            print("Monitor is not initialized.")
+        }
+
+        return records
+    }
+
+    /// Function to reinitialize location monitoring after app relaunch
+    func reinitializeMonitoringIfNeeded() {
+        // Check if the app is authorized to monitor location
+        let authorizationStatus = locationManager.authorizationStatus
+
+        if authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse {
+            // Reinitialize the monitoring logic here
+            Task {
+                do {
+                    // Ensure profile and zones are fetched
+                    try await fetchUserProfileAndZones()
+
+                    // Setup monitor for zones
+                    await setupMonitor()
+
+                    // Start updating location
+                    locationManager.startUpdatingLocation()
+
+                } catch {
+                    print("Error reinitializing monitoring: \(error)")
+                }
+            }
+        } else {
+            // Request location permissions if necessary
+            locationManager.requestAlwaysAuthorization()
+        }
     }
 }
