@@ -9,14 +9,14 @@ import Charts
 import Foundation
 import SwiftUI
 
-import Charts
-import SwiftUI
-
 struct LeaderboardView: View {
     @StateObject private var viewModel: LeaderboardViewModel
 
     init(friendsDataManager: FriendsDataManager, competitionManager: CompetitionManager) {
-        _viewModel = StateObject(wrappedValue: LeaderboardViewModel(friendsDataManager: friendsDataManager, competitionManager: competitionManager))
+        _viewModel = StateObject(wrappedValue: LeaderboardViewModel(
+            friendsDataManager: friendsDataManager,
+            competitionManager: competitionManager
+        ))
     }
 
     var body: some View {
@@ -53,9 +53,6 @@ struct LeaderboardView: View {
         .navigationTitle("Leaderboard")
         .onAppear {
             viewModel.fetchLeaderboardData()
-            Task {
-                await viewModel.friendsDataManager.fetchUserGroups()  // Fetch user groups directly
-            }
         }
     }
 
@@ -69,7 +66,7 @@ struct LeaderboardView: View {
         .pickerStyle(MenuPickerStyle())
         .onChange(of: viewModel.selectedGroup) { newGroup in
             if let group = newGroup {
-                viewModel.fetchLeaderboardData()  // Ensure fetching happens immediately after selection
+                viewModel.fetchLeaderboardData() // Update leaderboard data when a new group is selected
             }
         }
     }
@@ -82,9 +79,11 @@ struct LeaderboardView: View {
             }
         }
         .pickerStyle(MenuPickerStyle())
-        .onAppear {
-                print("Competitions: \(viewModel.competitionManager.competitions)")
+        .onChange(of: viewModel.selectedCompetition) { newCompetition in
+            if let competition = newCompetition {
+                viewModel.fetchLeaderboardData() // Update leaderboard data when a new competition is selected
             }
+        }
     }
 
     private var leaderboardChart: some View {
@@ -134,10 +133,10 @@ struct LeaderboardView: View {
 
     private func medalColor(for index: Int) -> Color {
         switch index {
-        case 0: return .yellow // Gold
-        case 1: return .gray // Silver
-        case 2: return .brown // Bronze
-        default: return .clear
+        case 0: .yellow // Gold
+        case 1: .gray // Silver
+        case 2: .brown // Bronze
+        default: .clear
         }
     }
 }
@@ -159,8 +158,10 @@ struct LeaderboardView: View {
 //                if let competition = selectedCompetition {
 //                    let groupCompetitors = try await competitionManager.fetchCompetitors(for: competition.id)
 //                    members = groupCompetitors.map { competitor in
-//                        let points = try await competitionManager.fetchCompetitionPoints(for: competitor.profile_id, competitionId: competition.id)
-//                        return LeaderboardMember(id: competitor.profile_id, name: competitor.name, groupName: competitor.group_name, points: points)
+//                        let points = try await competitionManager.fetchCompetitionPoints(for: competitor.profile_id,
+//                        competitionId: competition.id)
+//                        return LeaderboardMember(id: competitor.profile_id, name: competitor.name, groupName:
+//                        competitor.group_name, points: points)
 //                    }
 //                }
 //            }
@@ -172,7 +173,7 @@ struct LeaderboardView: View {
 //
 // }
 
-// Mock data structures
+/// Mock data structures
 struct MockGroup: Identifiable, Hashable {
     let id: UUID
     let name: String
@@ -190,7 +191,7 @@ struct LeaderboardMember: Identifiable, Hashable {
     let points: Int
 }
 
-// Mock data for groups and competitions
+/// Mock data for groups and competitions
 let mockGroups: [MockGroup] = [
     MockGroup(id: UUID(), name: "Group 1"),
     MockGroup(id: UUID(), name: "Group 2"),
