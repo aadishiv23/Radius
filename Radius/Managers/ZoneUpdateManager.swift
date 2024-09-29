@@ -216,7 +216,7 @@ final class ZoneUpdateManager {
         var query = supabaseClient.from("daily_zone_exits").select("*").eq("date", value: dateString)
 
         if let competitionId = competitionId {
-            // Fetch exits across all groups in the competition
+            // Fetch group ids related to the competition
             let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
                 .from("group_competition_links")
                 .select("*")
@@ -224,15 +224,55 @@ final class ZoneUpdateManager {
                 .execute()
                 .value
 
+            // Extract group_ids from the competition links
             let groupIds = groupCompetitionLinks.map { $0.group_id.uuidString }
-            query = query.in("group_id", values: groupIds)
+
+            // Fetch profiles of users belonging to these groups via the `group_members` table
+            let groupMembers: [GroupMember] = try await supabaseClient
+                .from("group_members")
+                .select("*")
+                .in("group_id", values: groupIds)
+                .execute()
+                .value
+
+            let profileIds = groupMembers.map { $0.profile_id.uuidString }
+
+            // Now, fetch exits from `daily_zone_exits` where `profile_id` belongs to the group members
+            let exitCountResponse: [DailyZoneExit] = try await supabaseClient
+                .from("daily_zone_exits")
+                .select("*")
+                .in("profile_id", values: profileIds)
+                .eq("date", value: dateString)
+                .execute()
+                .value
+
+            return exitCountResponse.count + 1 // Next exit order based on exits for competition group members
         } else if let groupId = groupId {
-            // Fetch exits for a specific group
-            query = query.eq("group_id", value: groupId.uuidString)
+            // Fetch profile ids of users in the specific group
+            let groupMembers: [GroupMember] = try await supabaseClient
+                .from("group_members")
+                .select("*")
+                .eq("group_id", value: groupId.uuidString)
+                .execute()
+                .value
+
+            let profileIds = groupMembers.map { $0.profile_id.uuidString }
+
+            // Fetch exits from `daily_zone_exits` for this specific group
+            let exitCountResponse: [DailyZoneExit] = try await supabaseClient
+                .from("daily_zone_exits")
+                .select("*")
+                .in("profile_id", values: profileIds)
+                .eq("date", value: dateString)
+                .execute()
+                .value
+
+            return exitCountResponse.count + 1 // Next exit order for specific group members
         }
 
+        // If no competitionId or groupId is provided, return based on overall total exits
         let exitCountResponse: [DailyZoneExit] = try await query.execute().value
-        return exitCountResponse.count + 1 // Next exit order
+        return exitCountResponse.count + 1 // General next exit order if no specific group/competition provided
     }
 
     private func calculatePoints(for exitOrder: Int, totalUsers: Int) -> Int {
