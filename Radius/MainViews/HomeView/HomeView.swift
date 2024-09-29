@@ -371,7 +371,7 @@ struct HomeView: View {
 //}
 
 // nic code to controll swiping navigation view back even when .navigationbar is hidden
-extension UINavigationController: UIGestureRecognizerDelegate {
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     override open func viewDidLoad() {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.delegate = self
