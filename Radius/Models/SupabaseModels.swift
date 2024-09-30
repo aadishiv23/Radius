@@ -238,6 +238,56 @@ struct DailyZoneExit: Identifiable, Codable {
     var zone_exit_id: UUID
     var exit_order: Int
     var points_earned: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case date
+        case profile_id
+        case zone_exit_id
+        case exit_order
+        case points_earned
+    }
+
+    // Custom decoding to handle the `yyyy-MM-dd` date format
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(UUID.self, forKey: .id)
+        profile_id = try container.decode(UUID.self, forKey: .profile_id)
+        zone_exit_id = try container.decode(UUID.self, forKey: .zone_exit_id)
+        exit_order = try container.decode(Int.self, forKey: .exit_order)
+        points_earned = try container.decode(Int.self, forKey: .points_earned)
+
+        // Custom decoding for the `date` field
+        let dateString = try container.decode(String.self, forKey: .date)
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+
+        guard let parsedDate = dateFormatter.date(from: dateString) else {
+            throw DecodingError.dataCorruptedError(forKey: .date, in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
+        date = parsedDate
+    }
+
+    // Custom encoding to ensure the date is saved as `yyyy-MM-dd`
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encode(profile_id, forKey: .profile_id)
+        try container.encode(zone_exit_id, forKey: .zone_exit_id)
+        try container.encode(exit_order, forKey: .exit_order)
+        try container.encode(points_earned, forKey: .points_earned)
+
+        // Custom encoding for the `date` field
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: date)
+
+        try container.encode(dateString, forKey: .date)
+    }
 }
 
 struct GroupTotalPoints: Identifiable, Codable {
