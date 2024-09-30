@@ -14,7 +14,7 @@ import SwiftUI
 
 struct DebugMenuView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-//    @StateObject private var zoneExitObserver = ZoneExitObserver()
+    ///    @StateObject private var zoneExitObserver = ZoneExitObserver()
     @State private var zoneExits: [ZoneExit] = []
     // @State private var localZoneExits: [LocalZoneExit] = []
     @State private var isLoading = false
@@ -29,8 +29,18 @@ struct DebugMenuView: View {
     @State private var isLoadingMonitorData = false
     @State private var isLoadingMonitorRecordData = false
 
+    // Alert state for showing whether the function executed successfully
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+
     var body: some View {
         List {
+            Section(header: Text("Zone Management")) {
+                Button("Execute Zone Exit & Handle Daily Zone Exits") {
+                    executeZoneExitAndHandleDaily()
+                }
+            }
+
             Section(header: Text("Current User")) {
                 if let currentUser = friendsDataManager.currentUser {
                     Text("Name: \(currentUser.full_name)")
@@ -154,8 +164,10 @@ struct DebugMenuView: View {
 //                } else {
 //                    ForEach(monitorRecords, id: \.zoneId) { recordPair in
 //                        VStack(alignment: .leading) {
-//                            Text("Zone ID: \(recordPair.zoneId.uuidString)")  // Access zoneId correctly from the tuple
-//                            Text("Record State: \(recordPair.record.state == .satisfied ? "Satisfied" : "Unsatisfied")")
+//                            Text("Zone ID: \(recordPair.zoneId.uuidString)")  // Access zoneId correctly from the
+//                            tuple
+//                            Text("Record State: \(recordPair.record.state == .satisfied ? "Satisfied" :
+//                            "Unsatisfied")")
 //                        }
 //                        .padding(.vertical, 4)
 //                    }
@@ -178,6 +190,14 @@ struct DebugMenuView: View {
             fetchMonitorEvents()
             fetchMonitorRecords()
         }
+        // Present an alert based on the outcome of function execution
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Execution Result"),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
 
     private func fetchAllZones() {
@@ -192,12 +212,12 @@ struct DebugMenuView: View {
                     .value
 
                 DispatchQueue.main.async {
-                    self.zones = fetchedZones
-                    self.isLoading = false
+                    zones = fetchedZones
+                    isLoading = false
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.isLoading = false
+                    isLoading = false
                 }
                 print("Failed to fetch zones: \(error)")
             }
@@ -205,7 +225,9 @@ struct DebugMenuView: View {
     }
 
     private func fetchZoneExitsForCurrentUser() {
-        guard let currentUser = friendsDataManager.currentUser else { return }
+        guard let currentUser = friendsDataManager.currentUser else {
+            return
+        }
         isLoading = true
 
         Task {
@@ -213,12 +235,12 @@ struct DebugMenuView: View {
                 let fetchedZoneExits = try await ZoneUpdateManager(supabaseClient: supabase)
                     .fetchZoneExits(for: currentUser.id)
                 DispatchQueue.main.async {
-                    self.zoneExits = fetchedZoneExits
-                    self.isLoading = false
+                    zoneExits = fetchedZoneExits
+                    isLoading = false
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.isLoading = false
+                    isLoading = false
                 }
                 print("Failed to fetch zone exits: \(error)")
             }
@@ -226,15 +248,15 @@ struct DebugMenuView: View {
     }
 
     private func fetchMonitoredZones() {
-        isLoadingMonitoredZones = true
-
-        Task {
-            let monitoredZonesResult = await LocationManager.shared.getMonitoredZones()
-            DispatchQueue.main.async {
-                self.monitoredZones = monitoredZonesResult
-                self.isLoadingMonitoredZones = false
-            }
-        }
+//        isLoadingMonitoredZones = true
+//
+//        Task {
+//            let monitoredZonesResult = await LocationManager.shared.getMonitoredZones()
+//            DispatchQueue.main.async {
+//                monitoredZones = monitoredZonesResult
+//                isLoadingMonitoredZones = false
+//            }
+//        }
     }
 
     private func fetchMonitorEvents() {
@@ -244,21 +266,54 @@ struct DebugMenuView: View {
             let fetchedEvents = try await LocationManager.shared.getMonitorEvents()
 
             DispatchQueue.main.async {
-                self.monitorEvents = fetchedEvents
-                self.isLoadingMonitorData = false
+                monitorEvents = fetchedEvents
+                isLoadingMonitorData = false
             }
         }
     }
-    
+
     private func fetchMonitorRecords() {
         isLoadingMonitorRecordData = true
-        
+
         Task {
             let fetchedRecords = await LocationManager.shared.getMonitorRecords()
 
             DispatchQueue.main.async {
-                self.monitorRecords = fetchedRecords // Make sure this is [(UUID, CLMonitor.Record)]
-                self.isLoadingMonitorRecordData = false
+                monitorRecords = fetchedRecords // Make sure this is [(UUID, CLMonitor.Record)]
+                isLoadingMonitorRecordData = false
+            }
+        }
+    }
+
+    /// Function that executes the zone exit and handles daily zone exits
+    private func executeZoneExitAndHandleDaily() {
+        Task {
+            do {
+                // Use the constant zoneId and profileId you mentioned earlier
+                let constantZoneId = UUID(uuidString: "82e295db-7477-4de7-bb9d-bbb2fb430a3d")!
+                let constantProfileId = UUID(uuidString: "d933c6a3-db45-4ffb-99de-3b0ca876d668")!
+
+                // Execute zone exit
+                try await ZoneUpdateManager(supabaseClient: supabase)
+                    .uploadZoneExit(for: constantProfileId, zoneIds: [constantZoneId], at: Date())
+
+                // Handle daily zone exits
+                try await ZoneUpdateManager(supabaseClient: supabase)
+                    .handleDailyZoneExits(for: constantProfileId, zoneIds: [constantZoneId], at: Date())
+
+                // Success: Update the alert message
+                DispatchQueue.main.async {
+                    alertMessage = "Successfully executed both zone exit and daily zone exit functions."
+                    showAlert = true
+                }
+
+            } catch {
+                // Failure: Show an error message in the alert
+                DispatchQueue.main.async {
+                    alertMessage =
+                        "Failed to execute zone exit or handle daily zone exits: \(error.localizedDescription)"
+                    showAlert = true
+                }
             }
         }
     }
@@ -269,6 +324,7 @@ struct DebugMenuView: View {
         formatter.timeStyle = .medium
         return formatter.string(from: date)
     }
+
 }
 
 // class ZoneExitObserver: ObservableObject {
