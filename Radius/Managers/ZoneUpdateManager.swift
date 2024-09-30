@@ -85,7 +85,17 @@ final class ZoneUpdateManager {
                     "date": currentDateString, // Date as String
                     "group_id": group.group_id.uuidString // Convert UUID to String
                 ]
-                try await supabaseClient.rpc("insert_daily_zone_exit", params: params).execute()
+                do {
+                    // Specify that no data is expected in return
+                    let response = try await supabaseClient.rpc("insert_daily_zone_exit", params: params).execute()
+                    print("Raw response data: \(response)")
+                    print(
+                        "Successfully inserted daily zone exit for profile \(profileId) and zone \(zoneId)"
+                    )
+                } catch {
+                    print("Error inserting daily zone exit: \(error)")
+                    throw error
+                }
             }
         }
         print("Daily zone exit recorded successfully.")

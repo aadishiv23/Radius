@@ -40,6 +40,8 @@
 		AC6A55292BD98D4200706E01 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A55282BD98D4200706E01 /* HomeView.swift */; };
 		AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552A2BD99B1700706E01 /* InfoView.swift */; };
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
+		AC84CE112CAA070000368A5E /* FogOfWarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC84CE102CAA070000368A5E /* FogOfWarView.swift */; };
+		AC84CE132CAA071100368A5E /* FogOfWarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC84CE122CAA071100368A5E /* FogOfWarManager.swift */; };
 		AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140102C93C2CA000112D2 /* FriendService.swift */; };
 		AC9140132C93C31F000112D2 /* GroupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140122C93C31F000112D2 /* GroupService.swift */; };
 		AC9140152C93C51B000112D2 /* ZoneService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140142C93C51B000112D2 /* ZoneService.swift */; };
@@ -120,6 +122,8 @@
 		AC6A55282BD98D4200706E01 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AC6A552A2BD99B1700706E01 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
+		AC84CE102CAA070000368A5E /* FogOfWarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FogOfWarView.swift; sourceTree = "<group>"; };
+		AC84CE122CAA071100368A5E /* FogOfWarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FogOfWarManager.swift; sourceTree = "<group>"; };
 		AC9140102C93C2CA000112D2 /* FriendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendService.swift; sourceTree = "<group>"; };
 		AC9140122C93C31F000112D2 /* GroupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupService.swift; sourceTree = "<group>"; };
 		AC9140142C93C51B000112D2 /* ZoneService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneService.swift; sourceTree = "<group>"; };
@@ -194,6 +198,7 @@
 		AC0AC6FE2BDB0EE4000418B8 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				AC84CE0F2CAA06F300368A5E /* MyProfile */,
 				ACA5B2872C9B2C3100EA4695 /* Friends */,
 				AC1A99C42C8371CC00ED5D1B /* Auth */,
 				AC5DB4D62C7D7FDF00A1019E /* Competitions */,
@@ -210,7 +215,6 @@
 				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
 				ACAEFDFE2C193F8500E12E0B /* GroupView.swift */,
 				AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */,
-				AC245A7E2C9151F4009B7A0D /* MyProfileView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -307,6 +311,16 @@
 				AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		AC84CE0F2CAA06F300368A5E /* MyProfile */ = {
+			isa = PBXGroup;
+			children = (
+				AC245A7E2C9151F4009B7A0D /* MyProfileView.swift */,
+				AC84CE102CAA070000368A5E /* FogOfWarView.swift */,
+				AC84CE122CAA071100368A5E /* FogOfWarManager.swift */,
+			);
+			path = MyProfile;
 			sourceTree = "<group>";
 		};
 		AC91400F2C93C2B9000112D2 /* Services */ = {
@@ -556,6 +570,7 @@
 				AC36A7382C928B7700840DDD /* CompetitionsRepository.swift in Sources */,
 				AC3989562C705637002F84E6 /* DataController.swift in Sources */,
 				AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */,
+				AC84CE132CAA071100368A5E /* FogOfWarManager.swift in Sources */,
 				AC5DB4DA2C7D800E00A1019E /* CompetitionManagerViewModel.swift in Sources */,
 				AC0AC7042BDB0F9B000418B8 /* FriendDetailView.swift in Sources */,
 				AC9BD1BE2BE9954400D23123 /* CreateFriendView.swift in Sources */,
@@ -602,6 +617,7 @@
 				ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
 				AC9140152C93C51B000112D2 /* ZoneService.swift in Sources */,
+				AC84CE112CAA070000368A5E /* FogOfWarView.swift in Sources */,
 				AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */,
 				AC1A7AC02C86A8B000C00EA8 /* CompetitionDetailView.swift in Sources */,
 				AC0AC7022BDB0F2F000418B8 /* LocationViewModel.swift in Sources */,
@@ -754,10 +770,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Radius/Info.plist;
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones, even when the app is not active.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "This apps needs your location to share it on the map";
 				INFOPLIST_KEY_NSLocationUsageDescription = "This apps needs your location to share it on the map";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones.";
+				INFOPLIST_KEY_NSSiriUsageDescription = "Radius uses Siri to quickly check your zone status.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -790,10 +807,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Radius/Info.plist;
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones, even when the app is not active.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "This apps needs your location to share it on the map";
 				INFOPLIST_KEY_NSLocationUsageDescription = "This apps needs your location to share it on the map";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones.";
+				INFOPLIST_KEY_NSSiriUsageDescription = "Radius uses Siri to quickly check your zone status.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

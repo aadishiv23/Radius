@@ -247,86 +247,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5611B732-EC29-4596-AC20-3F5EEC4708FC"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/Models/LocationManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "258"
-            endingLineNumber = "258"
-            landmarkName = "LocationManager"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D83BF5CE-6B46-47D4-ABC2-EEA15FD264A0"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/Models/LocationManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "113"
-            endingLineNumber = "113"
-            landmarkName = "setupMonitor()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "DA4497EB-AF4B-4FD9-B1CA-938220F6E729"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/Models/LocationManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "277"
-            endingLineNumber = "277"
-            landmarkName = "checkLocationAuthorization()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "2405D753-DBF4-43F5-A162-DD40C7B8B974"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/Models/LocationManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
-            landmarkName = "handleMonitorEvent(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "1A19F7C2-3C2C-474C-BD46-F2E829D346B0"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Radius/Models/LocationManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "279"
-            endingLineNumber = "279"
-            landmarkName = "checkLocationAuthorization()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "9FA000DF-380E-4ADC-9720-6A0F4150CD69"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -338,6 +258,64 @@
             endingLineNumber = "64"
             landmarkName = "fetchGroupLeaderboard(groupId:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9FA000DF-380E-4ADC-9720-6A0F4150CD69 - 8893c3ec0cc5222f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "64"
+                  endingLineNumber = "64">
+               </Location>
+               <Location
+                  uuid = "9FA000DF-380E-4ADC-9720-6A0F4150CD69 - be621d5b79e40d07"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "64"
+                  endingLineNumber = "64">
+               </Location>
+               <Location
+                  uuid = "9FA000DF-380E-4ADC-9720-6A0F4150CD69 - 5bf259c3a72ce631"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "64"
+                  endingLineNumber = "64">
+               </Location>
+               <Location
+                  uuid = "9FA000DF-380E-4ADC-9720-6A0F4150CD69 - 8d41117e2f260832"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(6) suspend resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "64"
+                  endingLineNumber = "64">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -482,6 +460,64 @@
             endingLineNumber = "70"
             landmarkName = "fetchGroupLeaderboard(groupId:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "25A4E178-B98E-4432-A197-677BDDE4ED8E - 5bf259c3a72ce6f7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+               <Location
+                  uuid = "25A4E178-B98E-4432-A197-677BDDE4ED8E - 80e1baea53a3d1cf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) await resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+               <Location
+                  uuid = "25A4E178-B98E-4432-A197-677BDDE4ED8E - 6ad2df91418baaf5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+               <Location
+                  uuid = "25A4E178-B98E-4432-A197-677BDDE4ED8E - 24315264fcd16ef3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for closure #1 () async -&gt; () in Radius.LeaderboardViewModel.fetchGroupLeaderboard(groupId: Foundation.UUID) -&gt; ()"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/MainViews/Leaderboard/LeaderboardViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "70"
+                  endingLineNumber = "70">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -498,6 +534,36 @@
             endingLineNumber = "93"
             landmarkName = "fetchDailyPoints(from:for:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "03D19DFB-D00E-4927-84F7-0A730FADE8F9 - af0c4a39e3ab2641"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Radius.CompetitionManager.fetchDailyPoints(from: Foundation.Date, for: Foundation.UUID) async throws -&gt; Swift.Int"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/CompetitionManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "93"
+                  endingLineNumber = "93">
+               </Location>
+               <Location
+                  uuid = "03D19DFB-D00E-4927-84F7-0A730FADE8F9 - b6086d1970f9ac35"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for Radius.CompetitionManager.fetchDailyPoints(from: Foundation.Date, for: Foundation.UUID) async throws -&gt; Swift.Int"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/CompetitionManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "93"
+                  endingLineNumber = "93">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -513,6 +579,132 @@
             startingLineNumber = "110"
             endingLineNumber = "110"
             landmarkName = "fetchDailyPoints(from:for:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "5113127D-7DC5-45E1-B4BB-21C785557F49 - 470d16b6d2d0e266"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Radius.CompetitionManager.fetchDailyPoints(from: Foundation.Date, for: Foundation.UUID) async throws -&gt; Swift.Int"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/CompetitionManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110">
+               </Location>
+               <Location
+                  uuid = "5113127D-7DC5-45E1-B4BB-21C785557F49 - 621b4ce75d9317b4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Int, Radius.DailyZoneExit) -&gt; Swift.Int in Radius.CompetitionManager.fetchDailyPoints(from: Foundation.Date, for: Foundation.UUID) async throws -&gt; Swift.Int"
+                  moduleName = "Radius.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/CompetitionManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "111"
+                  endingLineNumber = "111">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4BD7E2ED-C10A-4B62-9DF5-910F3124AC51"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Radius/Managers/ZoneUpdateManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "64"
+            endingLineNumber = "64"
+            landmarkName = "handleDailyZoneExits(for:zoneIds:at:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "70E69CC5-2118-4755-B3C6-E5703A2FAD3C"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Radius/Managers/ZoneUpdateManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "81"
+            endingLineNumber = "81"
+            landmarkName = "handleDailyZoneExits(for:zoneIds:at:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "819B0131-1BD2-4888-9211-F24BF4C53564"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Radius/Models/LocationManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
+            landmarkName = "plsInitiateLocationUpdates()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "835BDC53-E134-4956-8423-A3C840F3B767"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Radius/Models/LocationManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "296"
+            endingLineNumber = "296"
+            landmarkName = "plsInitiateLocationUpdates()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "663EDF54-10E2-48D5-9324-51EFFB828174"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Radius/Managers/ZoneUpdateManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "uploadZoneExit(for:zoneIds:at:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "525A0EED-28A9-405D-BF8D-FB0266281775"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Radius/Models/LocationManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "125"
+            endingLineNumber = "125"
+            landmarkName = "setupMonitor()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

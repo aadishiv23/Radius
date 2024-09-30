@@ -15,6 +15,7 @@ struct RadiusApp: App {
     @StateObject private var dataController = DataController()
     @StateObject private var friendsDataManager: FriendsDataManager
     @StateObject private var authViewModel: AuthViewModel
+    @StateObject var locationManager = LocationManager.shared
     
     init() {
         let friendsDataManager = FriendsDataManager(supabaseClient: supabaseClient)

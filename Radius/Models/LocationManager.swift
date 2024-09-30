@@ -103,6 +103,7 @@ class LocationManager: NSObject, ObservableObject {
 
     private func setupMonitor() async { // ⬅️ Changed: Made setupMonitor asynchronous
         monitor = await CLMonitor("ZoneMonitor")
+        print("[setupMonitor] Initialized Monitor 'ZoneMonitor'.")
 
         print("User zones: \(userZones.count)")
 
@@ -111,13 +112,16 @@ class LocationManager: NSObject, ObservableObject {
             let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
 
             await monitor?.add(condition, identifier: zone.id.uuidString, assuming: .satisfied)
+            print("[setupMonitor] Added condition for zone ID: \(zone.id.uuidString)")
         }
 
         Task {
             guard let monitor else {
                 return
             }
+            print("[setupMonitor] Starting to listen for monitor events.")
             for try await event in await monitor.events { // ⬅️ Changed: Updated to use `for await`
+                print("[setupMonitor] Received event: \(event)")
                 handleMonitorEvent(event)
             }
         }
@@ -126,28 +130,31 @@ class LocationManager: NSObject, ObservableObject {
     // MARK: - Handle Monitor Events ⬅️ Added: New section for handling monitor events
 
     private func handleMonitorEvent(_ event: CLMonitor.Event) {
+        print("[handleMonitorEvent] Event received: \(event.state.rawValue) for identifier: \(event.identifier)")
         if event.state == .unsatisfied {
             Task {
                 guard let currentUserId = fdm.currentUser?.id,
                       let zoneId = UUID(uuidString: event.identifier)
                 else {
-                    print("Invalid user or zone ID")
+                    print("[handleMonitorEvent] Invalid user or zone ID")
                     return
                 }
 
                 do {
                     // Fetch zone details before proceeding
                     let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
+                    print("[handleMonitorEvent] Fetched zone details: \(zone.name)")
 
                     // Upload zone exit
                     try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: Date())
+                    print("[handleMonitorEvent] Uploaded zone exit for zone: \(zone.name)")
 
                     // Handle daily zone exits and points
                     try await zoneUpdateManager.handleDailyZoneExits(for: currentUserId, zoneIds: [zoneId], at: Date())
+                    print("[handleMonitorEvent] Handled daily zone exits for zone: \(zone.name)")
 
-                    print("Successfully handled exit for zone: \(zone.name)")
                 } catch {
-                    print("Failed to handle monitor event: \(error)")
+                    print("[handleMonitorEvent] Failed to handle monitor event: \(error)")
                 }
             }
         }

@@ -17,7 +17,7 @@ struct FullScreenMapView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     @State private var selectedFriend: Profile? // Tracks the selected friend
-    @State private var isFriendSelectionExpanded: Bool = false // New state variable
+    @State private var isFriendSelectionExpanded = false // New state variable
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -63,56 +63,60 @@ struct FullScreenMapView: View {
             // Friend Selection Section
             VStack(spacing: 0) {
                 if isFriendSelectionExpanded {
-                    // Expanded FriendSelectionView with Stub to Collapse
-                    VStack(spacing: 0) {
-                        // Stub with Down Chevron
-                        Button(action: {
-                            toggleFriendSelection()
-                        }) {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "chevron.down")
-                                    .foregroundColor(.gray)
-                                    .padding(.top, 8)
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                    // Down Chevron Button (Separate from FriendSelectionView)
+                    Button(action: {
+                        toggleFriendSelection()
+                    }) {
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                            .padding()
+                            .background(Color(.systemBackground))
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.bottom, 8)
 
-                        // Actual FriendSelectionView
+                    // FriendSelectionView with Adjustments
+                    HStack {
+                        Spacer()
                         FriendSelectionView(
                             friends: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id },
                             selectedFriend: $selectedFriend,
                             onSelect: selectFriend
                         )
-                        // Removed negative padding
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .background(Color(.systemBackground).opacity(0.95))
+                        .cornerRadius(16) // Rounds all corners
+                        .shadow(radius: 5)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.9) // Makes it less wide
+                        Spacer()
                     }
-                    .background(Color(.systemBackground).opacity(0.95))
-                    .cornerRadius(16, corners: [.topLeft, .topRight])
-                    .shadow(radius: 5)
-                    .ignoresSafeArea(edges: .bottom) // Ensures the background extends to the bottom
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 } else {
-                    // Collapsed Button with Up Chevron
-                    Button(action: {
-                        toggleFriendSelection()
-                    }) {
-                        Image(systemName: "chevron.up")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Circle())
-                            .shadow(radius: 3)
-                            .padding(.bottom, 20)
+                    // Collapsed Button with Up Chevron Centered
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            toggleFriendSelection()
+                        }) {
+                            Image(systemName: "chevron.up")
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                        }
+                        Spacer()
                     }
+                    .padding(.bottom, 20)
                 }
             }
-            .frame(maxHeight: .infinity, alignment: .bottom) // Aligns the VStack to the bottom
-            .animation(.easeInOut, value: isFriendSelectionExpanded)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            // .animation(.easeInOut, value: isFriendSelectionExpanded)
         }
     }
 
-    // Function to toggle the friend selection section
+    /// Function to toggle the friend selection section
     private func toggleFriendSelection() {
         withAnimation(.easeInOut(duration: 0.3)) {
             isFriendSelectionExpanded.toggle()
@@ -131,7 +135,7 @@ struct FullScreenMapView: View {
 
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape( RoundedCorner(radius: radius, corners: corners) )
+        clipShape(RoundedCorner(radius: radius, corners: corners))
     }
 }
 
@@ -139,11 +143,13 @@ struct RoundedCorner: Shape {
     var radius: CGFloat = .infinity
     var corners: UIRectCorner = .allCorners
 
-    // Defines the path for the shape
+    /// Defines the path for the shape
     func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect,
-                                byRoundingCorners: corners,
-                                cornerRadii: CGSize(width: radius, height: radius))
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
         return Path(path.cgPath)
     }
 }
@@ -155,6 +161,8 @@ struct FriendSelectionView: View {
     @Binding var selectedFriend: Profile?
     var onSelect: (Profile) -> Void
 
+    let itemWidth: CGFloat = 70 // Set a fixed width for each item
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
@@ -162,7 +170,7 @@ struct FriendSelectionView: View {
                     Button(action: {
                         onSelect(friend)
                     }) {
-                        VStack {
+                        VStack(spacing: 8) { // Adjust spacing between elements
                             Circle()
                                 .fill(Color.white)
                                 .frame(width: 50, height: 50)
@@ -180,12 +188,18 @@ struct FriendSelectionView: View {
                             Text(friend.full_name)
                                 .font(.caption)
                                 .foregroundColor(.primary)
+                                .lineLimit(1) // Limit to one line
+                                .truncationMode(.tail) // Truncate if the name is too long
+                                .frame(width: itemWidth - 10) // Adjust width to fit within the item
+                                .multilineTextAlignment(.center) // Center align the text
                         }
+                        .frame(width: itemWidth) // Set fixed width for each item
                     }
                 }
             }
-            .padding(.horizontal) // Only horizontal padding to prevent vertical gaps
-            .padding(.bottom, 10) // Add some padding at the bottom if desired
+            .padding(.horizontal)
+            .padding(.bottom, 10)
+            .frame(height: 120)
         }
     }
 }
