@@ -37,6 +37,7 @@ final class ZoneUpdateManager {
         let exitTimeUTC = ISO8601DateFormatter.shared.string(from: time)
 
         for zoneId in zoneIds {
+          
             let zoneExit = [
                 "profile_id": profileId.uuidString,
                 "zone_id": zoneId.uuidString,
@@ -77,21 +78,22 @@ final class ZoneUpdateManager {
                     continue
                 }
 
-                // Step 2: Pass the `zone_exit_id` to the RPC function to calculate points
+                // Step 2: Prepare parameters for the RPC function
                 let params: [String: String] = [
-                    "profile_id": profileId.uuidString, // Convert UUID to String
-                    "zone_exit_id": zoneExitId.uuidString, // Convert UUID to String
-                    "zone_id": zoneId.uuidString, // Convert UUID to String
-                    "date": currentDateString, // Date as String
-                    "group_id": group.group_id.uuidString // Convert UUID to String
+                    "p_profile_id": profileId.uuidString,
+                    "p_zone_exit_id": zoneExitId.uuidString,
+                    "p_zone_id": zoneId.uuidString,
+                    "p_date": currentDateString,
+                    "p_group_id": group.group_id.uuidString
                 ]
+
                 do {
-                    // Specify that no data is expected in return
-                    let response = try await supabaseClient.rpc("insert_daily_zone_exit", params: params).execute()
-                    print("Raw response data: \(response)")
-                    print(
-                        "Successfully inserted daily zone exit for profile \(profileId) and zone \(zoneId)"
-                    )
+                    // Step 3: Call the RPC function
+                    _ = try await supabaseClient
+                        .rpc("insert_daily_zone_exit", params: params)
+                        .execute()
+
+                    print("Successfully inserted daily zone exit for profile \(profileId) and zone \(zoneId)")
                 } catch {
                     print("Error inserting daily zone exit: \(error)")
                     throw error
@@ -104,7 +106,7 @@ final class ZoneUpdateManager {
     private func fetchLatestZoneExitId(for profileId: UUID, zoneId: UUID) async throws -> UUID? {
         let zoneExits: [ZoneExit] = try await supabaseClient
             .from("zone_exits")
-            .select("id")
+            .select("*")
             .eq("profile_id", value: profileId.uuidString)
             .eq("zone_id", value: zoneId.uuidString)
             .order("exit_time", ascending: false) // Order by most recent exit
@@ -116,8 +118,8 @@ final class ZoneUpdateManager {
         return zoneExits.first?.id
     }
 
-    private func fetchUserGroupsZum(for profileId: UUID) async throws -> [GroupMember] {
-        let userGroups: [GroupMember] = try await supabaseClient
+    private func fetchUserGroupsZum(for profileId: UUID) async throws -> [GroupMemberWoBS] {
+        let userGroups: [GroupMemberWoBS] = try await supabaseClient
             .from("group_members")
             .select("*")
             .eq("profile_id", value: profileId.uuidString)
