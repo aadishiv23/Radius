@@ -32,7 +32,7 @@ class GroupService {
     
     // Fetch User Groups
    func fetchUserGroups(for userId: UUID) async throws -> [Group] {
-       let groupMembers: [GroupMember] = try await supabaseClient
+       let groupMembers: [GroupMemberWoBS] = try await supabaseClient
            .from("group_members")
            .select("*")
            .eq("profile_id", value: userId.uuidString)
