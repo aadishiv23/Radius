@@ -139,7 +139,7 @@ class FriendsDataManager: ObservableObject {
                 // Fetch friend relationships where profile_id1 or profile_id2 equals userId
                 let friendRelations: [FriendRelation] = try await supabaseClient
                     .from("friends")
-                    .select("friendship_id, profile_id1, profile_id2")
+                    .select("*")
                     .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
                     .execute()
                     .value
