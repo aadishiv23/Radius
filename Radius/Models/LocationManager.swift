@@ -146,11 +146,15 @@ class LocationManager: NSObject, ObservableObject {
                     print("[handleMonitorEvent] Fetched zone details: \(zone.name)")
 
                     // Upload zone exit
-                    try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: Date())
+                    try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: event.date)
                     print("[handleMonitorEvent] Uploaded zone exit for zone: \(zone.name)")
 
                     // Handle daily zone exits and points
-                    try await zoneUpdateManager.handleDailyZoneExits(for: currentUserId, zoneIds: [zoneId], at: Date())
+                    try await zoneUpdateManager.handleDailyZoneExits(
+                        for: currentUserId,
+                        zoneIds: [zoneId],
+                        at: event.date
+                    )
                     print("[handleMonitorEvent] Handled daily zone exits for zone: \(zone.name)")
 
                 } catch {
