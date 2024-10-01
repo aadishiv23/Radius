@@ -37,7 +37,6 @@ final class ZoneUpdateManager {
         let exitTimeUTC = ISO8601DateFormatter.shared.string(from: time)
 
         for zoneId in zoneIds {
-          
             let zoneExit = [
                 "profile_id": profileId.uuidString,
                 "zone_id": zoneId.uuidString,
@@ -72,7 +71,23 @@ final class ZoneUpdateManager {
 
         for group in userGroups {
             for zoneId in zoneIds {
-                // Step 1: Fetch the most recent zone_exit_id for the profile and zone
+                // Step 1: Check if a daily zone exit already exists for the profile, zone, and date
+                let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
+                    .from("daily_zone_exits")
+                    .select("*")
+                    .eq("profile_id", value: profileId.uuidString)
+                    .eq("zone_id", value: zoneId.uuidString)
+                    .eq("date", value: currentDateString)
+                    .execute()
+                    .value
+                
+                // If there is already an exit for this profile, zone, and date, skip inserting
+                guard existingDailyZoneExit.isEmpty else {
+                    print("Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on \(currentDateString)")
+                    continue
+                }
+
+                // Step 2: Fetch the most recent zone_exit_id for the profile and zone
                 guard let zoneExitId = try await fetchLatestZoneExitId(for: profileId, zoneId: zoneId) else {
                     print("No zone exit found for profile \(profileId) and zone \(zoneId)")
                     continue
