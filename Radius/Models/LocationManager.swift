@@ -94,7 +94,7 @@ class LocationManager: NSObject, ObservableObject {
                 userInfo: [NSLocalizedDescriptionKey: "Current user is nil"]
             )
         }
-        DispatchQueue.main.async {
+        await MainActor.run {
             self.userZones = currentUser.zones
         }
     }

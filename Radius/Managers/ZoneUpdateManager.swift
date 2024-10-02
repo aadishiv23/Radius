@@ -76,7 +76,7 @@ final class ZoneUpdateManager {
                     .from("daily_zone_exits")
                     .select("*")
                     .eq("profile_id", value: profileId.uuidString)
-                    .eq("zone_id", value: zoneId.uuidString)
+                    .eq("zone_exit_id", value: zoneId.uuidString)
                     .eq("date", value: currentDateString)
                     .execute()
                     .value

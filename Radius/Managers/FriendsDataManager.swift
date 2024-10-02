@@ -130,54 +130,52 @@ class FriendsDataManager: ObservableObject {
         await fetchUserGroups()
     }
 
-    func fetchFriends(for userId: UUID, retryCount: Int = 3) async {
-        var attempts = 0
-        var success = false
+    func fetchFriends(for userId: UUID) async {
+        do {
+            // Fetch friend relationships where profile_id1 or profile_id2 equals userId
+            let friendRelations: [FriendRelation] = try await supabaseClient
+                .from("friends")
+                .select("*")
+                .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
+                .execute()
+                .value
 
-        while attempts < retryCount, !success {
-            do {
-                // Fetch friend relationships where profile_id1 or profile_id2 equals userId
-                let friendRelations: [FriendRelation] = try await supabaseClient
-                    .from("friends")
-                    .select("*")
-                    .or("profile_id1.eq.\(userId.uuidString),profile_id2.eq.\(userId.uuidString)")
-                    .execute()
-                    .value
-
-                // Extract friend IDs
-                let friendIds = Set(friendRelations.compactMap { relation -> UUID? in
-                    if relation.profile_id1 == userId {
-                        return relation.profile_id2
-                    } else if relation.profile_id2 == userId {
-                        return relation.profile_id1
-                    }
-                    return nil
-                })
-
-                // Fetch the actual friend profiles
-                let friendProfiles: [Profile] = try await supabaseClient
-                    .from("profiles")
-                    .select("*")
-                    .in("id", values: friendIds.map(\.uuidString))
-                    .execute()
-                    .value
-
-                DispatchQueue.main.async {
-                    self.friends = friendProfiles
+            // Extract friend IDs
+            let friendIds = Set(friendRelations.compactMap { relation -> UUID? in
+                if relation.profile_id1 == userId {
+                    return relation.profile_id2
+                } else if relation.profile_id2 == userId {
+                    return relation.profile_id1
                 }
+                return nil
+            })
 
-                // Mark the operation as successful
-                success = true
+            // Fetch the actual friend profiles
+            let friendProfiles: [Profile] = try await supabaseClient
+                .from("profiles")
+                .select("*")
+                .in("id", values: friendIds.map(\.uuidString))
+                .execute()
+                .value
 
-            } catch {
-                attempts += 1
-                print("Attempt \(attempts) failed with error: \(error)")
-                if attempts >= retryCount {
-                    print("Failed to fetch friends after \(retryCount) attempts.")
-                }
-                // Add a short delay before retrying (exponential backoff strategy)
-                await Task.sleep(1_000_000_000 * UInt64(attempts)) // Sleep for attempts seconds
+            // Update the friends list on the main thread
+            DispatchQueue.main.async {
+                self.friends = friendProfiles
             }
+
+        } catch let error as PostgrestError {
+            // Handle Supabase thrown Error
+            print("PostgrestError encountered: \(error.localizedDescription)")
+        } catch let error as URLError {
+            // Handle URL errors, e.g., timeouts
+            if error.code == .timedOut {
+                print("Request timed out: \(error.localizedDescription)")
+            } else {
+                print("URLError encountered: \(error.localizedDescription)")
+            }
+        } catch {
+            // Handle any other unexpected error
+            print("Unexpected error encountered: \(error.localizedDescription)")
         }
     }
 
@@ -235,26 +233,41 @@ class FriendsDataManager: ObservableObject {
             userId = user.id
 
             if let userId {
-                let profile: Profile? = try await supabaseClient
-                    .from("profiles")
-                    .select("*, zones(*)") // Ensure zones are included in the query
-                    .eq("id", value: userId)
-                    .single()
-                    .execute()
-                    .value
+                do {
+                    let profile: Profile = try await supabaseClient
+                        .from("profiles")
+                        .select("*, zones(*)")
+                        .eq("id", value: userId)
+                        .single()
+                        .execute()
+                        .value
 
-                if let profile {
-                    print(profile.full_name)
-                    print(profile.username)
-                    print(user.email ?? "N/A")
-
-                    DispatchQueue.main.sync {
+                    // Successfully fetched profile, update state
+                    await MainActor.run {
                         self.currentUser = profile
                     }
+                } catch let error as PostgrestError {
+                    // Handle specific Supabase error (PostgrestError)
+                    print("Supabase error while fetching profile: \(error.localizedDescription)")
+                    // You could also log the error or display a user-friendly message here
+                } catch let error as URLError {
+                    // Handle specific URL error (network error)
+                    if error.code == .timedOut {
+                        print("Request timed out: \(error.localizedDescription)")
+                    } else if error.code == .notConnectedToInternet {
+                        print("No internet connection: \(error.localizedDescription)")
+                    } else {
+                        print("Network error occurred: \(error.localizedDescription)")
+                    }
+                } catch {
+                    // Handle any other unexpected errors
+                    print("Unexpected error: \(error.localizedDescription)")
                 }
             }
+        } catch let error as PostgrestError {
+            print("Supabase authentication error: \(error.localizedDescription)")
         } catch {
-            print("Failed to fetch current user profile: \(error)")
+            print("Failed to get current session: \(error.localizedDescription)")
         }
     }
 

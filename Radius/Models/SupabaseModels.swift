@@ -8,38 +8,38 @@
 import Foundation
 import SwiftUI
 
-//struct FriendRequest: Identifiable, Codable {
+// struct FriendRequest: Identifiable, Codable {
 //    var id: UUID
 //    var sender_id: UUID
 //    var receiver_id: UUID
 //    var status: String
 //    var created_at: Date
-//    
+//
 //    // For more readable status values, you can use an enum
 //    enum Status: String, Codable {
 //        case pending = "pending"
 //        case accepted = "accepted"
 //        case rejected = "rejected"
 //    }
-//    
+//
 //    // Computed property to get the status as an enum
 //    var requestStatus: Status {
 //        return Status(rawValue: status) ?? .pending
 //    }
-//    
+//
 //    // Additional convenience computed properties
 //    var isPending: Bool {
 //        return requestStatus == .pending
 //    }
-//    
+//
 //    var isAccepted: Bool {
 //        return requestStatus == .accepted
 //    }
-//    
+//
 //    var isRejected: Bool {
 //        return requestStatus == .rejected
 //    }
-//}
+// }
 
 struct FriendRequest: Identifiable, Codable {
     var id: UUID
@@ -49,25 +49,32 @@ struct FriendRequest: Identifiable, Codable {
     var created_at: Date
 
     enum CodingKeys: String, CodingKey {
-        case id, sender_id, receiver_id, status, created_at
+        case id
+        case sender_id
+        case receiver_id
+        case status
+        case created_at
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        sender_id = try container.decode(UUID.self, forKey: .sender_id)
-        receiver_id = try container.decode(UUID.self, forKey: .receiver_id)
-        status = try container.decode(String.self, forKey: .status)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.sender_id = try container.decode(UUID.self, forKey: .sender_id)
+        self.receiver_id = try container.decode(UUID.self, forKey: .receiver_id)
+        self.status = try container.decode(String.self, forKey: .status)
 
         let dateString = try container.decode(String.self, forKey: .created_at)
         if let date = DateFormatter.customSupabaseFormat.date(from: dateString) {
-            created_at = date
+            self.created_at = date
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .created_at, in: container, debugDescription: "Invalid date format: \(dateString)")
+            throw DecodingError.dataCorruptedError(
+                forKey: .created_at,
+                in: container,
+                debugDescription: "Invalid date format: \(dateString)"
+            )
         }
     }
 }
-
 
 extension DateFormatter {
     static let customSupabaseFormat: DateFormatter = {
@@ -77,7 +84,7 @@ extension DateFormatter {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
-    
+
     static let zoneExitSupabaseFormat: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
@@ -86,7 +93,8 @@ extension DateFormatter {
         return formatter
     }()
 }
-//extension DateFormatter {
+
+// extension DateFormatter {
 //    static let customSupabaseFormat: DateFormatter = {
 //        let formatter = DateFormatter()
 //        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
@@ -94,8 +102,7 @@ extension DateFormatter {
 //        formatter.locale = Locale(identifier: "en_US_POSIX")
 //        return formatter
 //    }()
-//}
-
+// }
 
 struct Group: Codable, Identifiable, Hashable {
     var id: UUID
@@ -105,7 +112,6 @@ struct Group: Codable, Identifiable, Hashable {
     var plain_password: String?
 }
 
-
 struct Group2: Codable, Identifiable {
     let id: UUID
     let name: String
@@ -114,12 +120,12 @@ struct Group2: Codable, Identifiable {
 }
 
 enum ZoneCategory: String, Codable, CaseIterable {
-    case home = "home"
-    case school = "school"
-    case gym = "gym"
-    case food = "food"
-    case social = "social"
-    case other = "other"
+    case home
+    case school
+    case gym
+    case food
+    case social
+    case other
 }
 
 struct Zone: Codable, Identifiable {
@@ -128,11 +134,19 @@ struct Zone: Codable, Identifiable {
     let latitude: Double
     let longitude: Double
     let radius: Double
-    let profile_id: UUID
+    let profile_id: UUID?
     let category: ZoneCategory
 
-    // Provide a default value for the category if not initialized
-    init(id: UUID = UUID(), name: String, latitude: Double, longitude: Double, radius: Double, profile_id: UUID, category: ZoneCategory = .other) {
+    /// Provide a default value for the category if not initialized
+    init(
+        id: UUID = UUID(),
+        name: String,
+        latitude: Double,
+        longitude: Double,
+        radius: Double,
+        profile_id: UUID,
+        category: ZoneCategory = .other
+    ) {
         self.id = id
         self.name = name
         self.latitude = latitude
@@ -163,25 +177,25 @@ struct Profile: Codable, Identifiable {
         case phone_num
         case zones
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        username = try container.decodeIfPresent(String.self, forKey: .username) ?? "Unknown User"
-        full_name = try container.decodeIfPresent(String.self, forKey: .full_name) ?? "Unknown Full Name"
-        color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#FFFFFF"
-        latitude = try container.decodeIfPresent(Double.self, forKey: .latitude) ?? 0.0
-        longitude = try container.decodeIfPresent(Double.self, forKey: .longitude) ?? 0.0
-        phone_num = try container.decodeIfPresent(String.self, forKey: .phone_num) ?? "123456789"
-        zones = try container.decodeIfPresent([Zone].self, forKey: .zones) ?? []
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.username = try container.decodeIfPresent(String.self, forKey: .username) ?? "Unknown User"
+        self.full_name = try container.decodeIfPresent(String.self, forKey: .full_name) ?? "Unknown Full Name"
+        self.color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#FFFFFF"
+        self.latitude = try container.decodeIfPresent(Double.self, forKey: .latitude) ?? 0.0
+        self.longitude = try container.decodeIfPresent(Double.self, forKey: .longitude) ?? 0.0
+        self.phone_num = try container.decodeIfPresent(String.self, forKey: .phone_num) ?? "123456789"
+        self.zones = try container.decodeIfPresent([Zone].self, forKey: .zones) ?? []
     }
-    
+
     var swiftUIColor: Color {
         Color(hex: color) ?? .black // .black
     }
 }
 
-//struct Profile: Decodable, Identifiable {
+// struct Profile: Decodable, Identifiable {
 //    let id: UUID
 //    let username: String
 //    let full_name: String
@@ -189,7 +203,7 @@ struct Profile: Codable, Identifiable {
 //    let latitude: Double
 //    let longitude: Double
 //    var zones: [Zone]
-//    
+//
 //    init(id: UUID, username: String?, full_name: String?, color: String?, latitude: Double?, longitude: Double?, zones: [Zone]?) {
 //        self.id = id
 //        self.username = username ?? "Unknown User"
@@ -199,7 +213,7 @@ struct Profile: Codable, Identifiable {
 //        self.longitude = longitude ?? 0.0
 //        self.zones = zones ?? []
 //    }
-//}
+// }
 
 //      enum CodingKeys: String, CodingKey {
 //        case username
@@ -207,15 +221,14 @@ struct Profile: Codable, Identifiable {
 //        case website
 //      }
 
-
 struct UpdateProfileParams: Encodable {
-  let username: String
-  let fullName: String
+    let username: String
+    let fullName: String
 
-  enum CodingKeys: String, CodingKey {
-    case username
-    case fullName = "full_name"
-  }
+    enum CodingKeys: String, CodingKey {
+        case username
+        case fullName = "full_name"
+    }
 }
 
 struct GroupMember: Codable {
@@ -229,7 +242,6 @@ struct GroupMemberWoBS: Codable {
     let group_id: UUID
     let profile_id: UUID
 }
-
 
 struct DailyZoneExit: Identifiable, Codable {
     var id: UUID
@@ -248,15 +260,15 @@ struct DailyZoneExit: Identifiable, Codable {
         case points_earned
     }
 
-    // Custom decoding to handle the `yyyy-MM-dd` date format
+    /// Custom decoding to handle the `yyyy-MM-dd` date format
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        id = try container.decode(UUID.self, forKey: .id)
-        profile_id = try container.decode(UUID.self, forKey: .profile_id)
-        zone_exit_id = try container.decode(UUID.self, forKey: .zone_exit_id)
-        exit_order = try container.decode(Int.self, forKey: .exit_order)
-        points_earned = try container.decode(Int.self, forKey: .points_earned)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.profile_id = try container.decode(UUID.self, forKey: .profile_id)
+        self.zone_exit_id = try container.decode(UUID.self, forKey: .zone_exit_id)
+        self.exit_order = try container.decode(Int.self, forKey: .exit_order)
+        self.points_earned = try container.decode(Int.self, forKey: .points_earned)
 
         // Custom decoding for the `date` field
         let dateString = try container.decode(String.self, forKey: .date)
@@ -265,12 +277,16 @@ struct DailyZoneExit: Identifiable, Codable {
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         guard let parsedDate = dateFormatter.date(from: dateString) else {
-            throw DecodingError.dataCorruptedError(forKey: .date, in: container, debugDescription: "Invalid date format: \(dateString)")
+            throw DecodingError.dataCorruptedError(
+                forKey: .date,
+                in: container,
+                debugDescription: "Invalid date format: \(dateString)"
+            )
         }
-        date = parsedDate
+        self.date = parsedDate
     }
 
-    // Custom encoding to ensure the date is saved as `yyyy-MM-dd`
+    /// Custom encoding to ensure the date is saved as `yyyy-MM-dd`
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -315,22 +331,29 @@ struct ZoneExit: Identifiable, Codable {
     var profile_id: UUID
     var zone_id: UUID
     var exit_time: Date
-    
+
     enum CodingKeys: String, CodingKey {
-        case id, profile_id, zone_id, exit_time
+        case id
+        case profile_id
+        case zone_id
+        case exit_time
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        profile_id = try container.decode(UUID.self, forKey: .profile_id)
-        zone_id = try container.decode(UUID.self, forKey: .zone_id)
-        
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.profile_id = try container.decode(UUID.self, forKey: .profile_id)
+        self.zone_id = try container.decode(UUID.self, forKey: .zone_id)
+
         let dateString = try container.decode(String.self, forKey: .exit_time)
         if let date = DateFormatter.zoneExitSupabaseFormat.date(from: dateString) {
-            exit_time = date
+            self.exit_time = date
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .exit_time, in: container, debugDescription: "Invalid date format: \(dateString)")
+            throw DecodingError.dataCorruptedError(
+                forKey: .exit_time,
+                in: container,
+                debugDescription: "Invalid date format: \(dateString)"
+            )
         }
     }
 }
@@ -343,7 +366,11 @@ struct GroupCompetition: Identifiable, Hashable, Codable {
     var created_at: Date
 
     enum CodingKeys: String, CodingKey {
-        case id, competition_name, competition_date, max_points, created_at
+        case id
+        case competition_name
+        case competition_date
+        case max_points
+        case created_at
     }
 
     init(id: UUID, competition_name: String, competition_date: Date, max_points: Int, created_at: Date) {
@@ -353,44 +380,49 @@ struct GroupCompetition: Identifiable, Hashable, Codable {
         self.max_points = max_points
         self.created_at = created_at
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        id = try container.decode(UUID.self, forKey: .id)
-        competition_name = try container.decode(String.self, forKey: .competition_name)
-        max_points = try container.decode(Int.self, forKey: .max_points)
-        
+
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.competition_name = try container.decode(String.self, forKey: .competition_name)
+        self.max_points = try container.decode(Int.self, forKey: .max_points)
+
         // Custom date decoding
         let dateString = try container.decode(String.self, forKey: .competition_date)
         let createdAtString = try container.decode(String.self, forKey: .created_at)
-        
+
         let isoDateFormatter = DateFormatter()
         isoDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         isoDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
+
         let simpleDateFormatter = DateFormatter()
         simpleDateFormatter.dateFormat = "yyyy-MM-dd"
         simpleDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
+
         if let competitionDate = simpleDateFormatter.date(from: dateString) {
             self.competition_date = competitionDate
         } else if let competitionDate = isoDateFormatter.date(from: dateString) {
             self.competition_date = competitionDate
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .competition_date, in: container, debugDescription: "Invalid date format: \(dateString)")
+            throw DecodingError.dataCorruptedError(
+                forKey: .competition_date,
+                in: container,
+                debugDescription: "Invalid date format: \(dateString)"
+            )
         }
 
         if let createdAtDate = isoDateFormatter.date(from: createdAtString) {
             self.created_at = createdAtDate
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .created_at, in: container, debugDescription: "Invalid date format: \(createdAtString)")
+            throw DecodingError.dataCorruptedError(
+                forKey: .created_at,
+                in: container,
+                debugDescription: "Invalid date format: \(createdAtString)"
+            )
         }
     }
 }
-
-
-
 
 struct GroupCompetitionLink: Identifiable, Codable {
     var id: UUID
