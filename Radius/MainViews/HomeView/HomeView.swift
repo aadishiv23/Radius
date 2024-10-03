@@ -163,24 +163,24 @@ struct HomeView: View {
 //                            }
                             // Main FAB
                             Button(action: {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                                withAnimation(.spring(response: 0.1, dampingFraction: 0.6, blendDuration: 0)) {
                                     showFABMenu.toggle()
                                 }
 
                                 if showFABMenu {
                                     // Show additional buttons with staggered delays
-                                    withAnimation(.spring().delay(0.05)) {
+                                    withAnimation(.spring().delay(0.025)) {
                                         showAddZoneButton = true
                                     }
-                                    withAnimation(.spring().delay(0.1)) {
+                                    withAnimation(.spring().delay(0.05)) {
                                         showFriendRequestButton = true
                                     }
                                 } else {
                                     // Hide additional buttons with reverse staggered delays
-                                    withAnimation(.spring().delay(0.05)) {
+                                    withAnimation(.spring().delay(0.025)) {
                                         showFriendRequestButton = false
                                     }
-                                    withAnimation(.spring().delay(0.1)) {
+                                    withAnimation(.spring().delay(0.05)) {
                                         showAddZoneButton = false
                                     }
                                 }
