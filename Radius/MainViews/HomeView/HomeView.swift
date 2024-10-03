@@ -35,6 +35,11 @@ struct HomeView: View {
     @State private var showZoneExitActionSheet = false
     @State private var userPoints: Int? = nil // To hold the user's points
 
+    @State private var showFABMenu = false
+    // New State Variables for FAB Animations
+    @State private var showFriendRequestButton = false
+    @State private var showAddZoneButton = false
+
     /// Initialization with repositories
     init(
         friendsRepository: FriendsRepository,
@@ -75,24 +80,13 @@ struct HomeView: View {
             .navigationTitle("Home")
             .toolbar {
                 // Plus button with a dropdown menu
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button {
-                            isPresentingZoneEditor = true
-                        } label: {
-                            Label("Add Zones", systemImage: "mappin.and.ellipse")
-                        }
-
                         Button {
                             isPresentingDebugMenu = true
                         } label: {
                             Label("Debug Menu", systemImage: "ladybug")
-                        }
-
-                        Button {
-                            isPresentingFriendRequests = true
-                        } label: {
-                            Label("Friend Requests", systemImage: "person.crop.circle.badge.plus")
                         }
 
                         Button {
@@ -101,7 +95,7 @@ struct HomeView: View {
                             Label("Manual Zone Exit", systemImage: "exclamationmark.circle")
                         }
                     } label: {
-                        Image(systemName: "plus")
+                        Image(systemName: "ladybug")
                     }
                 }
 
@@ -110,6 +104,105 @@ struct HomeView: View {
 //                    PointsPillView(points: userPoints)  // Reuse the PointsPillView created earlier
 //                }
             }
+            .overlay(
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 16) {
+                            // Additional Buttons with Staggered Animations
+                            if showAddZoneButton {
+                                Button(action: {
+                                    isPresentingZoneEditor = true
+                                }) {
+                                    Image(systemName: "mappin.and.ellipse")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(Color.blue.opacity(0.7))
+                                        .clipShape(Circle())
+                                        .shadow(radius: 5)
+                                }
+                                .transition(.scale.combined(with: .opacity))
+                            }
+
+                            if showFriendRequestButton {
+                                Button(action: {
+                                    isPresentingFriendRequests = true
+                                }) {
+                                    Image(systemName: "person.crop.circle.badge.plus")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(Color.blue.opacity(0.7))
+                                        .clipShape(Circle())
+                                        .shadow(radius: 5)
+                                }
+                                .transition(.scale.combined(with: .opacity))
+                            }
+//                            if showAddZoneButton {
+//                                Button(action: {
+//                                    isPresentingZoneEditor = true
+//                                }) {
+//                                    // Empty content as the style handles the visuals
+//                                }
+//                                .buttonStyle(GlassyButtonStyle(systemImage: "mappin.and.ellipse"))
+//                                .transition(.scale.combined(with: .opacity))
+//                            }
+//
+//                            if showFriendRequestButton {
+//                                Button(action: {
+//                                    isPresentingFriendRequests = true
+//                                }) {
+//                                    // Empty content as the style handles the visuals
+//                                }
+//                                .buttonStyle(
+//                                    GlassyButtonStyle(systemImage: "person.crop.circle.badge.plus")
+//                                )
+//                                .transition(.scale.combined(with: .opacity))
+//                            }
+                            // Main FAB
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                                    showFABMenu.toggle()
+                                }
+
+                                if showFABMenu {
+                                    // Show additional buttons with staggered delays
+                                    withAnimation(.spring().delay(0.05)) {
+                                        showAddZoneButton = true
+                                    }
+                                    withAnimation(.spring().delay(0.1)) {
+                                        showFriendRequestButton = true
+                                    }
+                                } else {
+                                    // Hide additional buttons with reverse staggered delays
+                                    withAnimation(.spring().delay(0.05)) {
+                                        showFriendRequestButton = false
+                                    }
+                                    withAnimation(.spring().delay(0.1)) {
+                                        showAddZoneButton = false
+                                    }
+                                }
+
+                                // Haptic Feedback (Optional)
+                                let generator = UIImpactFeedbackGenerator(style: .medium)
+                                generator.impactOccurred()
+                            }) {
+                                Image(systemName: "plus")
+                                    .rotationEffect(Angle(degrees: showFABMenu ? 135 : 0))
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 24, weight: .bold))
+                                    .frame(width: 60, height: 60)
+                                    .background(Color.blue)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            )
             .actionSheet(isPresented: $showZoneExitActionSheet) {
                 ActionSheet(
                     title: Text("Select Zone to Trigger Exit"),
@@ -399,5 +492,41 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     override open func viewDidLoad() {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.delegate = self
+    }
+}
+
+struct GlassyButtonStyle: ButtonStyle {
+    var backgroundColor = Color.blue
+    var foregroundColor: Color = .white
+    var systemImage: String
+
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            // Glassy Background
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            backgroundColor.opacity(0.7),
+                            backgroundColor.opacity(0.3)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                )
+                .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+
+            // Button Image
+            Image(systemName: systemImage)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(foregroundColor)
+                .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+                .animation(.spring(), value: configuration.isPressed)
+        }
+        .frame(width: 60, height: 60)
     }
 }
