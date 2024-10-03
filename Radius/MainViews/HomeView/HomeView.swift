@@ -35,10 +35,12 @@ struct HomeView: View {
     @State private var showZoneExitActionSheet = false
     @State private var userPoints: Int? = nil // To hold the user's points
 
+    // Updated State Variables
     @State private var showFABMenu = false
-    // New State Variables for FAB Animations
-    @State private var showFriendRequestButton = false
-    @State private var showAddZoneButton = false
+    @State private var addZoneButtonOffset = CGSize.zero
+    @State private var friendRequestButtonOffset = CGSize.zero
+    @State private var addZoneButtonScale: CGFloat = 0.0
+    @State private var friendRequestButtonScale: CGFloat = 0.0
 
     /// Initialization with repositories
     init(
@@ -109,88 +111,46 @@ struct HomeView: View {
                     Spacer()
                     HStack {
                         Spacer()
-                        VStack(spacing: 16) {
-                            // Additional Buttons with Staggered Animations
-                            if showAddZoneButton {
-                                Button(action: {
-                                    isPresentingZoneEditor = true
-                                }) {
-                                    Image(systemName: "mappin.and.ellipse")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .background(Color.blue.opacity(0.7))
-                                        .clipShape(Circle())
-                                        .shadow(radius: 5)
-                                }
-                                .transition(.scale.combined(with: .opacity))
-                            }
-
-                            if showFriendRequestButton {
-                                Button(action: {
-                                    isPresentingFriendRequests = true
-                                }) {
-                                    Image(systemName: "person.crop.circle.badge.plus")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .background(Color.blue.opacity(0.7))
-                                        .clipShape(Circle())
-                                        .shadow(radius: 5)
-                                }
-                                .transition(.scale.combined(with: .opacity))
-                            }
-//                            if showAddZoneButton {
-//                                Button(action: {
-//                                    isPresentingZoneEditor = true
-//                                }) {
-//                                    // Empty content as the style handles the visuals
-//                                }
-//                                .buttonStyle(GlassyButtonStyle(systemImage: "mappin.and.ellipse"))
-//                                .transition(.scale.combined(with: .opacity))
-//                            }
-//
-//                            if showFriendRequestButton {
-//                                Button(action: {
-//                                    isPresentingFriendRequests = true
-//                                }) {
-//                                    // Empty content as the style handles the visuals
-//                                }
-//                                .buttonStyle(
-//                                    GlassyButtonStyle(systemImage: "person.crop.circle.badge.plus")
-//                                )
-//                                .transition(.scale.combined(with: .opacity))
-//                            }
+                        ZStack {
                             // Main FAB
                             Button(action: {
-                                withAnimation(.spring(response: 0.1, dampingFraction: 0.6, blendDuration: 0)) {
-                                    showFABMenu.toggle()
-                                }
-
-                                if showFABMenu {
-                                    // Show additional buttons with staggered delays
-                                    withAnimation(.spring().delay(0.025)) {
-                                        showAddZoneButton = true
-                                    }
-                                    withAnimation(.spring().delay(0.05)) {
-                                        showFriendRequestButton = true
-                                    }
-                                } else {
-                                    // Hide additional buttons with reverse staggered delays
-                                    withAnimation(.spring().delay(0.025)) {
-                                        showFriendRequestButton = false
-                                    }
-                                    withAnimation(.spring().delay(0.05)) {
-                                        showAddZoneButton = false
-                                    }
-                                }
-
-                                // Haptic Feedback (Optional)
+                                // Haptic Feedback
                                 let generator = UIImpactFeedbackGenerator(style: .medium)
                                 generator.impactOccurred()
+
+                                showFABMenu.toggle()
+
+                                if showFABMenu {
+                                    // Animate buttons appearing
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                        addZoneButtonOffset = CGSize(width: 0, height: -80)
+                                        addZoneButtonScale = 1.0
+                                    }
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6).delay(0.05)) {
+                                        friendRequestButtonOffset = CGSize(width: 0, height: -160)
+                                        friendRequestButtonScale = 1.0
+                                    }
+                                } else {
+                                    // Animate buttons disappearing with a jump up before falling
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.45)) {
+                                        // Move up slightly (negative offset increases)
+                                        friendRequestButtonOffset = CGSize(width: 0, height: -180)
+                                        friendRequestButtonScale = 0.0
+                                    }
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.45).delay(0.05)) {
+                                        // Move up slightly
+                                        addZoneButtonOffset = CGSize(width: 0, height: -100)
+                                        addZoneButtonScale = 0.0
+                                    }
+                                    // Then animate buttons falling into FAB
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7).delay(0.1)) {
+                                        friendRequestButtonOffset = .zero
+                                        addZoneButtonOffset = .zero
+                                    }
+                                }
                             }) {
                                 Image(systemName: "plus")
-                                    .rotationEffect(Angle(degrees: showFABMenu ? 135 : 0))
+                                    .rotationEffect(Angle(degrees: showFABMenu ? 45 : 0))
                                     .foregroundColor(.white)
                                     .font(.system(size: 24, weight: .bold))
                                     .frame(width: 60, height: 60)
@@ -198,6 +158,58 @@ struct HomeView: View {
                                     .clipShape(Circle())
                                     .shadow(radius: 5)
                             }
+
+                            // Add Zone Button
+                            Button(action: {
+                                isPresentingZoneEditor = true
+                            }) {
+                                Image(systemName: "mappin.and.ellipse")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Circle()
+                                                    .fill(Color.blue.opacity(0.4))
+                                            )
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+                            .offset(addZoneButtonOffset)
+                            .scaleEffect(addZoneButtonScale)
+
+                            // Friend Request Button
+                            Button(action: {
+                                isPresentingFriendRequests = true
+                            }) {
+                                Image(systemName: "person.crop.circle.badge.plus")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Circle()
+                                                    .fill(Color.blue.opacity(0.4))
+                                            )
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+                            .offset(friendRequestButtonOffset)
+                            .scaleEffect(friendRequestButtonScale)
                         }
                         .padding()
                     }
