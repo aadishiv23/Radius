@@ -17,10 +17,40 @@ struct InfoView: View {
     @State private var isPresentingJoinGroupView = false
     @State private var isPresentingCompetitionManagerView = false
 
+    @State private var showFABMenu = false
+    @State private var createGroupButtonOffset = CGSize.zero
+    @State private var joinGroupButtonOffset = CGSize.zero
+    @State private var manageCompetitionsButtonOffset = CGSize.zero
+    @State private var createGroupButtonScale: CGFloat = 0.0
+    @State private var joinGroupButtonScale: CGFloat = 0.0
+    @State private var manageCompetitionsButtonScale: CGFloat = 0.0
+
+    // Constants for button positions
+    private let buttonRadius: CGFloat = 100
+    private let sqrt2over2: CGFloat = 0.7071
+
+    /// Final offsets for each button
+    private var createGroupFinalOffset: CGSize {
+        CGSize(width: -buttonRadius, height: 0)
+    }
+
+    private var joinGroupFinalOffset: CGSize {
+        CGSize(width: -buttonRadius * sqrt2over2, height: -buttonRadius * sqrt2over2)
+    }
+
+    private var manageCompetitionsFinalOffset: CGSize {
+        CGSize(width: 0, height: -buttonRadius)
+    }
+
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     // Other EnvironmentObjects...
 
-    init(friendsRepository: FriendsRepository, groupsRepository: GroupsRepository, competitionsRepository: CompetitionsRepository, userId: UUID) {
+    init(
+        friendsRepository: FriendsRepository,
+        groupsRepository: GroupsRepository,
+        competitionsRepository: CompetitionsRepository,
+        userId: UUID
+    ) {
         _viewModel = StateObject(wrappedValue: InfoViewModel(
             friendsRepository: friendsRepository,
             groupsRepository: groupsRepository,
@@ -35,7 +65,7 @@ struct InfoView: View {
                 VStack(spacing: 16) {
                     // Friends Section
                     CollapsibleSection(title: "Friends") {
-                        if $viewModel.filteredFriends.isEmpty && !viewModel.searchText.isEmpty {
+                        if $viewModel.filteredFriends.isEmpty, !viewModel.searchText.isEmpty {
                             noResultsView(for: "Friends")
                         } else {
                             ForEach(viewModel.filteredFriends) { friend in
@@ -48,7 +78,7 @@ struct InfoView: View {
 
                     // Groups Section
                     CollapsibleSection(title: "Groups") {
-                        if viewModel.filteredGroups.isEmpty && !viewModel.searchText.isEmpty {
+                        if viewModel.filteredGroups.isEmpty, !viewModel.searchText.isEmpty {
                             noResultsView(for: "Groups")
                         } else if viewModel.filteredGroups.isEmpty {
                             emptyGroupsView()
@@ -62,7 +92,7 @@ struct InfoView: View {
 
                     // Competitions Section
                     CollapsibleSection(title: "Competitions") {
-                        if viewModel.filteredCompetitions.isEmpty && !viewModel.searchText.isEmpty {
+                        if viewModel.filteredCompetitions.isEmpty, !viewModel.searchText.isEmpty {
                             noResultsView(for: "Competitions")
                         } else if viewModel.filteredCompetitions.isEmpty {
                             emptyCompetitionsView()
@@ -79,50 +109,196 @@ struct InfoView: View {
                 .padding(.top)
             }
             .navigationTitle("Friends Info")
-            .searchable(text: $viewModel.searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search Friends, Groups, Competitions")
+            .searchable(
+                text: $viewModel.searchText,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: "Search Friends, Groups, Competitions"
+            )
             .refreshable {
                 do {
                     try await viewModel.refreshAllData()
                 } catch {
-                    print("fuck")
+                    print("Error during refreshable: \(error.localizedDescription)")
                 }
             }
             .scrollContentBackground(.hidden)
             .background(
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.white.opacity(0.5), Color.yellow.opacity(0.5)]),
+                    gradient: Gradient(colors: [
+                        Color.blue.opacity(0.5),
+                        Color.white.opacity(0.5),
+                        Color.yellow.opacity(0.5)
+                    ]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
                 .edgesIgnoringSafeArea(.all)
             )
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button(action: {
-                            // Navigate to Create Group View
-                            isPresentingCreateGroupView = true
-                        }) {
-                            Label("Create Group", systemImage: "person.3.fill")
-                        }
-                        Button(action: {
-                            // Navigate to Join Group View
-                            isPresentingJoinGroupView = true
-                        }) {
-                            Label("Join Group", systemImage: "person.crop.circle.badge.plus")
-                        }
+//            .toolbar {
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    Menu {
+//                        Button(action: {
+//                            // Navigate to Create Group View
+//                            isPresentingCreateGroupView = true
+//                        }) {
+//                            Label("Create Group", systemImage: "person.3.fill")
+//                        }
+//                        Button(action: {
+//                            // Navigate to Join Group View
+//                            isPresentingJoinGroupView = true
+//                        }) {
+//                            Label("Join Group", systemImage: "person.crop.circle.badge.plus")
+//                        }
+//
+//                        Button(action: {
+//                            // Navigate to Competition Manager View
+//                            isPresentingCompetitionManagerView = true
+//                        }) {
+//                            Label("Manage Competitions", systemImage: "flag.2.crossed")
+//                        }
+//                    } label: {
+//                        Image(systemName: "plus")
+//                    }
+//                }
+//            }
+            .overlay(
+                VStack {
+                    Spacer()
+                    // Main FAB and action buttons
+                    HStack {
+                        // Main FAB
+                        Spacer()
 
-                        Button(action: {
-                            // Navigate to Competition Manager View
-                            isPresentingCompetitionManagerView = true
-                        }) {
-                            Label("Manage Competitions", systemImage: "flag.2.crossed")
+                        ZStack {
+                            Button(action: {
+                                // Haptic Feedback
+                                let generator = UIImpactFeedbackGenerator(style: .medium)
+                                generator.impactOccurred()
+                                
+                                showFABMenu.toggle()
+                                
+                                if showFABMenu {
+                                    // Animate buttons appearing
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                                        createGroupButtonOffset = createGroupFinalOffset
+                                        createGroupButtonScale = 1.0
+                                    }
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.05)) {
+                                        joinGroupButtonOffset = joinGroupFinalOffset
+                                        joinGroupButtonScale = 1.0
+                                    }
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.1)) {
+                                        manageCompetitionsButtonOffset = manageCompetitionsFinalOffset
+                                        manageCompetitionsButtonScale = 1.0
+                                    }
+                                } else {
+                                    // Animate buttons disappearing
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45)) {
+                                        manageCompetitionsButtonOffset = .zero
+                                        manageCompetitionsButtonScale = 0.0
+                                    }
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.05)) {
+                                        joinGroupButtonOffset = .zero
+                                        joinGroupButtonScale = 0.0
+                                    }
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.1)) {
+                                        createGroupButtonOffset = .zero
+                                        createGroupButtonScale = 0.0
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "person.3.sequence.fill")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 24, weight: .bold))
+                                    .frame(width: 60, height: 60)
+                                    .background(Color.blue)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
+                            }
+                            
+                            // Create Group Button
+                            Button(action: {
+                                isPresentingCreateGroupView = true
+                            }) {
+                                Image(systemName: "person.3.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Circle()
+                                                    .fill(Color.green.opacity(0.4))
+                                            )
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+                            .offset(createGroupButtonOffset)
+                            .scaleEffect(createGroupButtonScale)
+                            
+                            // Join Group Button
+                            Button(action: {
+                                isPresentingJoinGroupView = true
+                            }) {
+                                Image(systemName: "person.crop.circle.badge.plus")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Circle()
+                                                    .fill(Color.orange.opacity(0.4))
+                                            )
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+                            .offset(joinGroupButtonOffset)
+                            .scaleEffect(joinGroupButtonScale)
+                            
+                            // Manage Competitions Button
+                            Button(action: {
+                                isPresentingCompetitionManagerView = true
+                            }) {
+                                Image(systemName: "flag.2.crossed")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Circle()
+                                                    .fill(Color.purple.opacity(0.4))
+                                            )
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+                            .offset(manageCompetitionsButtonOffset)
+                            .scaleEffect(manageCompetitionsButtonScale)
                         }
-                    } label: {
-                        Image(systemName: "plus")
                     }
+                    .padding()
                 }
-            }
+            )
+
             .fullScreenCover(isPresented: $isPresentingCompetitionManagerView) {
                 CompetitionManagerView().environmentObject(friendsDataManager)
             }
@@ -137,14 +313,14 @@ struct InfoView: View {
                     do {
                         try await viewModel.refreshAllData()
                     } catch {
-                        print("fuck")
+                        print("Error during onAppear: \(error.localizedDescription)")
                     }
                 }
             }
         }
     }
 
-    // Helper Views
+    /// Helper Views
     private func noResultsView(for category: String) -> some View {
         VStack {
             Image(systemName: "magnifyingglass")
@@ -313,7 +489,8 @@ struct CompetitionCard: View {
         .padding()
         .background(
             LinearGradient(
-                gradient: Gradient(colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.4)]), // Adjusted for better contrast
+                gradient: Gradient(colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.4)]),
+                // Adjusted for better contrast
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -388,7 +565,7 @@ struct CompetitionCard: View {
 
 struct CollapsibleSection<Content: View>: View {
     let title: String
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded = true
     let content: Content
 
     init(title: String, @ViewBuilder content: () -> Content) {
@@ -436,3 +613,4 @@ struct CollapsibleSection<Content: View>: View {
         .padding(.horizontal)
     }
 }
+
