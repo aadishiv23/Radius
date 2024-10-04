@@ -12,11 +12,11 @@ class CompetitionManager {
     @Published var competitions: [GroupCompetition] = []
 
     private let supabaseClient: SupabaseClient
-    
+
     init(supabaseClient: SupabaseClient) {
         self.supabaseClient = supabaseClient
     }
-    
+
     func fetchCompetitions() async throws {
         let fetchedCompetitions: [GroupCompetition] = try await supabaseClient
             .from("group_competitions")
@@ -37,8 +37,13 @@ class CompetitionManager {
             .execute()
             .value
     }
-    
-    func createCompetition(competitionName: String, competitionDate: Date, maxPoints: Int, groupIds: [UUID]) async throws -> GroupCompetition {
+
+    func createCompetition(
+        competitionName: String,
+        competitionDate: Date,
+        maxPoints: Int,
+        groupIds: [UUID]
+    ) async throws -> GroupCompetition {
         let competition = GroupCompetition(
             id: UUID(),
             competition_name: competitionName,
@@ -46,13 +51,13 @@ class CompetitionManager {
             max_points: maxPoints,
             created_at: Date()
         )
-        
+
         // Insert competition
         try await supabaseClient
             .from("group_competitions")
             .insert(competition)
             .execute()
-        
+
         // Link groups to the competition
         for groupId in groupIds {
             let link = GroupCompetitionLink(id: UUID(), competition_id: competition.id, group_id: groupId)
@@ -61,7 +66,7 @@ class CompetitionManager {
                 .insert(link)
                 .execute()
         }
-        
+
         // Update max points based on the total number of profiles in linked groups
         let profileCount = try await fetchProfileCount(for: competition.id)
         let updatedCompetition = GroupCompetition(
@@ -71,25 +76,25 @@ class CompetitionManager {
             max_points: profileCount,
             created_at: competition.created_at
         )
-        
+
         try await supabaseClient
             .from("group_competitions")
             .update(updatedCompetition)
             .eq("id", value: competition.id.uuidString)
             .execute()
-        
+
         return updatedCompetition
     }
-    
+
     private func fetchProfileCount(for competition_id: UUID) async throws -> Int {
         let profileCountResponse: Int = try await supabaseClient
             .rpc("count_profiles_in_competition", params: ["comp_id": competition_id.uuidString])
             .execute()
             .value
-        
+
         return profileCountResponse
     }
-    
+
     func fetchDailyPoints(from date: Date, for profileId: UUID) async throws -> Int {
         // Get the start of the day in UTC
         let dateFormatter = DateFormatter()
@@ -114,14 +119,28 @@ class CompetitionManager {
         return totalPoints
     }
 
-
     func fetchCompetitionPoints(for profileId: UUID, competitionId: UUID) async throws -> Int {
         let pointsResponse: Int = try await supabaseClient
-            .rpc("fetch_competition_points", params: ["comp_id": competitionId.uuidString, "profile_id": profileId.uuidString])
+            .rpc(
+                "fetch_competition_points",
+                params: ["comp_id": competitionId.uuidString, "profile_id": profileId.uuidString]
+            )
             .execute()
             .value
-        
+
         return pointsResponse
+    }
+
+    func fetchDailyPointsOverTime(for profileId: UUID) async throws -> [DailyPoint] {
+        let dailyPoints: [DailyPoint] = try await supabaseClient
+            .from("daily_member_points_view")
+            .select("*")
+            .eq("profile_id", value: profileId.uuidString)
+            .order("date", ascending: true)
+            .execute()
+            .value
+
+        return dailyPoints
     }
 
     func fetchCompetitors(for competitionId: UUID) async throws -> [GroupMember] {
@@ -131,8 +150,8 @@ class CompetitionManager {
             .eq("competition_id", value: competitionId.uuidString)
             .execute()
             .value
-        
-        let groupIds = groupCompetitionLinks.map { $0.group_id }
+
+        let groupIds = groupCompetitionLinks.map(\.group_id)
         return try await fetchCompetitorsFromGroups(groupIds)
     }
 
@@ -140,11 +159,44 @@ class CompetitionManager {
         let groupMembers: [GroupMember] = try await supabaseClient
             .from("group_members")
             .select("profile_id, group_id, profiles(full_name), groups(name)")
-            .in("group_id", values: groupIds.map { $0.uuidString })
+            .in("group_id", values: groupIds.map(\.uuidString))
             .execute()
             .value
-        
+
         return groupMembers
+    }
+
+    func fetchPointsForProfiles(profileIds: [UUID], dateString: String) async throws -> [UUID: Int] {
+        let profileIdStrings = profileIds.map { $0.uuidString }
+        let dailyPoints: [DailyPoint] = try await supabaseClient
+            .from("daily_member_points_view")
+            .select("*")
+            .in("profile_id", values: profileIdStrings)
+            .eq("date", value: dateString)
+            .execute()
+            .value
+
+        var pointsMap: [UUID: Int] = [:]
+        for point in dailyPoints {
+            pointsMap[point.profile_id, default: 0] += point.points
+        }
+
+        return pointsMap
+    }
+
+    func fetchDailyPointsForProfiles(profileIds: [UUID]) async throws -> [UUID: [DailyPoint]] {
+        let profileIdStrings = profileIds.map { $0.uuidString }
+        let dailyPoints: [DailyPoint] = try await supabaseClient
+            .from("daily_member_points_view")
+            .select("*")
+            .in("profile_id", values: profileIdStrings)
+            .order("profile_id", ascending: true)
+            .order("date", ascending: true)
+            .execute()
+            .value
+
+        let groupedPoints = Dictionary(grouping: dailyPoints, by: { $0.profile_id })
+        return groupedPoints
     }
 
 }

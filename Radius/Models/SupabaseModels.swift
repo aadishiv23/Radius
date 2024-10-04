@@ -435,3 +435,68 @@ struct FriendRelation: Codable {
     var profile_id1: UUID
     var profile_id2: UUID
 }
+
+struct DailyPoint: Identifiable, Codable {
+    var id: UUID { profile_id } // Assuming profile_id uniquely identifies the data point
+    var profile_id: UUID
+    var date: Date
+    var points: Int
+
+    enum CodingKeys: String, CodingKey {
+        case profile_id
+        case date
+        case points
+    }
+
+    init(profile_id: UUID, date: Date, points: Int) {
+        self.profile_id = profile_id
+        self.date = date
+        self.points = points
+    }
+
+    /// Custom decoding to handle the `yyyy-MM-dd` date format from UTC
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.profile_id = try container.decode(UUID.self, forKey: .profile_id)
+        self.points = try container.decode(Int.self, forKey: .points)
+
+        // Decode the date string from UTC `yyyy-MM-dd` format
+        let dateString = try container.decode(String.self, forKey: .date)
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // UTC timezone
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+
+        guard let parsedDate = dateFormatter.date(from: dateString) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .date,
+                in: container,
+                debugDescription: "Invalid date format: \(dateString)"
+            )
+        }
+        self.date = parsedDate
+    }
+
+    /// Custom encoding to ensure the date is saved as `yyyy-MM-dd` in UTC
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(profile_id, forKey: .profile_id)
+        try container.encode(points, forKey: .points)
+
+        // Encode the date as a string in `yyyy-MM-dd` format in UTC
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // UTC timezone
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: date)
+
+        try container.encode(dateString, forKey: .date)
+    }
+
+    /// Helper method to get the date as a string in the user's local timezone
+    func localDateString() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone.current // User's local timezone
+        dateFormatter.dateStyle = .medium
+        return dateFormatter.string(from: date)
+    }
+}

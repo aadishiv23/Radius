@@ -9,20 +9,26 @@ import Charts
 import Foundation
 import SwiftUI
 
-import Charts
-import SwiftUI
+enum ChartType: String, CaseIterable {
+    case bar = "Bar Chart"
+    case line = "Line Chart"
+}
 
 struct LeaderboardView: View {
     @StateObject private var viewModel: LeaderboardViewModel
+    @State private var selectedChartType: ChartType = .bar
 
     init(friendsDataManager: FriendsDataManager, competitionManager: CompetitionManager) {
-        _viewModel = StateObject(wrappedValue: LeaderboardViewModel(friendsDataManager: friendsDataManager, competitionManager: competitionManager))
+        _viewModel = StateObject(wrappedValue: LeaderboardViewModel(
+            friendsDataManager: friendsDataManager,
+            competitionManager: competitionManager
+        ))
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // Segmented Picker
+                // Segmented Picker for Category
                 Picker("Category", selection: $viewModel.selectedCategory) {
                     ForEach(LeaderboardCategory.allCases, id: \.self) { category in
                         Text(category.rawValue).tag(category)
@@ -38,23 +44,18 @@ struct LeaderboardView: View {
                     competitionPicker
                 }
 
-                // Chart
+                // Charts (Bar and Line)
                 leaderboardChart
-                    .frame(height: 200)
-                    .padding()
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(15)
-                    .padding(.horizontal)
 
                 // Leaderboard List
                 leaderboardList
             }
-        }
-        .navigationTitle("Leaderboard")
-        .onAppear {
-            viewModel.fetchLeaderboardData()
-            Task {
-                await viewModel.friendsDataManager.fetchUserGroups()  // Fetch user groups directly
+            .navigationTitle("Leaderboard")
+            .onAppear {
+                viewModel.fetchLeaderboardData()
+                Task {
+                    await viewModel.friendsDataManager.fetchUserGroups()
+                }
             }
         }
     }
@@ -69,7 +70,7 @@ struct LeaderboardView: View {
         .pickerStyle(MenuPickerStyle())
         .onChange(of: viewModel.selectedGroup) { newGroup in
             if let group = newGroup {
-                viewModel.fetchLeaderboardData()  // Ensure fetching happens immediately after selection
+                viewModel.fetchLeaderboardData() // Ensure fetching happens immediately after selection
             }
         }
     }
@@ -83,17 +84,58 @@ struct LeaderboardView: View {
         }
         .pickerStyle(MenuPickerStyle())
         .onAppear {
-                print("Competitions: \(viewModel.competitionManager.competitions)")
-            }
+            print("Competitions: \(viewModel.competitionManager.competitions)")
+        }
     }
 
     private var leaderboardChart: some View {
-        Chart(viewModel.members.prefix(5)) { member in
-            BarMark(
-                x: .value("Name", member.name),
-                y: .value("Points", member.points)
-            )
-            .foregroundStyle(Color.blue.gradient)
+        VStack {
+            Picker("Chart Type", selection: $selectedChartType) {
+                ForEach(ChartType.allCases, id: \.self) { type in
+                    Text(type.rawValue).tag(type)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal)
+
+            if selectedChartType == .bar {
+                // Bar Chart for today's points
+                Chart(viewModel.members.prefix(5)) { member in
+                    BarMark(
+                        x: .value("Name", member.name),
+                        y: .value("Points", member.points)
+                    )
+                    .foregroundStyle(Color.blue.gradient)
+                }
+                .frame(height: 200)
+                .padding()
+                .background(Color.secondary.opacity(0.1))
+                .cornerRadius(15)
+                .padding(.horizontal)
+            } else if selectedChartType == .line {
+                // Line Chart for daily points over time
+                if let dailyPointsData = aggregatedDailyPointsData() {
+                    Chart(dailyPointsData) { dataPoint in
+                        ForEach(dataPoint.points, id: \.profile_id) { point in
+                            LineMark(
+                                x: .value("Date", point.date),
+                                y: .value("Points", point.points),
+                                series: .value("Member", dataPoint.memberName)
+                            )
+                        }
+                        .foregroundStyle(by: .value("Member", dataPoint.memberName))
+                    }
+                    .chartLegend(.visible)
+                    .frame(height: 200)
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(15)
+                    .padding(.horizontal)
+                } else {
+                    Text("Loading daily points...")
+                        .frame(height: 200)
+                }
+            }
         }
     }
 
@@ -134,45 +176,37 @@ struct LeaderboardView: View {
 
     private func medalColor(for index: Int) -> Color {
         switch index {
-        case 0: return .yellow // Gold
-        case 1: return .gray // Silver
-        case 2: return .brown // Bronze
-        default: return .clear
+        case 0: .yellow // Gold
+        case 1: .gray // Silver
+        case 2: .brown // Bronze
+        default: .clear
         }
     }
+
+    private func aggregatedDailyPointsData() -> [MemberDailyPoints]? {
+        let topMembers = viewModel.members.prefix(5)
+        var data: [MemberDailyPoints] = []
+
+        for member in topMembers {
+            if let dailyPoints = viewModel.memberDailyPoints[member.id] {
+                data.append(MemberDailyPoints(memberName: member.name, points: dailyPoints))
+            } else {
+                return nil // Data is not fully loaded yet
+            }
+        }
+
+        return data
+    }
+
 }
 
-// extension LeaderboardView {
-//    private func fetchLeaderboardData() async {
-//        do {
-//            switch selectedCategory {
-//            case .groups:
-//                if let group = selectedGroup {
-//                    let profiles = try await friendsDataManager.fetchGroupMembersProfiles(groupId: group.id)
-//                    members = profiles.map { profile in
-//                        // Fetch daily points for each profile
-//                        let points = try await competitionManager.fetchDailyPoints(for: profile.id, groupId: group.id)
-//                        return LeaderboardMember(id: profile.id, name: profile.full_name, points: points)
-//                    }
-//                }
-//            case .competitions:
-//                if let competition = selectedCompetition {
-//                    let groupCompetitors = try await competitionManager.fetchCompetitors(for: competition.id)
-//                    members = groupCompetitors.map { competitor in
-//                        let points = try await competitionManager.fetchCompetitionPoints(for: competitor.profile_id, competitionId: competition.id)
-//                        return LeaderboardMember(id: competitor.profile_id, name: competitor.name, groupName: competitor.group_name, points: points)
-//                    }
-//                }
-//            }
-//            members.sort { $0.points > $1.points }
-//        } catch {
-//            print("Failed to fetch leaderboard data: \(error)")
-//        }
-//    }
-//
-// }
+struct MemberDailyPoints: Identifiable {
+    let id = UUID()
+    let memberName: String
+    let points: [DailyPoint]
+}
 
-// Mock data structures
+/// Mock data structures
 struct MockGroup: Identifiable, Hashable {
     let id: UUID
     let name: String
@@ -190,7 +224,7 @@ struct LeaderboardMember: Identifiable, Hashable {
     let points: Int
 }
 
-// Mock data for groups and competitions
+/// Mock data for groups and competitions
 let mockGroups: [MockGroup] = [
     MockGroup(id: UUID(), name: "Group 1"),
     MockGroup(id: UUID(), name: "Group 2"),
@@ -202,109 +236,3 @@ let mockCompetitions: [MockGroupCompetition] = [
     MockGroupCompetition(id: UUID(), competition_name: "Competition 2"),
     MockGroupCompetition(id: UUID(), competition_name: "Competition 3")
 ]
-
-// Preview
-// struct LeaderboardView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            LeaderboardView()
-//        }
-//    }
-// }
-
-// struct LeaderboardView: View {
-//    @StateObject var friendsDataManager = FriendsDataManager(supabaseClient: supabase)
-//    @State private var selectedGroup: Group? = nil
-//    @State private var members: [Profile] = []
-//
-//    var body: some View {
-//        VStack {
-//            // Group Picker
-//            Picker("Select a Group", selection: $selectedGroup) {
-//                ForEach(friendsDataManager.userGroups, id: \.id) { group in
-//                    Text(group.name).tag(group as Group?)
-//                }
-//            }
-//            .pickerStyle(MenuPickerStyle())
-//            .padding()
-//
-//            // Podium for Top 3 Members
-//            if members.count >= 1 {
-//                podiumView
-//            }
-//
-//            // List for 4th and Beyond
-//            if members.count >= 3 {
-//                List {
-//                    ForEach(0..<members.count, id: \.self) { index in
-//                        memberRow(member: members[index], rank: index + 1)
-//                    }
-//                }
-//            }
-//        }
-//        .navigationTitle("Leaderboard")
-//        .onAppear {
-//            Task {
-//                await friendsDataManager.fetchUserGroups()
-//                if let firstGroup = friendsDataManager.userGroups.first {
-//                    selectedGroup = firstGroup
-//                }
-//            }
-//        }
-//        .onChange(of: selectedGroup) { newGroup in
-//            if let group = newGroup {
-//                Task {
-//                    members = (try? await friendsDataManager.fetchGroupMembersProfiles(groupId: group.id)) ?? []
-//                    print("Members fetched: \(members)")  // Debug output
-//                }
-//            }
-//        }
-//    }
-//
-//    private var podiumView: some View {
-//        HStack {
-//            // 2nd Place
-//            if members.count > 1 {
-//                podiumColumn(member: members[1], rank: 2)
-//                    .frame(height: 150)
-//            }
-//
-//            // 1st Place
-//            podiumColumn(member: members[0], rank: 1)
-//                .frame(height: 200)
-//
-//            // 3rd Place
-//            if members.count > 2 {
-//                podiumColumn(member: members[2], rank: 3)
-//                    .frame(height: 100)
-//            }
-//        }
-//        .padding()
-//    }
-//
-//    private func podiumColumn(member: Profile, rank: Int) -> some View {
-//        VStack {
-//            Text("\(rank)")
-//                .font(.title)
-//                .foregroundColor(.white)
-//                .frame(width: 50, height: 50)
-//                .background(Circle().fill(Color.blue))
-//
-//            Text(member.full_name)
-//                .font(.headline)
-//                .padding(.top, 8)
-//        }
-//        .frame(maxWidth: .infinity)
-//        .background(Color.gray.opacity(0.2))
-//        .cornerRadius(12)
-//    }
-//
-//    private func memberRow(member: Profile, rank: Int) -> some View {
-//        HStack {
-//            Text("\(rank). \(member.full_name)")
-//                .font(.headline)
-//            Spacer()
-//        }
-//        .padding(.vertical, 8)
-//    }
-// }
