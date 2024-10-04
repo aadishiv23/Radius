@@ -138,19 +138,28 @@ class InfoViewModel: ObservableObject {
     
     // Fetch and refresh all data
     func refreshAllData() async throws {
+        print("Starting to refresh all data...")
+        
         async let fetchedFriends = friendsRepository.fetchFriends(for: userId)
         async let fetchedGroups = groupsRepository.fetchGroups(for: userId)
         async let fetchedCompetitions = competitionsRepository.fetchCompetitions(for: userId)
         
-        let (friends, groups, competitions) = try await (fetchedFriends, fetchedGroups, fetchedCompetitions)
-        
-        await MainActor.run {
-            self.friends = friends
-            self.userGroups = groups
-            self.userCompetitions = competitions
+        do {
+            let (friends, groups, competitions) = try await (fetchedFriends, fetchedGroups, fetchedCompetitions)
             
-            // Initialize filtered data
-            self.filterContent(searchQuery: self.searchText)
+            await MainActor.run {
+                self.friends = friends
+                self.userGroups = groups
+                self.userCompetitions = competitions
+                
+                // Initialize filtered data
+                self.filterContent(searchQuery: self.searchText)
+            }
+            
+            print("Successfully refreshed all data.")
+        } catch {
+            print("Error in refreshAllData: \(error.localizedDescription)")
+            throw error // Rethrow to let the caller handle it
         }
     }
     
