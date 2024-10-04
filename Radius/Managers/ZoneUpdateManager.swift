@@ -71,7 +71,10 @@ final class ZoneUpdateManager {
 
         for group in userGroups {
             for zoneId in zoneIds {
-                // Step 1: Check if a daily zone exit already exists for the profile, zone, and date
+                // Step 1: Fetch zone details to check its category
+                let zone: Zone = try await fetchZone(for: zoneId)
+
+                // Step 2: Check if a daily zone exit already exists for the profile, zone, and date
                 let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
                     .from("daily_zone_exits")
                     .select("*")
@@ -80,20 +83,37 @@ final class ZoneUpdateManager {
                     .eq("date", value: currentDateString)
                     .execute()
                     .value
-                
+
                 // If there is already an exit for this profile, zone, and date, skip inserting
                 guard existingDailyZoneExit.isEmpty else {
-                    print("Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on \(currentDateString)")
+                    print(
+                        "Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on \(currentDateString)"
+                    )
                     continue
                 }
 
-                // Step 2: Fetch the most recent zone_exit_id for the profile and zone
+                // Step 3: If the zone is of category "home", ensure only one exit per day is counted
+                if zone.category == .home {
+                    let hasExitedToday = try await hasAlreadyExitedToday(
+                        for: profileId,
+                        zoneId: zoneId,
+                        category: zone.category
+                    )
+                    if hasExitedToday {
+                        print(
+                            "User \(profileId) has already exited home zone \(zoneId) today. Skipping further exits."
+                        )
+                        continue
+                    }
+                }
+
+                // Step 24: Fetch the most recent zone_exit_id for the profile and zone
                 guard let zoneExitId = try await fetchLatestZoneExitId(for: profileId, zoneId: zoneId) else {
                     print("No zone exit found for profile \(profileId) and zone \(zoneId)")
                     continue
                 }
 
-                // Step 2: Prepare parameters for the RPC function
+                // Step 5: Prepare parameters for the RPC function
                 let params: [String: String] = [
                     "p_profile_id": profileId.uuidString,
                     "p_zone_exit_id": zoneExitId.uuidString,
@@ -103,7 +123,7 @@ final class ZoneUpdateManager {
                 ]
 
                 do {
-                    // Step 3: Call the RPC function
+                    // Step 6: Call the RPC function
                     _ = try await supabaseClient
                         .rpc("insert_daily_zone_exit", params: params)
                         .execute()
