@@ -122,35 +122,35 @@ struct HomeView: View {
 
                                 if showFABMenu {
                                     // Animate buttons appearing
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.05)) {
                                         addZoneButtonOffset = CGSize(width: 0, height: -80)
                                         addZoneButtonScale = 1.0
                                     }
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6).delay(0.05)) {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.1)) {
                                         friendRequestButtonOffset = CGSize(width: 0, height: -160)
                                         friendRequestButtonScale = 1.0
                                     }
                                 } else {
                                     // Animate buttons disappearing with a jump up before falling
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.45)) {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45)) {
                                         // Move up slightly (negative offset increases)
                                         friendRequestButtonOffset = CGSize(width: 0, height: -180)
                                         friendRequestButtonScale = 0.0
                                     }
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.45).delay(0.05)) {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.1)) {
                                         // Move up slightly
                                         addZoneButtonOffset = CGSize(width: 0, height: -100)
                                         addZoneButtonScale = 0.0
                                     }
                                     // Then animate buttons falling into FAB
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7).delay(0.1)) {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.2)) {
                                         friendRequestButtonOffset = .zero
                                         addZoneButtonOffset = .zero
                                     }
                                 }
                             }) {
                                 Image(systemName: "plus")
-                                    .rotationEffect(Angle(degrees: showFABMenu ? 45 : 0))
+                                    .rotationEffect(Angle(degrees: showFABMenu ? 135 : 0))
                                     .foregroundColor(.white)
                                     .font(.system(size: 24, weight: .bold))
                                     .frame(width: 60, height: 60)
