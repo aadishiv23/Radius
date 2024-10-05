@@ -6,8 +6,8 @@
 //
 
 import CoreLocation
-import MapKit
 import Foundation
+import MapKit
 import Supabase
 import SwiftUI
 
@@ -26,10 +26,13 @@ struct SupabaseProfileView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     headerView
+                        .applyRadiusGlassStyle() // Apply glass style
 
                     userInfoCard
+                        .applyRadiusGlassStyle() // Apply glass style
 
                     zonesCard
+                        .applyRadiusGlassStyle() // Apply glass style
 
                     actionButtons
 
@@ -40,7 +43,7 @@ struct SupabaseProfileView: View {
                 .padding()
             }
             .background(backgroundGradient)
-            //.navigationBarHidden(true)
+            // .navigationBarHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     gearButton
@@ -56,27 +59,26 @@ struct SupabaseProfileView: View {
 
     private var headerView: some View {
         ZStack(alignment: .bottomLeading) {
-            // Profile Banner
-            Image("profile-banner") // Replace with your banner image
-                .resizable()
-                .scaledToFill()
-                .frame(height: 150)
-                .clipped()
-                .background(Color(UIColor.secondarySystemBackground))
-                .cornerRadius(15)
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-
+//            // Profile Banner
+//            Image("profile-banner")
+//                .resizable()
+//                .scaledToFill()
+//                .frame(height: 150)
+//                .clipped()
+//                .background(Color(UIColor.secondarySystemBackground))
+//                .cornerRadius(15)
+//                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
 
             // Profile Picture and Username
             HStack(alignment: .bottom, spacing: 16) {
-                Image(systemName: "person.crop.circle.fill") // Replace with user's profile image
+                Image(systemName: "person.crop.circle.fill")
                     .resizable()
                     .scaledToFill()
                     .frame(width: 80, height: 80)
                     .clipShape(Circle())
                     .overlay(Circle().stroke(Color.white, lineWidth: 4))
                     .shadow(radius: 5)
-
+                Spacer()
                 VStack(alignment: .leading, spacing: 4) {
                     Text(fullName)
                         .font(.title2)
@@ -88,11 +90,10 @@ struct SupabaseProfileView: View {
                         .foregroundColor(.white.opacity(0.8))
                 }
             }
-            .padding([.leading, .bottom], 16)
+            .padding([.bottom, .horizontal], 16)
         }
-        .frame(height: 150)
+        .padding()
         .cornerRadius(15)
-        .shadow(radius: 5)
     }
 
     // MARK: - User Info Card
@@ -144,14 +145,12 @@ struct SupabaseProfileView: View {
             }
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(15)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        //.shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
 
     // MARK: - Zones Card
 
-    /// Updated zonesSection in SupabaseProfileView
     private var zonesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -170,6 +169,7 @@ struct SupabaseProfileView: View {
                     if let currentUser = friendsDataManager.currentUser {
                         ForEach(currentUser.zones) { zone in
                             ZoneCard(zone: zone)
+                                .frame(width: 180) // Ensure ZoneCard has a fixed width
                         }
                     } else {
                         ProgressView()
@@ -177,9 +177,10 @@ struct SupabaseProfileView: View {
                 }
                 .padding(.vertical, 10)
             }
+            .frame(minWidth: 0, maxWidth: .infinity) // Ensure ScrollView takes full width
+            .padding(.horizontal, -16) // Remove horizontal padding if necessary
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(15)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
@@ -261,7 +262,6 @@ struct SupabaseProfileView: View {
 
     // MARK: - Background Gradient
 
-    /// Updated Background Gradient in SupabaseProfileView
     private var backgroundGradient: some View {
         LinearGradient(
             gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.yellow.opacity(0.7)]),
@@ -351,28 +351,30 @@ struct ProfileTextField: View {
     }
 }
 
-
 struct ZoneCard: View {
     var zone: Zone
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Map Snapshot
-            MapViewSnapshot(coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
-                .frame(height: 100)
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.white, lineWidth: 1)
-                )
-                .shadow(radius: 3)
-            
+            MapViewSnapshot(
+                coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude),
+                radius: zone.radius
+            )
+            .frame(height: 100)
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.white, lineWidth: 1)
+            )
+            .shadow(radius: 3)
+
             // Zone Name
             Text(zone.name)
                 .font(.headline)
                 .foregroundColor(.primary)
                 .lineLimit(1)
-            
+
             // Zone Details
             HStack(spacing: 5) {
                 Image(systemName: "location.fill")
@@ -381,7 +383,7 @@ struct ZoneCard: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
+
             HStack(spacing: 5) {
                 Image(systemName: "map")
                     .foregroundColor(.green)
@@ -411,22 +413,26 @@ struct MapViewSnapshot: UIViewRepresentable {
     }
 
     func updateUIView(_ view: MKMapView, context: Context) {
-        let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: radius * 2, longitudinalMeters: radius * 2)
+        let region = MKCoordinateRegion(
+            center: coordinate,
+            latitudinalMeters: radius * 2,
+            longitudinalMeters: radius * 2
+        )
         view.setRegion(region, animated: false)
-        
+
         // Remove existing annotations and overlays
         view.removeAnnotations(view.annotations)
         view.removeOverlays(view.overlays)
-        
+
         // Add a circle overlay to represent the zone
         let circle = MKCircle(center: coordinate, radius: radius)
         view.addOverlay(circle)
-        
+
         // Add a pin annotation
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
         view.addAnnotation(annotation)
-        
+
         view.delegate = context.coordinator
     }
 
@@ -456,14 +462,14 @@ struct MapViewSnapshot: UIViewRepresentable {
             if annotation is MKPointAnnotation {
                 let identifier = "ZoneCenter"
                 var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-                
+
                 if annotationView == nil {
                     annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                     annotationView?.canShowCallout = false
                 } else {
                     annotationView?.annotation = annotation
                 }
-                
+
                 return annotationView
             }
             return nil
