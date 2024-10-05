@@ -5,6 +5,8 @@
 //  Created by Aadi Shiv Malhotra on 5/8/24.
 //
 
+import CoreLocation
+import MapKit
 import Foundation
 import Supabase
 import SwiftUI
@@ -18,149 +20,156 @@ struct SupabaseProfileView: View {
     @State private var isLoading = false
     @State private var currentUserZones: [Zone] = []
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    self.profileForm
-                    
-                    self.userInfoSection
-                        .visionGlass()
-                    
-                    self.zonesSection // Reuse the zonesSection for the current user's zones
-                        .visionGlass()
+                    headerView
 
-                    self.updateProfileButton
-                    
-                    self.myProfileButton
-                    
-                    Divider()
-                    
-                    self.signOutButton
-                    
-                    Divider()
-                    
-                    Text("v1.0")
+                    userInfoCard
+
+                    zonesCard
+
+                    actionButtons
+
+                    Spacer()
+
+                    versionInfo
                 }
                 .padding()
             }
-            .background(self.backgroundGradient)
+            .background(backgroundGradient)
+            //.navigationBarHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: LocationSettingsView()) {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundColor(.primary)
-                    }
+                    gearButton
                 }
             }
         }
         .task {
-            await self.getInitialProfile()
-            // await friendsDataManager.fetchCurrentUserProfile()
+            await getInitialProfile()
         }
     }
-    
-    private var profileHStack: some View {
-        HStack(alignment: .top, spacing: 20) {
-            self.profileHeader // On the left
-                .frame(maxWidth: 100) // Constrain the width of profileHeader
-            self.profileForm // On the right
-                .frame(maxWidth: .infinity)
-                .layoutPriority(1) // Give profileForm higher priority to take up space
-        }
-        .padding()
-    }
-    
-    private var gearButton: some View {
-        NavigationLink(destination: LocationSettingsView()) {
-            Image(systemName: "gearshape.fill")
-                .foregroundColor(.primary)
-        }
-    }
-    
-    private var backgroundGradient: some View {
-        LinearGradient(gradient: Gradient(colors: [
-            Color.blue.opacity(0.2),
-            Color.yellow.opacity(0.2)
-        ]), startPoint: .topLeading, endPoint: .bottomTrailing)
-            .ignoresSafeArea()
-    }
-    
-    private var profileHeader: some View {
-        VStack(alignment: .center, spacing: 8) {
-            Image(systemName: "person.crop.circle.fill")
+
+    // MARK: - Header View
+
+    private var headerView: some View {
+        ZStack(alignment: .bottomLeading) {
+            // Profile Banner
+            Image("profile-banner") // Replace with your banner image
                 .resizable()
-                .scaledToFit()
-                .frame(width: 60, height: 60)
-                .foregroundColor(.blue)
-                .background(Circle().fill(Color.white).shadow(radius: 5))
-          
-            Text("@\(self.username)") // Only username is displayed
-                .font(.headline)
-                .foregroundColor(.secondary)
+                .scaledToFill()
+                .frame(height: 150)
+                .clipped()
+                .background(Color(UIColor.secondarySystemBackground))
+                .cornerRadius(15)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+
+
+            // Profile Picture and Username
+            HStack(alignment: .bottom, spacing: 16) {
+                Image(systemName: "person.crop.circle.fill") // Replace with user's profile image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 80, height: 80)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                    .shadow(radius: 5)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(fullName)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+
+                    Text("@\(username)")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .padding([.leading, .bottom], 16)
         }
-        .frame(maxWidth: 100) // Constrain the width for profileHeader
+        .frame(height: 150)
+        .cornerRadius(15)
+        .shadow(radius: 5)
     }
-  
-    private var profileForm: some View {
-        VStack(spacing: 15) {
-            ProfileTextField(title: "Username", text: self.$username, icon: "person")
-            ProfileTextField(title: "Full Name", text: self.$fullName, icon: "person.text.rectangle")
+
+    // MARK: - User Info Card
+
+    private var userInfoCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let currentUser = friendsDataManager.currentUser {
+                HStack {
+                    Label("Name", systemImage: "person.fill")
+                        .font(.headline)
+                    Spacer()
+                    Text(currentUser.full_name.isEmpty ? "Unknown" : currentUser.full_name)
+                        .foregroundColor(.secondary)
+                }
+
+                HStack {
+                    Label("Username", systemImage: "at")
+                        .font(.headline)
+                    Spacer()
+                    Text(currentUser.username.isEmpty ? "Unavailable" : currentUser.username)
+                        .foregroundColor(.secondary)
+                }
+
+                HStack {
+                    Label("Coordinates", systemImage: "location.fill")
+                        .font(.headline)
+                    Spacer()
+                    Text(
+                        currentUser.latitude != 0
+                            ? "\(currentUser.latitude), \(currentUser.longitude)"
+                            : "No coordinates available"
+                    )
+                    .foregroundColor(.secondary)
+                }
+
+                HStack {
+                    Label("Zones", systemImage: "map")
+                        .font(.headline)
+                    Spacer()
+                    Text(currentUser.zones.isEmpty ? "No zones available" : "\(currentUser.zones.count)")
+                        .foregroundColor(.secondary)
+                }
+            } else {
+                HStack {
+                    ProgressView()
+                    Text("Loading user information...")
+                        .foregroundColor(.secondary)
+                }
+            }
         }
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(15)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
-    
-    private var userInfoSection: some View {
-        VStack(spacing: 10) {
-            if let currentUser = friendsDataManager.currentUser {
-                Text("Name: \(currentUser.full_name.isEmpty ? "Unknown" : currentUser.full_name)")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text("Username: \(currentUser.username.isEmpty ? "Unavailable" : currentUser.username)")
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+    // MARK: - Zones Card
 
-                Text("Coordinates: \(currentUser.latitude != 0 ? "\(currentUser.latitude), \(currentUser.longitude)" : "No coordinates available")")
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Text("Number of Zones: \(currentUser.zones.isEmpty ? "No zones available" : "\(currentUser.zones.count)")")
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                // Display a loading message or placeholder content while currentUser is being fetched
-                Text("Loading user information...")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-        .padding()
-    }
-
-    private var zonesSection: some View {
+    /// Updated zonesSection in SupabaseProfileView
+    private var zonesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Zones")
                     .font(.headline)
                 Spacer()
                 NavigationLink(destination: ZoneGridView()) {
-                    Image(systemName: "plus")
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
                         .foregroundColor(.blue)
                 }
             }
-            
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 20) {
                     if let currentUser = friendsDataManager.currentUser {
                         ForEach(currentUser.zones) { zone in
-                            ZStack(alignment: .topTrailing) {
-                                PolaroidCard(zone: zone)
-                            }
+                            ZoneCard(zone: zone)
                         }
                     } else {
                         ProgressView()
@@ -170,59 +179,114 @@ struct SupabaseProfileView: View {
             }
         }
         .padding()
+        .background(Color(UIColor.secondarySystemBackground))
+        .cornerRadius(15)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
-    
+
+    // MARK: - Action Buttons
+
+    private var actionButtons: some View {
+        VStack(spacing: 15) {
+            updateProfileButton
+            myProfileButton
+            signOutButton
+        }
+    }
+
     private var updateProfileButton: some View {
-        Button(action: self.updateProfileButtonTapped) {
+        Button(action: updateProfileButtonTapped) {
             HStack {
                 Text("Update Profile")
                     .fontWeight(.semibold)
-                if self.isLoading {
+                if isLoading {
                     Spacer()
                     ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 }
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color.blue)
+            .background(
+                Color.black.opacity(0.7)
+            )
             .foregroundColor(.white)
             .cornerRadius(10)
         }
-        .disabled(self.isLoading)
+        .disabled(isLoading)
     }
-    
-    private var myProfileButton: some View { // New Button for MyProfileView
+
+    private var myProfileButton: some View {
         NavigationLink(destination: MyProfileView()) {
             Text("My Profile")
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.green)
+                .background(
+                    Color.black.opacity(0.7)
+                )
                 .foregroundColor(.white)
                 .cornerRadius(10)
         }
     }
-    
+
     private var signOutButton: some View {
-        Button(action: {
-            Task {
-                try? await supabase.auth.signOut()
-            }
-        }) {
+        Button(action: signOut) {
             Text("Sign Out")
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.red.opacity(0.8))
+                .background(
+                    Color.red.opacity(0.5)
+                )
                 .foregroundColor(.white)
                 .cornerRadius(10)
         }
     }
-    
+
+    private func signOut() {
+        Task {
+            try? await supabase.auth.signOut()
+        }
+    }
+
+    // MARK: - Version Info
+
+    private var versionInfo: some View {
+        Text("v1.0")
+            .font(.footnote)
+            .foregroundColor(.gray)
+            .padding(.top, 10)
+    }
+
+    // MARK: - Background Gradient
+
+    /// Updated Background Gradient in SupabaseProfileView
+    private var backgroundGradient: some View {
+        LinearGradient(
+            gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.yellow.opacity(0.7)]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+    }
+
+    // MARK: - Gear Button
+
+    private var gearButton: some View {
+        NavigationLink(destination: LocationSettingsView()) {
+            Image(systemName: "gear.badge")
+                .foregroundColor(.primary)
+                .font(.title2)
+        }
+    }
+
+    // MARK: - Data Fetching
+
     func getInitialProfile() async {
         do {
             let currentUser = try await supabase.auth.session.user
-           
+
             let profile: Profile = try await supabase
                 .from("profiles")
                 .select()
@@ -230,26 +294,26 @@ struct SupabaseProfileView: View {
                 .single()
                 .execute()
                 .value
-           
-            self.username = profile.username
-            self.fullName = profile.full_name
+
+            username = profile.username
+            fullName = profile.full_name
 
         } catch {
             debugPrint(error)
         }
     }
-       
+
     func updateProfileButtonTapped() {
         Task {
-            self.isLoading = true
+            isLoading = true
             defer { isLoading = false }
             do {
                 let currentUser = try await supabase.auth.session.user
-                
+
                 try await supabase
                     .from("profiles")
                     .update(
-                        UpdateProfileParams(username: self.username, fullName: self.fullName)
+                        UpdateProfileParams(username: username, fullName: fullName)
                     )
                     .eq("id", value: currentUser.id)
                     .execute()
@@ -260,20 +324,22 @@ struct SupabaseProfileView: View {
     }
 }
 
+// MARK: - ProfileTextField Component
+
 struct ProfileTextField: View {
     let title: String
     @Binding var text: String
     let icon: String
-    
+
     var body: some View {
         HStack {
-            Image(systemName: self.icon)
+            Image(systemName: icon)
                 .foregroundColor(.secondary)
                 .frame(width: 30)
-            
-            TextField(self.title, text: self.$text)
-                .textContentType(self.title == "Full Name" ? .name : .username)
-                .autocapitalization(self.title == "Full Name" ? .words : .none)
+
+            TextField(title, text: $text)
+                .textContentType(title == "Full Name" ? .name : .username)
+                .autocapitalization(title == "Full Name" ? .words : .none)
         }
         .padding()
         .background(Color(UIColor.systemBackground))
@@ -282,5 +348,125 @@ struct ProfileTextField: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray.opacity(0.2), lineWidth: 1)
         )
+    }
+}
+
+
+struct ZoneCard: View {
+    var zone: Zone
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Map Snapshot
+            MapViewSnapshot(coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
+                .frame(height: 100)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.white, lineWidth: 1)
+                )
+                .shadow(radius: 3)
+            
+            // Zone Name
+            Text(zone.name)
+                .font(.headline)
+                .foregroundColor(.primary)
+                .lineLimit(1)
+            
+            // Zone Details
+            HStack(spacing: 5) {
+                Image(systemName: "location.fill")
+                    .foregroundColor(.blue)
+                Text("Radius: \(zone.radius)m")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack(spacing: 5) {
+                Image(systemName: "map")
+                    .foregroundColor(.green)
+                Text(String(format: "Lat: %.4f, Lon: %.4f", zone.latitude, zone.longitude))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(15)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .frame(width: 180)
+    }
+}
+
+struct MapViewSnapshot: UIViewRepresentable {
+    var coordinate: CLLocationCoordinate2D
+    var radius: CLLocationDistance
+
+    func makeUIView(context: Context) -> MKMapView {
+        let mapView = MKMapView()
+        mapView.isUserInteractionEnabled = false
+        mapView.layer.cornerRadius = 10
+        mapView.clipsToBounds = true
+        return mapView
+    }
+
+    func updateUIView(_ view: MKMapView, context: Context) {
+        let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: radius * 2, longitudinalMeters: radius * 2)
+        view.setRegion(region, animated: false)
+        
+        // Remove existing annotations and overlays
+        view.removeAnnotations(view.annotations)
+        view.removeOverlays(view.overlays)
+        
+        // Add a circle overlay to represent the zone
+        let circle = MKCircle(center: coordinate, radius: radius)
+        view.addOverlay(circle)
+        
+        // Add a pin annotation
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        view.addAnnotation(annotation)
+        
+        view.delegate = context.coordinator
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, MKMapViewDelegate {
+        var parent: MapViewSnapshot
+
+        init(_ parent: MapViewSnapshot) {
+            self.parent = parent
+        }
+
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let circleOverlay = overlay as? MKCircle {
+                let renderer = MKCircleRenderer(overlay: circleOverlay)
+                renderer.fillColor = UIColor.blue.withAlphaComponent(0.1)
+                renderer.strokeColor = UIColor.blue
+                renderer.lineWidth = 2
+                return renderer
+            }
+            return MKOverlayRenderer(overlay: overlay)
+        }
+
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if annotation is MKPointAnnotation {
+                let identifier = "ZoneCenter"
+                var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+                
+                if annotationView == nil {
+                    annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                    annotationView?.canShowCallout = false
+                } else {
+                    annotationView?.annotation = annotation
+                }
+                
+                return annotationView
+            }
+            return nil
+        }
     }
 }
