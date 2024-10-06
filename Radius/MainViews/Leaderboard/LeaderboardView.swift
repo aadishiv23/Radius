@@ -69,7 +69,7 @@ struct LeaderboardView: View {
         }
         .pickerStyle(MenuPickerStyle())
         .onChange(of: viewModel.selectedGroup) { newGroup in
-            if let group = newGroup {
+            if let _ = newGroup {
                 viewModel.fetchLeaderboardData() // Ensure fetching happens immediately after selection
             }
         }
@@ -114,25 +114,33 @@ struct LeaderboardView: View {
                 .padding(.horizontal)
             } else if selectedChartType == .line {
                 // Line Chart for daily points over time
-                if let dailyPointsData = aggregatedDailyPointsData() {
-                    Chart(dailyPointsData) { dataPoint in
-                        ForEach(dataPoint.points, id: \.profile_id) { point in
-                            LineMark(
-                                x: .value("Date", point.date),
-                                y: .value("Points", point.points),
-                                series: .value("Member", dataPoint.memberName)
-                            )
-                        }
+                if !viewModel.combinedDailyPoints.isEmpty {
+                    Chart(viewModel.combinedDailyPoints) { dataPoint in
+                        LineMark(
+                            x: .value("Date", dataPoint.date),
+                            y: .value("Points", dataPoint.points)
+                        )
                         .foregroundStyle(by: .value("Member", dataPoint.memberName))
+                        .interpolationMethod(.catmullRom) // Smooth lines
                     }
                     .chartLegend(.visible)
+                    .chartXAxis {
+                        AxisMarks(preset: .aligned, position: .bottom) { _ in
+                            AxisGridLine()
+                            AxisTick()
+                            AxisValueLabel(format: .dateTime.month().day())
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading)
+                    }
                     .frame(height: 200)
                     .padding()
                     .background(Color.secondary.opacity(0.1))
                     .cornerRadius(15)
                     .padding(.horizontal)
                 } else {
-                    Text("Loading daily points...")
+                    ProgressView("Loading daily points...")
                         .frame(height: 200)
                 }
             }
@@ -176,28 +184,12 @@ struct LeaderboardView: View {
 
     private func medalColor(for index: Int) -> Color {
         switch index {
-        case 0: .yellow // Gold
-        case 1: .gray // Silver
-        case 2: .brown // Bronze
-        default: .clear
+        case 0: return .yellow // Gold
+        case 1: return .gray // Silver
+        case 2: return .brown // Bronze
+        default: return .clear
         }
     }
-
-    private func aggregatedDailyPointsData() -> [MemberDailyPoints]? {
-        let topMembers = viewModel.members.prefix(5)
-        var data: [MemberDailyPoints] = []
-
-        for member in topMembers {
-            if let dailyPoints = viewModel.memberDailyPoints[member.id] {
-                data.append(MemberDailyPoints(memberName: member.name, points: dailyPoints))
-            } else {
-                return nil // Data is not fully loaded yet
-            }
-        }
-
-        return data
-    }
-
 }
 
 struct MemberDailyPoints: Identifiable {

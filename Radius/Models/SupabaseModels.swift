@@ -326,6 +326,13 @@ struct DailyPoints: Identifiable, Codable {
     var date: Date
 }
 
+struct CombinedDailyPoint: Identifiable {
+    let id = UUID()
+    let memberName: String
+    let date: Date
+    let points: Int
+}
+
 struct ZoneExit: Identifiable, Codable {
     var id: UUID
     var profile_id: UUID
@@ -437,7 +444,7 @@ struct FriendRelation: Codable {
 }
 
 struct DailyPoint: Identifiable, Codable {
-    var id: UUID { profile_id } // Assuming profile_id uniquely identifies the data point
+    var id: UUID // Changed from computed property to unique UUID
     var profile_id: UUID
     var date: Date
     var points: Int
@@ -449,6 +456,7 @@ struct DailyPoint: Identifiable, Codable {
     }
 
     init(profile_id: UUID, date: Date, points: Int) {
+        self.id = UUID() // Assign a unique UUID
         self.profile_id = profile_id
         self.date = date
         self.points = points
@@ -463,7 +471,7 @@ struct DailyPoint: Identifiable, Codable {
         // Decode the date string from UTC `yyyy-MM-dd` format
         let dateString = try container.decode(String.self, forKey: .date)
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // UTC timezone
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         guard let parsedDate = dateFormatter.date(from: dateString) else {
@@ -474,6 +482,7 @@ struct DailyPoint: Identifiable, Codable {
             )
         }
         self.date = parsedDate
+        self.id = UUID() // Assign a unique UUID during decoding
     }
 
     /// Custom encoding to ensure the date is saved as `yyyy-MM-dd` in UTC
@@ -485,7 +494,7 @@ struct DailyPoint: Identifiable, Codable {
 
         // Encode the date as a string in `yyyy-MM-dd` format in UTC
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // UTC timezone
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: date)
 
