@@ -155,6 +155,17 @@ struct Zone: Codable, Identifiable {
         self.profile_id = profile_id
         self.category = category
     }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.latitude = try container.decode(Double.self, forKey: .latitude)
+        self.longitude = try container.decode(Double.self, forKey: .longitude)
+        self.radius = try container.decode(Double.self, forKey: .radius)
+        self.profile_id = try container.decodeIfPresent(UUID.self, forKey: .profile_id)
+        self.category = try container.decode(ZoneCategory.self, forKey: .category)
+    }
 }
 
 struct Profile: Codable, Identifiable {
