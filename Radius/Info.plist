@@ -23,5 +23,9 @@
 	<array>
 		<string>location</string>
 	</array>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The app requires your location for its social features</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The app requires your location for its social features</string>
 </dict>
 </plist>

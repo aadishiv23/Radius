@@ -33,11 +33,16 @@ struct MyProfileView: View {
                     showFogOfWarMap = true
                 }) {
                     Text("Fog of War Map")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(10)
                 }
+                .padding(.horizontal)
                 .fullScreenCover(isPresented: $showFogOfWarMap) {
-                    NavigationView {
-                        FogOfWarMapScreen()
-                    }
+                    FogOfWarContainerView()
                 }
 
                 zoneExitsSection // New section for recent zone exits
@@ -52,6 +57,7 @@ struct MyProfileView: View {
                     editing.toggle()
                 }) {
                     Text(editing ? "Done" : "Edit")
+                        .foregroundColor(.blue)
                 }
             }
         }

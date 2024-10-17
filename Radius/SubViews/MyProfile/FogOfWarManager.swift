@@ -5,125 +5,166 @@
 //  Created by Aadi Shiv Malhotra on 9/29/24.
 //
 
+import CoreLocation
 import Foundation
 import MapKit
-import CoreLocation
 
 class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var fogOverlays: [MKOverlay] = []
+    @Published var fogOverlay: MKOverlay?
+    @Published var totalTiles = 0
+    @Published var uncoveredTiles = 0
 
     private var locationManager = CLLocationManager()
     private var visitedTiles: Set<String> = []
 
-    // Tile size in meters
-    private let tileSize: Double = 100.0
-
-    // Maximum distance in meters (25 miles ≈ 40,233.6 meters)
-    private let maxDistance: Double = 40233.6
+    private let tileSizeMeters = 100.0
+    private let maxDistance = 1609.0
 
     override init() {
         super.init()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest // High accuracy
-        locationManager.distanceFilter = 10 // Update every 10 meters
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = 10
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         loadVisitedTiles()
+        updateFogOverlay()
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
+        guard let location = locations.last else {
+            return
+        }
 
-        // Determine which tile the user is in
         let tileKey = tileKeyForLocation(location.coordinate)
         if !visitedTiles.contains(tileKey) {
             visitedTiles.insert(tileKey)
             saveVisitedTiles()
-            updateFogOverlays()
+            updateFogOverlay()
         }
     }
 
     private func tileKeyForLocation(_ coordinate: CLLocationCoordinate2D) -> String {
-        let x = Int(coordinate.latitude * 1000 / tileSize)
-        let y = Int(coordinate.longitude * 1000 / tileSize)
+        let latitudeDegree = tileSizeMeters / 111_000.0
+        let longitudeDegree = tileSizeMeters / (111_000.0 * cos(coordinate.latitude * .pi / 180))
+
+        let x = Int(coordinate.latitude / latitudeDegree)
+        let y = Int(coordinate.longitude / longitudeDegree)
         return "\(x)_\(y)"
     }
 
-    private func updateFogOverlays() {
-        // Generate fog overlays for unvisited tiles within 25-mile radius
-        var overlays: [MKOverlay] = []
-
+    func updateFogOverlay() {
         guard let userLocation = locationManager.location?.coordinate else {
-            DispatchQueue.main.async {
-                self.fogOverlays = overlays
-            }
             return
         }
 
-        let userPoint = MKMapPoint(userLocation)
+        let latitudeDegree = tileSizeMeters / 111_000.0
+        let longitudeDegree = tileSizeMeters / (111_000.0 * cos(userLocation.latitude * .pi / 180))
 
-        // Calculate the range of tiles to consider based on maxDistance
-        let tileCount = Int((maxDistance / tileSize).rounded(.up))
-        let userTileX = Int(userLocation.latitude * 1000 / tileSize)
-        let userTileY = Int(userLocation.longitude * 1000 / tileSize)
+        let userTileX = Int(userLocation.latitude / latitudeDegree)
+        let userTileY = Int(userLocation.longitude / longitudeDegree)
 
+        let tileCount = Int((maxDistance / tileSizeMeters).rounded(.up))
         let minX = userTileX - tileCount
         let maxX = userTileX + tileCount
         let minY = userTileY - tileCount
         let maxY = userTileY + tileCount
 
+        var outerCoordinates: [CLLocationCoordinate2D] = []
+        // Define the outer boundary (e.g., a square or circle around the user)
+        // For simplicity, let's use a square here
+        let boundarySize = tileCount * Int(tileSizeMeters)
+        let boundaryDegreeLat = Double(tileCount) * latitudeDegree
+        let boundaryDegreeLon = Double(tileCount) * longitudeDegree
+
+        let topLeft = CLLocationCoordinate2D(
+            latitude: userLocation.latitude - boundaryDegreeLat,
+            longitude: userLocation.longitude - boundaryDegreeLon
+        )
+        let topRight = CLLocationCoordinate2D(
+            latitude: userLocation.latitude - boundaryDegreeLat,
+            longitude: userLocation.longitude + boundaryDegreeLon
+        )
+        let bottomRight = CLLocationCoordinate2D(
+            latitude: userLocation.latitude + boundaryDegreeLat,
+            longitude: userLocation.longitude + boundaryDegreeLon
+        )
+        let bottomLeft = CLLocationCoordinate2D(
+            latitude: userLocation.latitude + boundaryDegreeLat,
+            longitude: userLocation.longitude - boundaryDegreeLon
+        )
+        outerCoordinates = [topLeft, topRight, bottomRight, bottomLeft]
+
+        var holeCoordinates: [[CLLocationCoordinate2D]] = []
         for x in minX...maxX {
             for y in minY...maxY {
-                let tileCenterCoordinate = coordinateForTileCenter(x: x, y: y)
-                let tileCenterPoint = MKMapPoint(tileCenterCoordinate)
-                let distance = userPoint.distance(to: tileCenterPoint)
-
-                if distance <= maxDistance {
-                    let tileKey = "\(x)_\(y)"
-                    if !visitedTiles.contains(tileKey) {
-                        // Create overlay for this tile
-                        let overlay = overlayForTile(x: x, y: y)
-                        overlays.append(overlay)
-                    }
+                let tileKey = "\(x)_\(y)"
+                if visitedTiles.contains(tileKey) {
+                    let tileCenter = coordinateForTileCenter(
+                        x: x,
+                        y: y,
+                        latitudeDegree: latitudeDegree,
+                        longitudeDegree: longitudeDegree
+                    )
+                    let tileCoords = coordinatesForTile(
+                        x: x,
+                        y: y,
+                        latitudeDegree: latitudeDegree,
+                        longitudeDegree: longitudeDegree
+                    )
+                    holeCoordinates.append(tileCoords)
                 }
             }
         }
 
+        let combinedPolygon = MKPolygon(
+            coordinates: outerCoordinates,
+            count: outerCoordinates.count,
+            interiorPolygons: holeCoordinates.map { MKPolygon(coordinates: $0, count: $0.count) }
+        )
+
         DispatchQueue.main.async {
-            self.fogOverlays = overlays
+            self.fogOverlay = combinedPolygon
+            self.totalTiles = (maxX - minX + 1) * (maxY - minY + 1)
+            self.uncoveredTiles = holeCoordinates.count
         }
     }
 
-    private func coordinateForTileCenter(x: Int, y: Int) -> CLLocationCoordinate2D {
-        let latitude = (Double(x) + 0.5) * tileSize / 1000
-        let longitude = (Double(y) + 0.5) * tileSize / 1000
+    private func coordinatesForTile(
+        x: Int,
+        y: Int,
+        latitudeDegree: Double,
+        longitudeDegree: Double
+    ) -> [CLLocationCoordinate2D] {
+        let latitude = Double(x) * latitudeDegree
+        let longitude = Double(y) * longitudeDegree
+
+        return [
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude + longitudeDegree),
+            CLLocationCoordinate2D(latitude: latitude + latitudeDegree, longitude: longitude + longitudeDegree),
+            CLLocationCoordinate2D(latitude: latitude + latitudeDegree, longitude: longitude)
+        ]
+    }
+
+    private func coordinateForTileCenter(
+        x: Int,
+        y: Int,
+        latitudeDegree: Double,
+        longitudeDegree: Double
+    ) -> CLLocationCoordinate2D {
+        let latitude = (Double(x) + 0.5) * latitudeDegree
+        let longitude = (Double(y) + 0.5) * longitudeDegree
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    private func overlayForTile(x: Int, y: Int) -> MKOverlay {
-        let latitude = Double(x) * tileSize / 1000
-        let longitude = Double(y) * tileSize / 1000
-
-        let topLeft = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let topRight = CLLocationCoordinate2D(latitude: latitude, longitude: longitude + tileSize / 1000)
-        let bottomRight = CLLocationCoordinate2D(latitude: latitude + tileSize / 1000, longitude: longitude + tileSize / 1000)
-        let bottomLeft = CLLocationCoordinate2D(latitude: latitude + tileSize / 1000, longitude: longitude)
-
-        var coordinates = [topLeft, topRight, bottomRight, bottomLeft]
-
-        let polygon = MKPolygon(coordinates: &coordinates, count: coordinates.count)
-        return polygon
-    }
-
-    // Persistence Methods
+    /// Persistence Methods remain the same
     private func saveVisitedTiles() {
-        // Save visitedTiles to persistent storage
         let tilesArray = Array(visitedTiles)
         UserDefaults.standard.set(tilesArray, forKey: "VisitedTiles")
     }
 
     private func loadVisitedTiles() {
-        // Load visitedTiles from persistent storage
         if let tilesArray = UserDefaults.standard.array(forKey: "VisitedTiles") as? [String] {
             visitedTiles = Set(tilesArray)
         }
