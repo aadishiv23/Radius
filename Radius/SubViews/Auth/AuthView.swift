@@ -118,10 +118,12 @@ struct AuthView: View {
                             .padding()
                             .foregroundColor(.white)
                             .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.yellow]), startPoint: .leading, endPoint: .trailing))
-                            .cornerRadius(15)
+                            .cornerRadius(5)
                             .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
                     }
                     .padding(.horizontal)
+                    
+                    SignInView(isSignUp: $isSignUp) // Pass `isSignUp` binding to SignInView
                     
                     if !isSignUp {
                         NavigationLink(destination: ChangePasswordView()) {

@@ -34,6 +34,7 @@
 		AC5855FC2BDF1391009C490B /* AddressEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FB2BDF1391009C490B /* AddressEntryView.swift */; };
 		AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */; };
 		AC5856002BDF1925009C490B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5855FF2BDF1925009C490B /* MapView.swift */; };
+		AC5B025E2CC3661B00BEF0D7 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5B025D2CC3661800BEF0D7 /* SignInView.swift */; };
 		AC5DB4D52C7D7F0100A1019E /* CompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */; };
 		AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */; };
 		AC5DB4DA2C7D800E00A1019E /* CompetitionManagerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */; };
@@ -115,6 +116,7 @@
 		AC5855FB2BDF1391009C490B /* AddressEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryView.swift; sourceTree = "<group>"; };
 		AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorView.swift; sourceTree = "<group>"; };
 		AC5855FF2BDF1925009C490B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		AC5B025D2CC3661800BEF0D7 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		AC5DB4D42C7D7F0100A1019E /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
 		AC5DB4D72C7D7FF800A1019E /* CompetitionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerView.swift; sourceTree = "<group>"; };
 		AC5DB4D92C7D800E00A1019E /* CompetitionManagerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerViewModel.swift; sourceTree = "<group>"; };
@@ -403,6 +405,7 @@
 		ACA021492BE0B7C100E98DA4 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				AC5B025D2CC3661800BEF0D7 /* SignInView.swift */,
 				ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */,
 				AC9BD1B72BE2F51600D23123 /* ColorTransformer.swift */,
 				AC3989552C705637002F84E6 /* DataController.swift */,
@@ -587,6 +590,7 @@
 				ACC537302BF3258300BECF8A /* Stuff.swift in Sources */,
 				AC36A7362C928B6300840DDD /* ZonesRepository.swift in Sources */,
 				AC36A73A2C928B8900840DDD /* GroupsRepository.swift in Sources */,
+				AC5B025E2CC3661B00BEF0D7 /* SignInView.swift in Sources */,
 				ACA85ABA2C87D3740086C484 /* RadiusGlass.swift in Sources */,
 				ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */,
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
