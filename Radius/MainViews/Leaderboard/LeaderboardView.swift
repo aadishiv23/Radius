@@ -17,6 +17,8 @@ enum ChartType: String, CaseIterable {
 struct LeaderboardView: View {
     @StateObject private var viewModel: LeaderboardViewModel
     @State private var selectedChartType: ChartType = .bar
+    @State private var selectedGroup: Group?
+    @State private var isSheetPresented = false
 
     init(friendsDataManager: FriendsDataManager, competitionManager: CompetitionManager) {
         _viewModel = StateObject(wrappedValue: LeaderboardViewModel(
@@ -26,53 +28,117 @@ struct LeaderboardView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                // Segmented Picker for Category
-                Picker("Category", selection: $viewModel.selectedCategory) {
-                    ForEach(LeaderboardCategory.allCases, id: \.self) { category in
-                        Text(category.rawValue).tag(category)
+        NavigationView {
+            ZStack {
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.yellow.opacity(0.7)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: 20) {
+                    Text("Leaderboard")
+                        .font(.system(.body, design: .rounded))
+                        .fontWeight(.heavy)
+
+                    buttonsPicker
+                    
+                    VStack {
+                        Image(systemName: "hammer")
+                            .font(.largeTitle)
+                            .foregroundColor(.gray)
+                        Text("Under Construction")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
                     }
+                    .applyRadiusGlassStyle()
+                    
+                    Spacer()
                 }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding(.horizontal)
-
-                // Dropdown for Group/Competition selection
-                if viewModel.selectedCategory == .groups {
-                    groupPicker
-                } else {
-                    competitionPicker
-                }
-
-                // Charts (Bar and Line)
-                leaderboardChart
-
-                // Leaderboard List
-                leaderboardList
             }
-            .navigationTitle("Leaderboard")
             .onAppear {
                 viewModel.fetchLeaderboardData()
                 Task {
                     await viewModel.friendsDataManager.fetchUserGroups()
                 }
             }
+            .sheet(isPresented: $isSheetPresented) {
+                leaderboardDetailSheet
+            }
         }
     }
 
-    private var groupPicker: some View {
-        Picker("Select a Group", selection: $viewModel.selectedGroup) {
-            Text("Select a Group").tag(nil as Group?)
-            ForEach(viewModel.friendsDataManager.userGroups, id: \.id) { group in
-                Text(group.name).tag(group as Group?)
+    private var buttonsPicker: some View {
+        HStack(spacing: 16) {
+            Button(action: {
+                viewModel.selectedCategory = .groups
+                isSheetPresented = true
+            }) {
+                VStack(alignment: .leading) {
+                    Image(systemName: "person.2.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                    Text("Groups")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .cornerRadius(15)
+                .shadow(radius: 4)
+                .scaleEffect(viewModel.selectedCategory == .groups ? 0.9 : 1.0)
+                .animation(.spring(response: 0.6, dampingFraction: 0.4), value: viewModel.selectedCategory)
+            }
+
+            Button(action: {
+                viewModel.selectedCategory = .competitions
+                isSheetPresented = true
+            }) {
+                VStack(alignment: .leading) {
+                    Image(systemName: "trophy.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                    Text("Competitions")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .cornerRadius(15)
+                .shadow(radius: 4)
+                .scaleEffect(viewModel.selectedCategory == .competitions ? 0.9 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.5), value: viewModel.selectedCategory)
             }
         }
-        .pickerStyle(MenuPickerStyle())
-        .onChange(of: viewModel.selectedGroup) { newGroup in
-            if let _ = newGroup {
-                viewModel.fetchLeaderboardData() // Ensure fetching happens immediately after selection
+        .padding(.horizontal)
+    }
+
+    private var leaderboardDetailSheet: some View {
+        VStack(spacing: 20) {
+            if viewModel.selectedCategory == .groups {
+                LVCustomGroupPicker(
+                    selectedGroup: $selectedGroup,
+                    groups: viewModel.friendsDataManager.userGroups
+                )
+                .onChange(of: selectedGroup) { newGroup in
+                    viewModel.selectedGroup = newGroup
+                    viewModel.fetchLeaderboardData()
+                }
+            } else {
+                competitionPicker
             }
+
+            Divider()
+
+            leaderboardChart
+
+            leaderboardList
         }
+        .padding()
+        .presentationDetents([.medium, .large]) // Adjusts the sheet size
     }
 
     private var competitionPicker: some View {
@@ -121,7 +187,7 @@ struct LeaderboardView: View {
                             y: .value("Points", dataPoint.points)
                         )
                         .foregroundStyle(by: .value("Member", dataPoint.memberName))
-                        .interpolationMethod(.catmullRom) // Smooth lines
+                        .interpolationMethod(.catmullRom)
                     }
                     .chartLegend(.visible)
                     .chartXAxis {
@@ -180,17 +246,19 @@ struct LeaderboardView: View {
                 .padding(.vertical, 8)
             }
         }
+        .background(Color.white)
     }
 
     private func medalColor(for index: Int) -> Color {
         switch index {
-        case 0: return .yellow // Gold
-        case 1: return .gray // Silver
-        case 2: return .brown // Bronze
-        default: return .clear
+        case 0: .yellow // Gold
+        case 1: .gray // Silver
+        case 2: .brown // Bronze
+        default: .clear
         }
     }
 }
+
 
 struct MemberDailyPoints: Identifiable {
     let id = UUID()
@@ -228,3 +296,42 @@ let mockCompetitions: [MockGroupCompetition] = [
     MockGroupCompetition(id: UUID(), competition_name: "Competition 2"),
     MockGroupCompetition(id: UUID(), competition_name: "Competition 3")
 ]
+
+struct LVCustomGroupPicker: View {
+    @Binding var selectedGroup: Group?
+    let groups: [Group]
+
+    var body: some View {
+        Menu {
+            ForEach(groups, id: \.id) { group in
+                Button(action: {
+                    selectedGroup = group
+                }) {
+                    HStack {
+                        Text(group.name)
+                        if selectedGroup == group {
+                            Spacer()
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack {
+                Text(selectedGroup?.name ?? "Select a Group")
+                    .foregroundColor(.primary)
+                    .fontWeight(.medium)
+                Spacer()
+                Image(systemName: "chevron.down")
+                    .foregroundColor(.blue)
+            }
+            .padding()
+            .frame(maxWidth: .infinity) // Makes the picker expand to fill the available space
+            .background(Color.white.opacity(0.8))
+            .cornerRadius(10)
+            .shadow(radius: 2)
+        }
+        .padding(.horizontal)
+    }
+}
