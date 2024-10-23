@@ -33,6 +33,10 @@ class LocationManager: NSObject, ObservableObject {
     private let userDefaultsKey = "LocationAccuracyMode"
     private var profileFetched = false // Flag to check if profile is fetched
 
+    private var inactivityTimer: Timer?
+    private var temporaryZoneId: UUID?
+    private let temporaryZoneRadius: CLLocationDistance = 150
+
     let zoneUpdateManager: ZoneUpdateManager
     private let fdm: FriendsDataManager
 
@@ -140,6 +144,15 @@ class LocationManager: NSObject, ObservableObject {
                     return
                 }
 
+                // Check if it's the temporary zone
+                if zoneId == temporaryZoneId {
+                    print("[handleMonitorEvent] User exited temporary zone.")
+                    // Remove the temporary zone and reset the ID
+                    await removeGeographicCondition(for: zoneId)
+                    self.temporaryZoneId = nil
+                    return
+                }
+
                 do {
                     // Fetch zone details before proceeding
                     let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
@@ -189,6 +202,14 @@ class LocationManager: NSObject, ObservableObject {
             DispatchQueue.main.async {
                 self.userLocation = newLocation
             }
+            
+            // If the user moves after creating a temporary zone, remove it
+             if temporaryZoneId != nil {
+                 await removeGeographicCondition(for: temporaryZoneId!)
+                 temporaryZoneId = nil
+                 print("User moved. Removed temporary zone.")
+             }
+            
             if shouldUploadLocation(newLocation) {
                 uploadLocation(newLocation)
             }
@@ -390,4 +411,48 @@ extension LocationManager {
             locationManager.requestAlwaysAuthorization()
         }
     }
+
+    // MARK: - Timer
+
+    /// Start the inactivity timer when the app goes into the background or when needed
+    func startInactivityTimer() {
+        stopInactivityTimer() // Stop any existing timer first
+
+        inactivityTimer = Timer.scheduledTimer(withTimeInterval: 15 * 60, repeats: false) { [weak self] _ in
+            self?.createTemporaryZoneIfNeeded()
+        }
+    }
+
+    /// Stop the inactivity timer
+    func stopInactivityTimer() {
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
+    }
+
+    // MARK: - Temporary
+
+    private func createTemporaryZoneIfNeeded() {
+        guard let currentLocation = userLocation else {
+            print("Current location is not available")
+            return
+        }
+
+        // Generate a new UUID for the temporary zone
+        let newZoneId = UUID()
+        temporaryZoneId = newZoneId
+
+        let center = CLLocationCoordinate2D(
+            latitude: currentLocation.coordinate.latitude,
+            longitude: currentLocation.coordinate.longitude
+        )
+        let condition = CLMonitor.CircularGeographicCondition(center: center, radius: temporaryZoneRadius)
+
+        Task {
+            await monitor?.add(condition, identifier: newZoneId.uuidString, assuming: .satisfied)
+            print(
+                "[createTemporaryZoneIfNeeded] Added temporary zone for user inactivity at location: \(center) with radius: \(temporaryZoneRadius)m"
+            )
+        }
+    }
+
 }

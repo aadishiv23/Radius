@@ -42,6 +42,8 @@ struct HomeView: View {
     @State private var addZoneButtonScale: CGFloat = 0.0
     @State private var friendRequestButtonScale: CGFloat = 0.0
 
+    @Namespace private var zoomNamespace
+
     /// Initialization with repositories
     init(
         friendsRepository: FriendsRepository,
@@ -324,21 +326,44 @@ struct HomeView: View {
                 }
 
                 Spacer()
-
-                Button(action: {
-                    showFullScreenMap.toggle()
-                    let generator = UIImpactFeedbackGenerator(style: .light)
-                    generator.impactOccurred()
-                }) {
-                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                        .circularButtonStyle()
+                
+                if #available(iOS 18, *) {
+                    Button(action: {
+                        showFullScreenMap.toggle()
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                    }) {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .circularButtonStyle()
+                            .matchedTransitionSource(id: "zoom", in: zoomNamespace)
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.top, 20)
+                } else {
+                    Button(action: {
+                        showFullScreenMap.toggle()
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                    }) {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .circularButtonStyle()
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.top, 20)
                 }
-                .padding(.trailing, 20)
-                .padding(.top, 20)
+
+ 
             }
         }
         .fullScreenCover(isPresented: $showFullScreenMap) {
-            FullScreenMapView()
+            if #available(iOS 18, *) {
+                FullScreenMapView()
+                    .navigationTransition(.zoom(sourceID: "zoom", in: zoomNamespace))
+                    .environmentObject(friendsDataManager)
+            } else {
+                FullScreenMapView() // Fallback without transition for older iOS versions
+                    .environmentObject(friendsDataManager)
+            }
         }
     }
 

@@ -5,9 +5,9 @@
 //  Created by Aadi Shiv Malhotra on 4/5/24.
 //
 
-import SwiftUI
-import Supabase
 import AppIntents
+import Supabase
+import SwiftUI
 
 @main
 struct RadiusApp: App {
@@ -16,7 +16,9 @@ struct RadiusApp: App {
     @StateObject private var friendsDataManager: FriendsDataManager
     @StateObject private var authViewModel: AuthViewModel
     @StateObject var locationManager = LocationManager.shared
-    
+
+    @Environment(\.scenePhase) var scenePhase
+
     init() {
         let friendsDataManager = FriendsDataManager(supabaseClient: supabaseClient)
         _friendsDataManager = StateObject(wrappedValue: friendsDataManager)
@@ -31,22 +33,32 @@ struct RadiusApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(friendsDataManager)
                 .environmentObject(authViewModel)
+                .onChange(of: scenePhase) { newPhase in
+                    switch newPhase {
+                    case .background:
+                        locationManager.startInactivityTimer()
+                    case .active:
+                        locationManager.stopInactivityTimer()
+                    default:
+                        break
+                    }
+                }
         }
     }
 }
 
-//@main
-//struct RadiusApp: App {
+// @main
+// struct RadiusApp: App {
 //    let dataController = DataController()
 //    let friendsDataManager: FriendsDataManager
 //    let supabaseClient = supabase
-//    
+//
 //    init() {
 //        friendsDataManager = FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient)
 //        CLLocationCoordinate2DTransformer.register()
 //        ColorTransformer.register()
 //    }
-//    
+//
 //    var body: some Scene {
 //        WindowGroup {
 //            AppView()
@@ -54,11 +66,10 @@ struct RadiusApp: App {
 //                .environmentObject(FriendsDataManager(dataController: dataController, supabaseClient: supabaseClient))
 //        }
 //    }
-//    
-//}
+//
+// }
 
-
-//struct RadiusApp: App {
+// struct RadiusApp: App {
 //    //@StateObject var friendData = FriendData()  // Create an instance of your data model
 //    @State var isAuthenticated = false
 //    let dataController = DataController() // Initialize your Core Data controller
@@ -94,7 +105,8 @@ struct RadiusApp: App {
 //                //                                Label("Map", systemImage: "map")
 //                //                            }
 //                //                    }
-//                //                    .environmentObject(friendsDataManager)  // Provide the EnvironmentObject to all views
+//                //                    .environmentObject(friendsDataManager)  // Provide the EnvironmentObject to all
+//                /views
 //                //}
 //            }
 //            else {
@@ -104,4 +116,4 @@ struct RadiusApp: App {
 //
 //    }
 //
-//}
+// }
