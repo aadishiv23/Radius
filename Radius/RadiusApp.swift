@@ -33,16 +33,6 @@ struct RadiusApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(friendsDataManager)
                 .environmentObject(authViewModel)
-                .onChange(of: scenePhase) { newPhase in
-                    switch newPhase {
-                    case .background:
-                        locationManager.startInactivityTimer()
-                    case .active:
-                        locationManager.stopInactivityTimer()
-                    default:
-                        break
-                    }
-                }
         }
     }
 }
