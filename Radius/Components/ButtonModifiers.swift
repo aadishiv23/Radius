@@ -14,9 +14,11 @@ struct CircleButtonStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding()
-            .background(Color.white.opacity(0.9))
+            .background(
+                colorScheme == .light ? Color.white.opacity(0.9) : Color.black.opacity(0.7)
+            )
             .clipShape(Circle())
-            .shadow(radius: 3)
+            .shadow(color: .gray.opacity(0.4), radius: 3)
     }
 }
 
@@ -25,3 +27,4 @@ extension View {
         modifier(CircleButtonStyle())
     }
 }
+
