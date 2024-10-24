@@ -9,6 +9,10 @@ import CoreLocation
 import Foundation
 import MapKit
 
+import CoreLocation
+import Foundation
+import MapKit
+
 class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var fogOverlay: MKOverlay?
     @Published var totalTiles = 0
@@ -16,11 +20,44 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var uncoverMessage: String?
 
     private var locationManager = CLLocationManager()
-    private var visitedTiles: Set<String> = []
-    private let visitedTilesQueue = DispatchQueue(label: "visitedTilesQueue", attributes: .concurrent)
+    private var visitedRegions: [String: TileRegion] = [:]
+    private let visitedRegionsQueue = DispatchQueue(label: "visitedRegionsQueue", attributes: .concurrent)
 
+    // Constants for tile and region management
     private let tileSizeMeters = 100.0
-    private let maxDistance = 5000.0
+    private let viewportRadius = 10000.0  // Radius around user for rendering
+    
+    // Structure to represent a tile region
+    private struct TileRegion {
+        let bounds: MKCoordinateRegion
+        let key: String
+        let timestamp: Date
+        
+        init(coordinate: CLLocationCoordinate2D, tileSizeMeters: Double, key: String) {
+            // Calculate region bounds based on tile size
+            let latitudeDelta = tileSizeMeters / 111000.0
+            let longitudeDelta = tileSizeMeters / (111000.0 * cos(coordinate.latitude * .pi / 180))
+            
+            self.bounds = MKCoordinateRegion(
+                center: coordinate,
+                span: MKCoordinateSpan(
+                    latitudeDelta: latitudeDelta,
+                    longitudeDelta: longitudeDelta
+                )
+            )
+            self.key = key
+            self.timestamp = Date()
+        }
+        
+        func contains(_ coordinate: CLLocationCoordinate2D) -> Bool {
+            let region = bounds
+            let latInRange = coordinate.latitude >= (region.center.latitude - region.span.latitudeDelta/2) &&
+                           coordinate.latitude <= (region.center.latitude + region.span.latitudeDelta/2)
+            let lonInRange = coordinate.longitude >= (region.center.longitude - region.span.longitudeDelta/2) &&
+                           coordinate.longitude <= (region.center.longitude + region.span.longitudeDelta/2)
+            return latInRange && lonInRange
+        }
+    }
 
     override init() {
         super.init()
@@ -28,145 +65,197 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         applyLocationAccuracySettings()
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
-        loadVisitedTiles()
-        updateFogOverlay()
+        loadVisitedRegions()
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        let tileKey = tileKeyForLocation(location.coordinate)
+        let coordinate = location.coordinate
         
-        if !isTileVisited(tileKey) {
-            addVisitedTile(tileKey)
-            updateFogOverlay(newTileKey: tileKey)
+        // Check if the current location is in any existing regions
+        let regionKey = generateRegionKey(for: coordinate)
+        if !isRegionVisited(coordinate) {
+            addVisitedRegion(coordinate, key: regionKey)
             showUncoverMessage()
         }
-        else {
-            // Force update for the current tile if already marked as visited
-            updateFogOverlay(newTileKey: tileKey)
-        }
+        
+        updateFogOverlay()
     }
 
-    private func tileKeyForLocation(_ coordinate: CLLocationCoordinate2D) -> String {
-        let latitudeDegree = tileSizeMeters / 111_000.0
-        let longitudeDegree = tileSizeMeters / (111_000.0 * cos(coordinate.latitude * .pi / 180))
-
+    private func generateRegionKey(for coordinate: CLLocationCoordinate2D) -> String {
+        let latitudeDegree = tileSizeMeters / 111000.0
+        let longitudeDegree = tileSizeMeters / (111000.0 * cos(coordinate.latitude * .pi / 180))
+        
         let x = Int((coordinate.latitude / latitudeDegree).rounded())
         let y = Int((coordinate.longitude / longitudeDegree).rounded())
         return "\(x)_\(y)"
     }
 
-    private func addVisitedTile(_ tileKey: String) {
-        visitedTilesQueue.async(flags: .barrier) {
-            self.visitedTiles.insert(tileKey)
-        }
-        saveVisitedTiles()
-    }
-
-    private func isTileVisited(_ tileKey: String) -> Bool {
-        visitedTilesQueue.sync {
-            visitedTiles.contains(tileKey)
-        }
-    }
-
-    func updateFogOverlay(newTileKey: String? = nil) {
-        guard let userLocation = locationManager.location?.coordinate else { return }
-
-        let latitudeDegree = tileSizeMeters / 111_000.0
-        let longitudeDegree = tileSizeMeters / (111_000.0 * cos(userLocation.latitude * .pi / 180))
-
-        let userTileX = Int(userLocation.latitude / latitudeDegree)
-        let userTileY = Int(userLocation.longitude / longitudeDegree)
-
-        let tileCount = Int((maxDistance / tileSizeMeters).rounded(.up))
-        let minX = userTileX - tileCount
-        let maxX = userTileX + tileCount
-        let minY = userTileY - tileCount
-        let maxY = userTileY + tileCount
-
-        // Define the outer boundary coordinates
-        let boundaryDegreeLat = Double(tileCount) * latitudeDegree
-        let boundaryDegreeLon = Double(tileCount) * longitudeDegree
-
-        let topLeft = CLLocationCoordinate2D(
-            latitude: userLocation.latitude - boundaryDegreeLat,
-            longitude: userLocation.longitude - boundaryDegreeLon
-        )
-        let topRight = CLLocationCoordinate2D(
-            latitude: userLocation.latitude - boundaryDegreeLat,
-            longitude: userLocation.longitude + boundaryDegreeLon
-        )
-        let bottomRight = CLLocationCoordinate2D(
-            latitude: userLocation.latitude + boundaryDegreeLat,
-            longitude: userLocation.longitude + boundaryDegreeLon
-        )
-        let bottomLeft = CLLocationCoordinate2D(
-            latitude: userLocation.latitude + boundaryDegreeLat,
-            longitude: userLocation.longitude - boundaryDegreeLon
-        )
-        let outerCoordinates = [topLeft, topRight, bottomRight, bottomLeft]
-
-        var holeCoordinates: [[CLLocationCoordinate2D]] = []
-        for x in minX...maxX {
-            for y in minY...maxY {
-                let tileKey = "\(x)_\(y)"
-                if visitedTiles.contains(tileKey) {
-                    let tileCoords = coordinatesForTile(
-                        x: x,
-                        y: y,
-                        latitudeDegree: latitudeDegree,
-                        longitudeDegree: longitudeDegree
-                    )
-                    holeCoordinates.append(tileCoords)
+    private func isRegionVisited(_ coordinate: CLLocationCoordinate2D) -> Bool {
+        visitedRegionsQueue.sync {
+            for region in visitedRegions.values {
+                if region.contains(coordinate) {
+                    return true
                 }
             }
+            return false
         }
+    }
 
-        let combinedPolygon = MKPolygon(
+    private func addVisitedRegion(_ coordinate: CLLocationCoordinate2D, key: String) {
+        let region = TileRegion(coordinate: coordinate, tileSizeMeters: tileSizeMeters, key: key)
+        visitedRegionsQueue.async(flags: .barrier) {
+            self.visitedRegions[key] = region
+        }
+        saveVisitedRegions()
+    }
+
+    func updateFogOverlay() {
+        guard let userLocation = locationManager.location?.coordinate else { return }
+        
+        // Create the viewport region around the user
+        let viewportRegion = MKCoordinateRegion(
+            center: userLocation,
+            latitudinalMeters: viewportRadius * 2,
+            longitudinalMeters: viewportRadius * 2
+        )
+        
+        // Get regions within the viewport
+        let visibleRegions = visitedRegionsQueue.sync {
+            visitedRegions.values.filter { region in
+                isRegion(region.bounds, intersectingWith: viewportRegion)
+            }
+        }
+        
+        // Create the fog polygon with holes for visited regions
+        let fogPolygon = createFogPolygon(
+            around: userLocation,
+            withHoles: visibleRegions.map { $0.bounds }
+        )
+        
+        DispatchQueue.main.async {
+            self.fogOverlay = fogPolygon
+            self.totalTiles = self.calculateTotalTilesInViewport()
+            self.uncoveredTiles = visibleRegions.count
+        }
+    }
+
+    private func createFogPolygon(
+        around coordinate: CLLocationCoordinate2D,
+        withHoles regions: [MKCoordinateRegion]
+    ) -> MKPolygon {
+        // Create outer boundary of fog (viewport rectangle)
+        let latDelta = viewportRadius / 111000.0
+        let lonDelta = viewportRadius / (111000.0 * cos(coordinate.latitude * .pi / 180))
+        
+        let outerCoordinates = [
+            CLLocationCoordinate2D(
+                latitude: coordinate.latitude - latDelta,
+                longitude: coordinate.longitude - lonDelta
+            ),
+            CLLocationCoordinate2D(
+                latitude: coordinate.latitude - latDelta,
+                longitude: coordinate.longitude + lonDelta
+            ),
+            CLLocationCoordinate2D(
+                latitude: coordinate.latitude + latDelta,
+                longitude: coordinate.longitude + lonDelta
+            ),
+            CLLocationCoordinate2D(
+                latitude: coordinate.latitude + latDelta,
+                longitude: coordinate.longitude - lonDelta
+            )
+        ]
+        
+        // Create holes for visited regions
+        let holes = regions.map { region -> MKPolygon in
+            let coords = [
+                CLLocationCoordinate2D(
+                    latitude: region.center.latitude - region.span.latitudeDelta/2,
+                    longitude: region.center.longitude - region.span.longitudeDelta/2
+                ),
+                CLLocationCoordinate2D(
+                    latitude: region.center.latitude - region.span.latitudeDelta/2,
+                    longitude: region.center.longitude + region.span.longitudeDelta/2
+                ),
+                CLLocationCoordinate2D(
+                    latitude: region.center.latitude + region.span.latitudeDelta/2,
+                    longitude: region.center.longitude + region.span.longitudeDelta/2
+                ),
+                CLLocationCoordinate2D(
+                    latitude: region.center.latitude + region.span.latitudeDelta/2,
+                    longitude: region.center.longitude - region.span.longitudeDelta/2
+                )
+            ]
+            return MKPolygon(coordinates: coords, count: coords.count)
+        }
+        
+        return MKPolygon(
             coordinates: outerCoordinates,
             count: outerCoordinates.count,
-            interiorPolygons: holeCoordinates.map { MKPolygon(coordinates: $0, count: $0.count) }
+            interiorPolygons: holes
         )
+    }
 
-        DispatchQueue.main.async {
-            self.fogOverlay = combinedPolygon
-            self.totalTiles = (maxX - minX + 1) * (maxY - minY + 1)
-            self.uncoveredTiles = holeCoordinates.count
+    private func isRegion(_ region1: MKCoordinateRegion, intersectingWith region2: MKCoordinateRegion) -> Bool {
+        let lat1 = region1.center.latitude
+        let lon1 = region1.center.longitude
+        let lat2 = region2.center.latitude
+        let lon2 = region2.center.longitude
+        
+        let latOverlap = abs(lat1 - lat2) <= (region1.span.latitudeDelta/2 + region2.span.latitudeDelta/2)
+        let lonOverlap = abs(lon1 - lon2) <= (region1.span.longitudeDelta/2 + region2.span.longitudeDelta/2)
+        
+        return latOverlap && lonOverlap
+    }
+
+    private func calculateTotalTilesInViewport() -> Int {
+        let tilesPerSide = Int(ceil(viewportRadius * 2 / tileSizeMeters))
+        return tilesPerSide * tilesPerSide
+    }
+
+    private func saveVisitedRegions() {
+        visitedRegionsQueue.sync {
+            let regionData = visitedRegions.mapValues { region -> [String: Any] in
+                return [
+                    "key": region.key,
+                    "latitude": region.bounds.center.latitude,
+                    "longitude": region.bounds.center.longitude,
+                    "timestamp": region.timestamp
+                ]
+            }
+            UserDefaults.standard.set(regionData, forKey: "VisitedRegions")
         }
     }
 
-    private func coordinatesForTile(
-        x: Int,
-        y: Int,
-        latitudeDegree: Double,
-        longitudeDegree: Double
-    ) -> [CLLocationCoordinate2D] {
-        let latitude = Double(x) * latitudeDegree
-        let longitude = Double(y) * longitudeDegree
-
-        return [
-            CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
-            CLLocationCoordinate2D(latitude: latitude, longitude: longitude + longitudeDegree),
-            CLLocationCoordinate2D(latitude: latitude + latitudeDegree, longitude: longitude + longitudeDegree),
-            CLLocationCoordinate2D(latitude: latitude + latitudeDegree, longitude: longitude)
-        ]
-    }
-
-    private func saveVisitedTiles() {
-        let tilesArray = Array(visitedTiles)
-        UserDefaults.standard.set(tilesArray, forKey: "VisitedTiles")
-    }
-
-    private func loadVisitedTiles() {
-        if let tilesArray = UserDefaults.standard.array(forKey: "VisitedTiles") as? [String] {
-            visitedTiles = Set(tilesArray)
+    private func loadVisitedRegions() {
+        if let savedRegions = UserDefaults.standard.dictionary(forKey: "VisitedRegions") as? [String: [String: Any]] {
+            var loadedRegions: [String: TileRegion] = [:]
+            
+            for (key, data) in savedRegions {
+                if let latitude = data["latitude"] as? Double,
+                   let longitude = data["longitude"] as? Double {
+                    let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    loadedRegions[key] = TileRegion(
+                        coordinate: coordinate,
+                        tileSizeMeters: tileSizeMeters,
+                        key: key
+                    )
+                }
+            }
+            
+            visitedRegionsQueue.async(flags: .barrier) {
+                self.visitedRegions = loadedRegions
+            }
         }
     }
 
     private func showUncoverMessage() {
-        uncoverMessage = "New area uncovered!"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.uncoverMessage = nil
+        DispatchQueue.main.async {
+            self.uncoverMessage = "New area uncovered!"
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.uncoverMessage = nil
+            }
         }
     }
 
