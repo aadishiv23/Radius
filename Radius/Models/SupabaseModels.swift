@@ -172,20 +172,16 @@ struct Profile: Codable, Identifiable {
     var id: UUID
     var username: String
     var full_name: String
-    var color: String
     var latitude: Double
     var longitude: Double
-    var phone_num: String
     var zones: [Zone]
 
     enum CodingKeys: String, CodingKey {
         case id
         case username
         case full_name
-        case color
         case latitude
         case longitude
-        case phone_num
         case zones
     }
 
@@ -194,16 +190,14 @@ struct Profile: Codable, Identifiable {
         self.id = try container.decode(UUID.self, forKey: .id)
         self.username = try container.decodeIfPresent(String.self, forKey: .username) ?? "Unknown User"
         self.full_name = try container.decodeIfPresent(String.self, forKey: .full_name) ?? "Unknown Full Name"
-        self.color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#FFFFFF"
         self.latitude = try container.decodeIfPresent(Double.self, forKey: .latitude) ?? 0.0
         self.longitude = try container.decodeIfPresent(Double.self, forKey: .longitude) ?? 0.0
-        self.phone_num = try container.decodeIfPresent(String.self, forKey: .phone_num) ?? "123456789"
         self.zones = try container.decodeIfPresent([Zone].self, forKey: .zones) ?? []
     }
 
-    var swiftUIColor: Color {
-        Color(hex: color) ?? .black // .black
-    }
+//    var swiftUIColor: Color {
+//      //  Color(hex: color) ?? .black // .black
+//    }
 }
 
 // struct Profile: Decodable, Identifiable {
