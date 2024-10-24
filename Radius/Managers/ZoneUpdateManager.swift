@@ -323,20 +323,29 @@ extension ZoneUpdateManager {
             dateFormatter.dateFormat = "yyyy-MM-dd"
             let currentDateString = dateFormatter.string(from: Date())
 
+            // Step 1: Fetch the latest `zone_exit_id` for the given `zoneId`
+            guard let latestZoneExitId = try await fetchLatestZoneExitId(for: profileId, zoneId: zoneId) else {
+                print("No zone exit found for profile \(profileId) and zone \(zoneId)")
+                return false
+            }
+
+            // Step 2: Check if a daily zone exit already exists for the `zone_exit_id`
             let existingExit: [DailyZoneExit] = try await supabaseClient
                 .from("daily_zone_exits")
                 .select("*")
                 .eq("profile_id", value: profileId.uuidString)
-                .eq("zone_id", value: zoneId.uuidString)
+                .eq("zone_exit_id", value: latestZoneExitId.uuidString) // Use the fetched zone_exit_id here
                 .eq("date", value: currentDateString)
                 .execute()
                 .value
 
             return !existingExit.isEmpty
         }
+
         // If it's not a "home" zone, always return false
         return false
     }
+
 }
 
 extension ISO8601DateFormatter {
