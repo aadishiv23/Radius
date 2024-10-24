@@ -13,7 +13,6 @@ enum LocationAccuracyMode: String {
     case balanced = "Balanced"
     case lowPower = "LowPower"
 
-    /// Initialize from a string or return a default value
     static func from(rawValue: String?) -> LocationAccuracyMode {
         guard let rawValue else {
             return .balanced
@@ -24,6 +23,7 @@ enum LocationAccuracyMode: String {
 
 @available(iOS 17.0, *)
 class LocationManager: NSObject, ObservableObject {
+    // MARK: - Properties
     static let shared = LocationManager()
     private var locationManager = CLLocationManager()
     private var monitor: CLMonitor?
@@ -31,238 +31,20 @@ class LocationManager: NSObject, ObservableObject {
     private let locationUpdateInterval: TimeInterval = 60
     private let minimumDistance: CLLocationDistance = 50
     private let userDefaultsKey = "LocationAccuracyMode"
-    private var profileFetched = false // Flag to check if profile is fetched
-
-    private var inactivityTimer: Timer?
+    private var profileFetched = false
+    
+    // Temporary Zone Properties
     private var temporaryZoneId: UUID?
     private let temporaryZoneRadius: CLLocationDistance = 150
+    private var lastSignificantMovement: Date?
+    private let inactivityThreshold: TimeInterval = 15 * 60 // 15 minutes
+    private let minimumSignificantDistance: CLLocationDistance = 50 // meters
 
     let zoneUpdateManager: ZoneUpdateManager
     private let fdm: FriendsDataManager
 
     @Published var userZones: [Zone] = []
     @Published var userLocation: CLLocation?
-
-    private var initializationCancellable: AnyCancellable? // ⬅️ Added: To manage initialization sequence
-
-    override init() {
-        self.zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)
-        self.fdm = FriendsDataManager(supabaseClient: supabase)
-
-        super.init()
-        let savedMode = UserDefaults.standard.string(forKey: userDefaultsKey)
-        self.accuracyMode = LocationAccuracyMode.from(rawValue: savedMode)
-        locationManager.delegate = self
-        applyAccuracySettings()
-        locationManager.allowsBackgroundLocationUpdates = true
-        locationManager.pausesLocationUpdatesAutomatically = false
-
-        checkLocationAuthorization()
-
-        // Start the initialization sequence ⬅️ Changed: Moved initialization to a separate method
-        initializeLocationManager()
-    }
-
-    // MARK: - Initialization Sequence ⬅️ Added: New section for initialization
-
-    private func initializeLocationManager() { // ⬅️ Added: New method for initialization
-        Task {
-            do {
-                try await fetchUserProfileAndZones() // Fetch profile and zones first
-                self.profileFetched = true // Set flag once profile is fetched
-                await setupMonitor() // Setup monitor after fetching zones
-                startMonitoringSignificantLocationChanges() // Start monitoring
-                locationManager.startUpdatingLocation() // Start updating location
-            } catch {
-                print("Initialization failed: \(error)")
-            }
-        }
-    }
-
-    // MARK: - monitor signfiicant locaiton changes
-
-    /// Ensure the app keeps tracking location when terminated or suspended
-    func startMonitoringSignificantLocationChanges() {
-        locationManager.startMonitoringSignificantLocationChanges()
-    }
-
-    // MARK: - Fetch User Profile and Zones ⬅️ Added: New section for fetching user data
-
-    private func fetchUserProfileAndZones() async throws { // ⬅️ Changed: Modified to throw errors
-        await fdm.fetchCurrentUserProfile() // Await fetch
-        print("fetched")
-        guard let currentUser = fdm.currentUser else {
-            throw NSError(
-                domain: "LocationManager",
-                code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "Current user is nil"]
-            )
-        }
-        await MainActor.run {
-            self.userZones = currentUser.zones
-        }
-    }
-
-    // MARK: - Monitor Setup ⬅️ Added: New section for monitor setup
-
-    private func setupMonitor() async { // ⬅️ Changed: Made setupMonitor asynchronous
-        monitor = await CLMonitor("ZoneMonitor")
-        print("[setupMonitor] Initialized Monitor 'ZoneMonitor'.")
-
-        print("User zones: \(userZones.count)")
-
-        for zone in userZones {
-            let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
-            let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
-
-            await monitor?.add(condition, identifier: zone.id.uuidString, assuming: .satisfied)
-            print("[setupMonitor] Added condition for zone ID: \(zone.id.uuidString)")
-        }
-
-        Task {
-            guard let monitor else {
-                return
-            }
-            print("[setupMonitor] Starting to listen for monitor events.")
-            for try await event in await monitor.events { // ⬅️ Changed: Updated to use `for await`
-                print("[setupMonitor] Received event: \(event)")
-                handleMonitorEvent(event)
-            }
-        }
-    }
-
-    // MARK: - Handle Monitor Events ⬅️ Added: New section for handling monitor events
-
-    private func handleMonitorEvent(_ event: CLMonitor.Event) {
-        print("[handleMonitorEvent] Event received: \(event.state.rawValue) for identifier: \(event.identifier)")
-        if event.state == .unsatisfied {
-            Task {
-                guard let currentUserId = fdm.currentUser?.id,
-                      let zoneId = UUID(uuidString: event.identifier)
-                else {
-                    print("[handleMonitorEvent] Invalid user or zone ID")
-                    return
-                }
-
-                // Check if it's the temporary zone
-                if zoneId == temporaryZoneId {
-                    print("[handleMonitorEvent] User exited temporary zone.")
-                    // Remove the temporary zone and reset the ID
-                    await removeGeographicCondition(for: zoneId)
-                    self.temporaryZoneId = nil
-                    return
-                }
-
-                do {
-                    // Fetch zone details before proceeding
-                    let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
-                    print("[handleMonitorEvent] Fetched zone details: \(zone.name)")
-
-                    // Upload zone exit
-                    try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: event.date)
-                    print("[handleMonitorEvent] Uploaded zone exit for zone: \(zone.name)")
-
-                    // Handle daily zone exits and points
-                    try await zoneUpdateManager.handleDailyZoneExits(
-                        for: currentUserId,
-                        zoneIds: [zoneId],
-                        at: event.date
-                    )
-                    print("[handleMonitorEvent] Handled daily zone exits for zone: \(zone.name)")
-
-                } catch {
-                    print("[handleMonitorEvent] Failed to handle monitor event: \(error)")
-                }
-            }
-        }
-    }
-
-    // MARK: - Remove a geographic condition upon deletion of a zone
-
-    func removeGeographicCondition(for zoneId: UUID) async {
-        guard let monitor else {
-            return
-        }
-
-        // Remove the monitored condition by accessing its identifier
-        await monitor.remove(zoneId.uuidString)
-
-        print("Removed geographic condition for zone: \(zoneId)")
-    }
-
-    // MARK: - Location Updates ⬅️ Changed: Updated location updates section
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let newLocation = locations.last else {
-            return
-        }
-
-        Task {
-            await ensureProfileIsFetched() // Wait for profile fetch
-            DispatchQueue.main.async {
-                self.userLocation = newLocation
-            }
-            
-            // If the user moves after creating a temporary zone, remove it
-             if temporaryZoneId != nil {
-                 await removeGeographicCondition(for: temporaryZoneId!)
-                 temporaryZoneId = nil
-                 print("User moved. Removed temporary zone.")
-             }
-            
-            if shouldUploadLocation(newLocation) {
-                uploadLocation(newLocation)
-            }
-        }
-    }
-
-    // Ensure the profile is fetched before proceeding ⬅️ Added: New method to ensure profile is fetched
-
-    private func ensureProfileIsFetched() async {
-        while !profileFetched {
-            try? await Task.sleep(nanoseconds: 500_000_000) // Wait 500ms
-        }
-    }
-
-    private func shouldUploadLocation(_ newLocation: CLLocation) -> Bool {
-        guard let lastLocation = lastUploadedLocation else {
-            return true
-        }
-
-        let timeInterval = newLocation.timestamp.timeIntervalSince(lastLocation.timestamp)
-        let distance = newLocation.distance(from: lastLocation)
-        return timeInterval >= locationUpdateInterval || distance >= locationManager.distanceFilter
-    }
-
-    private func uploadLocation(_ newLocation: CLLocation) {
-        let locationArr = [
-            "latitude": newLocation.coordinate.latitude,
-            "longitude": newLocation.coordinate.longitude
-        ]
-        Task {
-            do {
-                await fdm.fetchCurrentUserProfile() // Fetch profile again before updating location
-                guard let currentUser = fdm.currentUser else {
-                    print("Current user is nil, cannot update location.")
-                    return
-                }
-                try await supabase
-                    .from("profiles")
-                    .update(locationArr)
-                    .eq("id", value: currentUser.id.uuidString)
-                    .execute()
-
-                DispatchQueue.main.async {
-                    self.lastUploadedLocation = newLocation
-                }
-            } catch {
-                print("Failed to update location: \(error)")
-            }
-        }
-    }
-
-    // MARK: - Accuracy Settings ⬅️ Changed: Moved accuracy settings below location updates
-
     @Published var accuracyMode: LocationAccuracyMode = .balanced {
         didSet {
             saveUserPreference()
@@ -270,22 +52,70 @@ class LocationManager: NSObject, ObservableObject {
         }
     }
 
-    private func applyAccuracySettings() {
-        switch accuracyMode {
-        case .highAccuracy:
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-            locationManager.distanceFilter = 25 // frequent updates
-        case .balanced:
-            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-            locationManager.distanceFilter = 100 // moderate updates
-        case .lowPower:
-            locationManager.desiredAccuracy = kCLLocationAccuracyReduced
-            locationManager.distanceFilter = 500 // infrequent updates
+    // MARK: - Initialization
+    override init() {
+        self.zoneUpdateManager = ZoneUpdateManager(supabaseClient: supabase)
+        self.fdm = FriendsDataManager(supabaseClient: supabase)
+
+        super.init()
+        
+        let savedMode = UserDefaults.standard.string(forKey: userDefaultsKey)
+        self.accuracyMode = LocationAccuracyMode.from(rawValue: savedMode)
+        
+        locationManager.delegate = self
+        applyAccuracySettings()
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
+        
+        checkLocationAuthorization()
+        initializeLocationManager()
+        
+        // Initialize last movement time
+        lastSignificantMovement = Date()
+    }
+
+    private func initializeLocationManager() {
+        Task {
+            do {
+                try await fetchUserProfileAndZones()
+                self.profileFetched = true
+                await setupMonitor()
+                startMonitoringSignificantLocationChanges()
+                locationManager.startUpdatingLocation()
+            } catch {
+                print("Initialization failed: \(error)")
+            }
         }
     }
 
-    private func saveUserPreference() {
-        UserDefaults.standard.set(accuracyMode.rawValue, forKey: userDefaultsKey)
+    // MARK: - Location Updates
+    private func handleLocationUpdate(_ location: CLLocation) {
+        let previousLocation = userLocation
+        userLocation = location
+        
+        // If this is the first location update, just store it and return
+        guard let previousLocation = previousLocation else { return }
+        
+        let distance = location.distance(from: previousLocation)
+        
+        // If movement is detected, update last movement time
+        if distance > minimumSignificantDistance {
+            lastSignificantMovement = Date()
+            
+            // If there was a temporary zone, remove it
+            if let tempId = temporaryZoneId {
+                Task {
+                    await removeGeographicCondition(for: tempId)
+                    temporaryZoneId = nil
+                }
+            }
+        } else {
+            // Check if we've been stationary long enough to create a temporary zone
+            let timeStationary = Date().timeIntervalSince(lastSignificantMovement ?? Date())
+            if timeStationary >= inactivityThreshold && temporaryZoneId == nil {
+                createTemporaryZoneIfNeeded()
+            }
+        }
     }
 
     // MARK: - Location Services ⬅️ Changed: Updated location services section
@@ -299,6 +129,99 @@ class LocationManager: NSObject, ObservableObject {
         }
     }
 
+    // MARK: - Monitor Setup
+    private func setupMonitor() async {
+        monitor = await CLMonitor("ZoneMonitor")
+        print("[setupMonitor] Initialized Monitor 'ZoneMonitor'.")
+
+        for zone in userZones {
+            let center = CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude)
+            let condition = CLMonitor.CircularGeographicCondition(center: center, radius: zone.radius)
+            await monitor?.add(condition, identifier: zone.id.uuidString, assuming: .satisfied)
+        }
+
+        Task {
+            guard let monitor else { return }
+            for try await event in await monitor.events {
+                handleMonitorEvent(event)
+            }
+        }
+    }
+
+    // MARK: - Temporary Zone Management
+    private func createTemporaryZoneIfNeeded() {
+        guard let currentLocation = userLocation,
+              temporaryZoneId == nil else { return }
+        
+        let newZoneId = UUID()
+        let center = currentLocation.coordinate
+        
+        Task {
+            let condition = CLMonitor.CircularGeographicCondition(
+                center: center,
+                radius: temporaryZoneRadius
+            )
+            
+            await monitor?.add(condition, identifier: newZoneId.uuidString, assuming: .satisfied)
+            temporaryZoneId = newZoneId
+            
+            // Store the creation time and location
+            UserDefaults.standard.set(Date(), forKey: "tempZoneCreationTime")
+            UserDefaults.standard.set(center.latitude, forKey: "tempZoneLatitude")
+            UserDefaults.standard.set(center.longitude, forKey: "tempZoneLongitude")
+        }
+    }
+
+    private func cleanupStaleTemporaryZones() {
+        if let creationTime = UserDefaults.standard.object(forKey: "tempZoneCreationTime") as? Date,
+           Date().timeIntervalSince(creationTime) > 24 * 60 * 60 {
+            if let tempId = temporaryZoneId {
+                Task {
+                    await removeGeographicCondition(for: tempId)
+                    temporaryZoneId = nil
+                    
+                    UserDefaults.standard.removeObject(forKey: "tempZoneCreationTime")
+                    UserDefaults.standard.removeObject(forKey: "tempZoneLatitude")
+                    UserDefaults.standard.removeObject(forKey: "tempZoneLongitude")
+                }
+            }
+        }
+    }
+
+    // MARK: - Monitor Events
+    private func handleMonitorEvent(_ event: CLMonitor.Event) {
+        print("[handleMonitorEvent] Event received: \(event.state.rawValue) for identifier: \(event.identifier)")
+        if event.state == .unsatisfied {
+            Task {
+                guard let currentUserId = fdm.currentUser?.id,
+                      let zoneId = UUID(uuidString: event.identifier) else {
+                    print("[handleMonitorEvent] Invalid user or zone ID")
+                    return
+                }
+
+                if zoneId == temporaryZoneId {
+                    print("[handleMonitorEvent] User exited temporary zone.")
+                    await removeGeographicCondition(for: zoneId)
+                    self.temporaryZoneId = nil
+                    return
+                }
+
+                do {
+                    let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
+                    try await zoneUpdateManager.uploadZoneExit(for: currentUserId, zoneIds: [zoneId], at: event.date)
+                    try await zoneUpdateManager.handleDailyZoneExits(
+                        for: currentUserId,
+                        zoneIds: [zoneId],
+                        at: event.date
+                    )
+                } catch {
+                    print("[handleMonitorEvent] Failed to handle monitor event: \(error)")
+                }
+            }
+        }
+    }
+
+    // MARK: - Location Services
     private func checkLocationAuthorization() {
         switch locationManager.authorizationStatus {
         case .notDetermined:
@@ -308,7 +231,6 @@ class LocationManager: NSObject, ObservableObject {
         case .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
         case .authorizedAlways:
-            // Only start updating location if initialization is complete ⬅️ Changed: Added check for profileFetched
             if profileFetched {
                 locationManager.startUpdatingLocation()
             }
@@ -317,8 +239,95 @@ class LocationManager: NSObject, ObservableObject {
         }
     }
 
+    // MARK: - Profile and Zones
+    private func fetchUserProfileAndZones() async throws {
+        await fdm.fetchCurrentUserProfile()
+        guard let currentUser = fdm.currentUser else {
+            throw NSError(
+                domain: "LocationManager",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Current user is nil"]
+            )
+        }
+        await MainActor.run {
+            self.userZones = currentUser.zones
+        }
+    }
+
+    private func ensureProfileIsFetched() async {
+        while !profileFetched {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
+    }
+
+    // MARK: - Location Upload
+    private func shouldUploadLocation(_ newLocation: CLLocation) -> Bool {
+        guard let lastLocation = lastUploadedLocation else {
+            return true
+        }
+        let timeInterval = newLocation.timestamp.timeIntervalSince(lastLocation.timestamp)
+        let distance = newLocation.distance(from: lastLocation)
+        return timeInterval >= locationUpdateInterval || distance >= locationManager.distanceFilter
+    }
+
+    private func uploadLocation(_ newLocation: CLLocation) {
+        let locationArr = [
+            "latitude": newLocation.coordinate.latitude,
+            "longitude": newLocation.coordinate.longitude
+        ]
+        Task {
+            do {
+                await fdm.fetchCurrentUserProfile()
+                guard let currentUser = fdm.currentUser else {
+                    print("Current user is nil, cannot update location.")
+                    return
+                }
+                try await supabase
+                    .from("profiles")
+                    .update(locationArr)
+                    .eq("id", value: currentUser.id.uuidString)
+                    .execute()
+
+                await MainActor.run {
+                    self.lastUploadedLocation = newLocation
+                }
+            } catch {
+                print("Failed to update location: \(error)")
+            }
+        }
+    }
+
+    // MARK: - Accuracy Settings
+    private func applyAccuracySettings() {
+        switch accuracyMode {
+        case .highAccuracy:
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.distanceFilter = 25
+        case .balanced:
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            locationManager.distanceFilter = 100
+        case .lowPower:
+            locationManager.desiredAccuracy = kCLLocationAccuracyReduced
+            locationManager.distanceFilter = 500
+        }
+    }
+
+    private func saveUserPreference() {
+        UserDefaults.standard.set(accuracyMode.rawValue, forKey: userDefaultsKey)
+    }
+
+    // MARK: - Public Methods
+    func startMonitoringSignificantLocationChanges() {
+        locationManager.startMonitoringSignificantLocationChanges()
+    }
+
+    func removeGeographicCondition(for zoneId: UUID) async {
+        await monitor?.remove(zoneId.uuidString)
+        print("Removed geographic condition for zone: \(zoneId)")
+    }
+
     func plsInitiateLocationUpdates() {
-        if profileFetched { // ⬅️ Changed: Added check for profileFetched
+        if profileFetched {
             locationManager.startUpdatingLocation()
         } else {
             print("Cannot initiate location updates before profile is fetched.")
@@ -328,32 +337,65 @@ class LocationManager: NSObject, ObservableObject {
     func stopUpdating() {
         locationManager.stopUpdatingLocation()
     }
+    
+    // MARK: - App Lifecycle Methods
+    func applicationDidEnterBackground() {
+        locationManager.startMonitoringSignificantLocationChanges()
+        
+        if let lastMovement = lastSignificantMovement,
+           Date().timeIntervalSince(lastMovement) >= inactivityThreshold {
+            createTemporaryZoneIfNeeded()
+        }
+    }
+    
+    func applicationWillEnterForeground() {
+        if let tempId = temporaryZoneId {
+            Task {
+                await removeGeographicCondition(for: tempId)
+                temporaryZoneId = nil
+            }
+        }
+        lastSignificantMovement = Date()
+    }
 }
 
 // MARK: - CLLocationManagerDelegate
-
 extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         checkLocationAuthorization()
     }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        
+        Task {
+            await ensureProfileIsFetched()
+            
+            await MainActor.run {
+                handleLocationUpdate(location)
+            }
+            
+            if shouldUploadLocation(location) {
+                uploadLocation(location)
+            }
+        }
+    }
 }
 
+// MARK: - Monitoring Utilities
 extension LocationManager {
     func getMonitoredZones() async -> [(zoneId: UUID, isMonitored: Bool)] {
         var monitoredZones: [(UUID, Bool)] = []
-
-        // Fetch the list of monitored region identifiers
         let monitoredIdentifiers = await monitor?.identifiers ?? []
-
+        
         for zone in userZones {
-            // Check if the zone ID is in the monitoredIdentifiers list
             let isMonitored = monitoredIdentifiers.contains(zone.id.uuidString)
             monitoredZones.append((zone.id, isMonitored))
         }
-
+        
         return monitoredZones
     }
-
+    
     func getMonitorEvents() async throws -> [CLMonitor.Event] {
         var events: [CLMonitor.Event] = []
         if let monitor {
@@ -363,96 +405,34 @@ extension LocationManager {
         }
         return events
     }
-
+    
     func getMonitorRecords() async -> [(zoneId: UUID, record: CLMonitor.Record)] {
         var records: [(UUID, CLMonitor.Record)] = []
-        print("hello")
         if let monitor {
             for zone in userZones {
                 if let record = await monitor.record(for: zone.id.uuidString) {
-                    print("Record condition: \(record.condition)")
-                    print("Record last event: \(record.lastEvent)")
                     records.append((zone.id, record))
-                } else {
-                    print("No record found for zone ID: \(zone.id)")
                 }
             }
-        } else {
-            print("Monitor is not initialized.")
         }
-
         return records
     }
-
-    /// Function to reinitialize location monitoring after app relaunch
+    
     func reinitializeMonitoringIfNeeded() {
-        // Check if the app is authorized to monitor location
         let authorizationStatus = locationManager.authorizationStatus
-
+        
         if authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse {
-            // Reinitialize the monitoring logic here
             Task {
                 do {
-                    // Ensure profile and zones are fetched
                     try await fetchUserProfileAndZones()
-
-                    // Setup monitor for zones
                     await setupMonitor()
-
-                    // Start updating location
                     locationManager.startUpdatingLocation()
-
                 } catch {
                     print("Error reinitializing monitoring: \(error)")
                 }
             }
         } else {
-            // Request location permissions if necessary
             locationManager.requestAlwaysAuthorization()
         }
     }
-
-    // MARK: - Timer
-
-    /// Start the inactivity timer when the app goes into the background or when needed
-    func startInactivityTimer() {
-        stopInactivityTimer() // Stop any existing timer first
-
-        inactivityTimer = Timer.scheduledTimer(withTimeInterval: 15 * 60, repeats: false) { [weak self] _ in
-            self?.createTemporaryZoneIfNeeded()
-        }
-    }
-
-    /// Stop the inactivity timer
-    func stopInactivityTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
-    }
-
-    // MARK: - Temporary
-
-    private func createTemporaryZoneIfNeeded() {
-        guard let currentLocation = userLocation else {
-            print("Current location is not available")
-            return
-        }
-
-        // Generate a new UUID for the temporary zone
-        let newZoneId = UUID()
-        temporaryZoneId = newZoneId
-
-        let center = CLLocationCoordinate2D(
-            latitude: currentLocation.coordinate.latitude,
-            longitude: currentLocation.coordinate.longitude
-        )
-        let condition = CLMonitor.CircularGeographicCondition(center: center, radius: temporaryZoneRadius)
-
-        Task {
-            await monitor?.add(condition, identifier: newZoneId.uuidString, assuming: .satisfied)
-            print(
-                "[createTemporaryZoneIfNeeded] Added temporary zone for user inactivity at location: \(center) with radius: \(temporaryZoneRadius)m"
-            )
-        }
-    }
-
 }
