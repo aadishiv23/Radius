@@ -41,6 +41,10 @@ struct HomeView: View {
     @State private var friendRequestButtonOffset = CGSize.zero
     @State private var addZoneButtonScale: CGFloat = 0.0
     @State private var friendRequestButtonScale: CGFloat = 0.0
+    @State private var showFogOfWarMap = false
+    @State private var fogOfWarButtonOffset = CGSize.zero
+    @State private var fogOfWarButtonScale: CGFloat = 0.0
+
 
     @Namespace private var zoomNamespace
 
@@ -132,20 +136,27 @@ struct HomeView: View {
                                         friendRequestButtonOffset = CGSize(width: 0, height: -160)
                                         friendRequestButtonScale = 1.0
                                     }
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.15)) {
+                                        fogOfWarButtonOffset = CGSize(width: 0, height: -240)
+                                        fogOfWarButtonScale = 1.0
+                                    }
                                 } else {
                                     // Animate buttons disappearing with a jump up before falling
                                     withAnimation(.spring(response: 0.5, dampingFraction: 0.45)) {
-                                        // Move up slightly (negative offset increases)
+                                        fogOfWarButtonOffset = CGSize(width: 0, height: -260)
+                                        fogOfWarButtonScale = 0.0
+                                    }
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.1)) {
                                         friendRequestButtonOffset = CGSize(width: 0, height: -180)
                                         friendRequestButtonScale = 0.0
                                     }
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.1)) {
-                                        // Move up slightly
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.2)) {
                                         addZoneButtonOffset = CGSize(width: 0, height: -100)
                                         addZoneButtonScale = 0.0
                                     }
                                     // Then animate buttons falling into FAB
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.2)) {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.3)) {
+                                        fogOfWarButtonOffset = .zero
                                         friendRequestButtonOffset = .zero
                                         addZoneButtonOffset = .zero
                                     }
@@ -212,6 +223,32 @@ struct HomeView: View {
                             }
                             .offset(friendRequestButtonOffset)
                             .scaleEffect(friendRequestButtonScale)
+
+                            // Fog of War Button
+                            Button(action: {
+                                showFogOfWarMap = true
+                            }) {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Circle()
+                                                    .fill(Color.blue.opacity(0.4))
+                                            )
+                                    )
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+                            .offset(fogOfWarButtonOffset)
+                            .scaleEffect(fogOfWarButtonScale)
                         }
                         .padding()
                     }
@@ -250,7 +287,9 @@ struct HomeView: View {
                 FriendRequestsView()
                     .environmentObject(friendsDataManager)
             }
-
+            .fullScreenCover(isPresented: $showFogOfWarMap) {
+                FogOfWarContainerView()
+            }
             .onReceive(checkDistanceTimer) { _ in
                 checkDistance()
             }
