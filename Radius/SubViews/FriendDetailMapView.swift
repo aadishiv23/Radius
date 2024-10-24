@@ -174,7 +174,7 @@ struct OldFriendDetailMapView: UIViewRepresentable {
         // Ensure the friend's location is marked
         let annotation = ColorAnnotation(
             coordinate: CLLocationCoordinate2D(latitude: friend.latitude, longitude: friend.longitude),
-            color: Color(hex: friend.color) ?? .black
+            color: .black
         )
         mapView.addAnnotation(annotation)
     }

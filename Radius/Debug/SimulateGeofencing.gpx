@@ -12,23 +12,47 @@
         <name>Finish</name>
         <time>2014-09-24T14:55:27Z</time>
     </wpt>
-    
-    <!-- Far location - 5 minutes after Finish -->
-    <wpt lat="42.27788704703879" lon="-83.73501452747601">
-        <name>Far</name>
-        <time>2014-09-24T15:56:007Z</time>
+
+    <!-- Additional Waypoints -->
+    <wpt lat="42.277678" lon="-83.739978">
+        <name>Waypoint 1</name>
+        <time>2014-09-24T14:55:32Z</time>
     </wpt>
-    
-    <!-- New Location 1 - 2 minutes after Far, 500 meters east -->
-    <wpt lat="42.27788704703879" lon="-83.72951452747601">
-        <name>East1</name>
-        <time>2014-09-24T15:02:27Z</time>
+    <wpt lat="42.277501" lon="-83.738473">
+        <name>Waypoint 2</name>
+        <time>2014-09-24T14:55:37Z</time>
     </wpt>
-    
-    <!-- New Location 2 - 2 minutes after East1, 500 meters further east -->
-    <wpt lat="42.27788704703879" lon="-83.72401452747601">
-        <name>East2</name>
-        <time>2014-09-24T15:04:27Z</time>
+    <wpt lat="42.277324" lon="-83.736968">
+        <name>Waypoint 3</name>
+        <time>2014-09-24T14:55:42Z</time>
+    </wpt>
+    <wpt lat="42.277147" lon="-83.735463">
+        <name>Waypoint 4</name>
+        <time>2014-09-24T14:55:47Z</time>
+    </wpt>
+    <wpt lat="42.276970" lon="-83.733958">
+        <name>Waypoint 5</name>
+        <time>2014-09-24T14:55:52Z</time>
+    </wpt>
+    <wpt lat="42.276793" lon="-83.732453">
+        <name>Waypoint 6</name>
+        <time>2014-09-24T14:55:57Z</time>
+    </wpt>
+    <wpt lat="42.276616" lon="-83.730948">
+        <name>Waypoint 7</name>
+        <time>2014-09-24T14:56:02Z</time>
+    </wpt>
+    <wpt lat="42.276439" lon="-83.729443">
+        <name>Waypoint 8</name>
+        <time>2014-09-24T14:56:07Z</time>
+    </wpt>
+    <wpt lat="42.276262" lon="-83.727938">
+        <name>Waypoint 9</name>
+        <time>2014-09-24T14:56:12Z</time>
+    </wpt>
+    <wpt lat="42.276085" lon="-83.726433">
+        <name>Waypoint 10</name>
+        <time>2014-09-24T14:56:17Z</time>
     </wpt>
     
 </gpx>

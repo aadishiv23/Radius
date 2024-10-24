@@ -13,18 +13,19 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var fogOverlay: MKOverlay?
     @Published var totalTiles = 0
     @Published var uncoveredTiles = 0
+    @Published var uncoverMessage: String?
 
     private var locationManager = CLLocationManager()
     private var visitedTiles: Set<String> = []
+    private let visitedTilesQueue = DispatchQueue(label: "visitedTilesQueue", attributes: .concurrent)
 
     private let tileSizeMeters = 100.0
-    private let maxDistance = 1609.0
+    private let maxDistance = 5000.0
 
     override init() {
         super.init()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 10
+        applyLocationAccuracySettings()
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         loadVisitedTiles()
@@ -32,15 +33,17 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else {
-            return
-        }
-
+        guard let location = locations.last else { return }
         let tileKey = tileKeyForLocation(location.coordinate)
-        if !visitedTiles.contains(tileKey) {
-            visitedTiles.insert(tileKey)
-            saveVisitedTiles()
-            updateFogOverlay()
+        
+        if !isTileVisited(tileKey) {
+            addVisitedTile(tileKey)
+            updateFogOverlay(newTileKey: tileKey)
+            showUncoverMessage()
+        }
+        else {
+            // Force update for the current tile if already marked as visited
+            updateFogOverlay(newTileKey: tileKey)
         }
     }
 
@@ -48,15 +51,26 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let latitudeDegree = tileSizeMeters / 111_000.0
         let longitudeDegree = tileSizeMeters / (111_000.0 * cos(coordinate.latitude * .pi / 180))
 
-        let x = Int(coordinate.latitude / latitudeDegree)
-        let y = Int(coordinate.longitude / longitudeDegree)
+        let x = Int((coordinate.latitude / latitudeDegree).rounded())
+        let y = Int((coordinate.longitude / longitudeDegree).rounded())
         return "\(x)_\(y)"
     }
 
-    func updateFogOverlay() {
-        guard let userLocation = locationManager.location?.coordinate else {
-            return
+    private func addVisitedTile(_ tileKey: String) {
+        visitedTilesQueue.async(flags: .barrier) {
+            self.visitedTiles.insert(tileKey)
         }
+        saveVisitedTiles()
+    }
+
+    private func isTileVisited(_ tileKey: String) -> Bool {
+        visitedTilesQueue.sync {
+            visitedTiles.contains(tileKey)
+        }
+    }
+
+    func updateFogOverlay(newTileKey: String? = nil) {
+        guard let userLocation = locationManager.location?.coordinate else { return }
 
         let latitudeDegree = tileSizeMeters / 111_000.0
         let longitudeDegree = tileSizeMeters / (111_000.0 * cos(userLocation.latitude * .pi / 180))
@@ -70,10 +84,7 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let minY = userTileY - tileCount
         let maxY = userTileY + tileCount
 
-        var outerCoordinates: [CLLocationCoordinate2D] = []
-        // Define the outer boundary (e.g., a square or circle around the user)
-        // For simplicity, let's use a square here
-        let boundarySize = tileCount * Int(tileSizeMeters)
+        // Define the outer boundary coordinates
         let boundaryDegreeLat = Double(tileCount) * latitudeDegree
         let boundaryDegreeLon = Double(tileCount) * longitudeDegree
 
@@ -93,19 +104,13 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             latitude: userLocation.latitude + boundaryDegreeLat,
             longitude: userLocation.longitude - boundaryDegreeLon
         )
-        outerCoordinates = [topLeft, topRight, bottomRight, bottomLeft]
+        let outerCoordinates = [topLeft, topRight, bottomRight, bottomLeft]
 
         var holeCoordinates: [[CLLocationCoordinate2D]] = []
         for x in minX...maxX {
             for y in minY...maxY {
                 let tileKey = "\(x)_\(y)"
                 if visitedTiles.contains(tileKey) {
-                    let tileCenter = coordinateForTileCenter(
-                        x: x,
-                        y: y,
-                        latitudeDegree: latitudeDegree,
-                        longitudeDegree: longitudeDegree
-                    )
                     let tileCoords = coordinatesForTile(
                         x: x,
                         y: y,
@@ -147,18 +152,6 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         ]
     }
 
-    private func coordinateForTileCenter(
-        x: Int,
-        y: Int,
-        latitudeDegree: Double,
-        longitudeDegree: Double
-    ) -> CLLocationCoordinate2D {
-        let latitude = (Double(x) + 0.5) * latitudeDegree
-        let longitude = (Double(y) + 0.5) * longitudeDegree
-        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-
-    /// Persistence Methods remain the same
     private func saveVisitedTiles() {
         let tilesArray = Array(visitedTiles)
         UserDefaults.standard.set(tilesArray, forKey: "VisitedTiles")
@@ -167,6 +160,27 @@ class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private func loadVisitedTiles() {
         if let tilesArray = UserDefaults.standard.array(forKey: "VisitedTiles") as? [String] {
             visitedTiles = Set(tilesArray)
+        }
+    }
+
+    private func showUncoverMessage() {
+        uncoverMessage = "New area uncovered!"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.uncoverMessage = nil
+        }
+    }
+
+    private func applyLocationAccuracySettings() {
+        switch LocationManager.shared.accuracyMode {
+        case .highAccuracy:
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.distanceFilter = 25
+        case .balanced:
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            locationManager.distanceFilter = 100
+        case .lowPower:
+            locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
+            locationManager.distanceFilter = 500
         }
     }
 }
