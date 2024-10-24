@@ -25,11 +25,12 @@ class CompetitionsRepository: ObservableObject {
         // Step 1: Fetch the user's groups
         let userGroups: [GroupMember] = try await supabaseClient
             .from("group_members")
-            .select("group_id, profile_id")
+            .select("*")
             .eq("profile_id", value: userId.uuidString)
             .execute()
             .value
-        
+        print("User Groups: \(userGroups)")
+
         let groupIds = userGroups.map { $0.group_id.uuidString }
         
         // Step 2: Fetch competitions linked to these groups
