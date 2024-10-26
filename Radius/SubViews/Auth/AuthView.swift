@@ -87,7 +87,7 @@ struct AuthView: View {
                         .foregroundColor(.primary)
                     
                     // Animated logo
-                    Image(systemName: "mappin.and.ellipse")
+                    Image(systemName: "mappin.circle")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 100, height: 100)
