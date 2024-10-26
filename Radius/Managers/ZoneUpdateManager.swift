@@ -60,6 +60,7 @@ final class ZoneUpdateManager {
         }
     }
 
+
     func handleDailyZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // UTC
@@ -73,13 +74,23 @@ final class ZoneUpdateManager {
             for zoneId in zoneIds {
                 // Step 1: Fetch zone details to check its category
                 let zone: Zone = try await fetchZone(for: zoneId)
-
-                // Step 2: Check if a daily zone exit already exists for the profile, zone, and date
+                
+                // Step 2: Check if a `zone_exit` exists for our give zone (given zone
+                let existingZoneExit: ZoneExit = try await supabaseClient
+                    .from("zone_exits")
+                    .select("*")
+                    .eq("zone_id", value: zoneId.uuidString)
+                    .order("exit_time", ascending: false)
+                    .limit(1)
+                    .execute()
+                    .value
+                
+                // Step 3: Check if a daily zone exit already exists for the profile, zone, and date
                 let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
                     .from("daily_zone_exits")
                     .select("*")
                     .eq("profile_id", value: profileId.uuidString)
-                    .eq("zone_exit_id", value: zoneId.uuidString)
+                    .eq("zone_exit_id", value: existingZoneExit.id)
                     .eq("date", value: currentDateString)
                     .execute()
                     .value
