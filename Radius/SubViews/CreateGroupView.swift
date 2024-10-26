@@ -14,87 +14,149 @@ struct CreateGroupView: View {
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var passwordMatch: Bool = true
-    @Binding var isPresented: Bool  // Binding to control the presentation
+    @State private var isLoading: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+    @Binding var isPresented: Bool
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                Form {
-                    Section(header: Text("Group Information")) {
-                        TextField("Group Name", text: $groupName)
-                            .padding()
-                            .background(Color.gray.opacity(0.2).cornerRadius(10))
-                    }
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header Image or Icon
+                    Image(systemName: "person.3.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.blue)
+                        .padding(.top, 20)
                     
-                    Section(header: Text("Set a Password")) {
-                        SecureField("Password", text: $password)
-                            .padding()
-                            .background(Color.gray.opacity(0.2).cornerRadius(10))
+                    // Group Information Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Group Name")
+                            .font(.headline)
+                            .foregroundColor(.primary)
                         
-                        SecureField("Confirm Password", text: $confirmPassword)
-                            .padding()
-                            .background(Color.gray.opacity(0.2).cornerRadius(10))
-                            .onChange(of: confirmPassword) { _ in
-                                checkPasswordsMatch()
+                        TextField("Enter group name", text: $groupName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .autocapitalization(.none)
+                            .padding(.horizontal, 4)
+                    }
+                    .padding(.horizontal)
+                    
+                    // Password Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Security")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            SecureField("Create password", text: $password)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .autocapitalization(.none)
+                            
+                            SecureField("Confirm password", text: $confirmPassword)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .autocapitalization(.none)
+                                .onChange(of: confirmPassword) { _ in
+                                    checkPasswordsMatch()
+                                }
+                            
+                            // Password Feedback
+                            if !confirmPassword.isEmpty {
+                                HStack {
+                                    Image(systemName: passwordMatch ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundColor(passwordMatch ? .green : .red)
+                                    
+                                    Text(passwordMatch ? "Passwords match" : "Passwords don't match")
+                                        .font(.subheadline)
+                                        .foregroundColor(passwordMatch ? .green : .red)
+                                }
+                                .padding(.top, 4)
                             }
-                        
-                        passwordFeedbackView
+                        }
                     }
+                    .padding(.horizontal)
                     
+                    // Create Button
                     Button(action: saveGroup) {
-                        Text("Create Group")
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity, minHeight: 50)
-                            .background(passwordMatch ? Color.blue : Color.gray)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            .padding(.vertical)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(buttonColor)
+                            
+                            if isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            } else {
+                                Text("Create Group")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                            }
+                        }
                     }
-                    .disabled(!passwordMatch)
+                    .frame(height: 50)
+                    .padding(.horizontal)
+                    .disabled(!isValid || isLoading)
                     
-                    Text("Please note down the password and group name.")
+                    // Help Text
+                    Text("You'll need to share both the group name and password\nwith people you want to invite.")
                         .font(.footnote)
                         .foregroundColor(.secondary)
-                        .padding(.top, 10)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
                 }
-                .navigationTitle("Create Group")
-                .navigationBarItems(trailing: Button("Done") {
-                    isPresented = false
-                })
+                .padding(.vertical)
             }
-            .padding()
+            .navigationTitle("Create Group")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    isPresented = false
+                },
+                trailing: Button("Done") {
+                    isPresented = false
+                }
+                .disabled(!isValid)
+            )
+            .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text("Error"),
+                    message: Text(alertMessage),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
         }
     }
     
-    private var passwordFeedbackView: some View {
-        HStack {
-            if !passwordMatch {
-                Text("Passwords do not match")
-                    .foregroundColor(.red)
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.red)
-            } else if !confirmPassword.isEmpty {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-            } else {
-                ProgressView()
-            }
-        }
-        .padding(.top, 10)
+    private var isValid: Bool {
+        !groupName.isEmpty && !password.isEmpty && !confirmPassword.isEmpty && passwordMatch
+    }
+    
+    private var buttonColor: Color {
+        isValid && !isLoading ? .blue : .gray.opacity(0.5)
     }
     
     private func saveGroup() {
-        // Save group only if passwords match
-        if passwordMatch {
-            Task {
+        isLoading = true
+        
+        Task {
+            do {
                 await friendsDataManager.createGroup(name: groupName, description: "A new group", password: password)
-                let val = try await friendsDataManager.joinGroup(groupName: groupName, password: password)
-                if val {
-                    print("works")
-                } else {
-                    print("bruh no work")
+                let success = try await friendsDataManager.joinGroup(groupName: groupName, password: password)
+                
+                await MainActor.run {
+                    isLoading = false
+                    if success {
+                        isPresented = false
+                    } else {
+                        alertMessage = "Failed to join the group. Please try again."
+                        showAlert = true
+                    }
                 }
-                isPresented = false
+            } catch {
+                await MainActor.run {
+                    isLoading = false
+                    alertMessage = error.localizedDescription
+                    showAlert = true
+                }
             }
         }
     }
@@ -103,3 +165,10 @@ struct CreateGroupView: View {
         passwordMatch = password == confirmPassword
     }
 }
+
+//struct CreateGroupView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CreateGroupView(isPresented: .constant(true))
+//            .environmentObject(FriendsDataManager())
+//    }
+//}

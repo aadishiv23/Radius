@@ -9,10 +9,6 @@ import CoreLocation
 import Foundation
 import MapKit
 
-import CoreLocation
-import Foundation
-import MapKit
-
 class FogOfWarManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var fogOverlay: MKOverlay?
     @Published var totalTiles = 0
