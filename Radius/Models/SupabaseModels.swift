@@ -244,8 +244,8 @@ struct GroupMember: Codable {
 }
 
 struct GroupMemberWoBS: Codable {
-    let group_id: UUID
-    let profile_id: UUID
+    var group_id: UUID
+    var profile_id: UUID
 }
 
 struct DailyZoneExit: Identifiable, Codable {

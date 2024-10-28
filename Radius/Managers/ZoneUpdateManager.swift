@@ -76,32 +76,32 @@ final class ZoneUpdateManager {
                 let zone: Zone = try await fetchZone(for: zoneId)
                 
                 // Step 2: Check if a `zone_exit` exists for our give zone (given zone
-                let existingZoneExit: ZoneExit = try await supabaseClient
-                    .from("zone_exits")
-                    .select("*")
-                    .eq("zone_id", value: zoneId.uuidString)
-                    .order("exit_time", ascending: false)
-                    .limit(1)
-                    .execute()
-                    .value
-                
-                // Step 3: Check if a daily zone exit already exists for the profile, zone, and date
-                let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
-                    .from("daily_zone_exits")
-                    .select("*")
-                    .eq("profile_id", value: profileId.uuidString)
-                    .eq("zone_exit_id", value: existingZoneExit.id)
-                    .eq("date", value: currentDateString)
-                    .execute()
-                    .value
-
-                // If there is already an exit for this profile, zone, and date, skip inserting
-                guard existingDailyZoneExit.isEmpty else {
-                    print(
-                        "Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on \(currentDateString)"
-                    )
-                    continue
-                }
+//                let existingZoneExit: ZoneExit = try await supabaseClient
+//                    .from("zone_exits")
+//                    .select("*")
+//                    .eq("zone_id", value: zoneId.uuidString)
+//                    .order("exit_time", ascending: false)
+//                    .limit(1)
+//                    .execute()
+//                    .value
+//                
+//                // Step 3: Check if a daily zone exit already exists for the profile, zone, and date
+//                let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
+//                    .from("daily_zone_exits")
+//                    .select("*")
+//                    .eq("profile_id", value: profileId.uuidString)
+//                    .eq("zone_exit_id", value: existingZoneExit.id)
+//                    .eq("date", value: currentDateString)
+//                    .execute()
+//                    .value
+//
+//                // If there is already an exit for this profile, zone, and date, skip inserting
+//                guard existingDailyZoneExit.isEmpty else {
+//                    print(
+//                        "Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on \(currentDateString)"
+//                    )
+//                    continue
+//                }
 
                 // Step 3: If the zone is of category "home", ensure only one exit per day is counted
                 if zone.category == .home {

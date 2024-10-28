@@ -31,7 +31,7 @@ class AuthViewModel: ObservableObject {
                             Task {
                                 await self.friendsDataManager?.fetchCurrentUserProfile()
                                 if let profile = self.friendsDataManager?.currentUser,
-                                   profile.full_name.isEmpty || profile.username.isEmpty {
+                                   profile.full_name == "Unknown Full Name" || profile.username == "Unknown User" {
                                     self.needsProfileSetup = true
                                 } else {
                                     self.needsProfileSetup = false
