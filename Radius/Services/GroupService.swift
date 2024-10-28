@@ -41,6 +41,9 @@ class GroupService {
                 print("URLError: \(error.localizedDescription)")
             }
             throw error
+        } catch let error as DecodingError {
+            debugPrintDecodingError(error)
+            throw error
         } catch {
             print("Unexpected error while creating group: \(error.localizedDescription)")
             throw error
@@ -52,19 +55,39 @@ class GroupService {
         do {
             let groupMembers: [GroupMemberWoBS] = try await supabaseClient
                 .from("group_members")
-                .select("*")
+                .select("group_id, profile_id") // Explicitly specify fields needed
                 .eq("profile_id", value: userId.uuidString)
                 .execute()
                 .value
 
-            let groupIDs = groupMembers.map(\.group_id.uuidString)
+            // Debugging: Print the fetched group members to see if it contains the expected data
+            print("Fetched group members: \(groupMembers)")
 
-            return try await supabaseClient
+            // Check if groupMembers is empty
+            guard !groupMembers.isEmpty else {
+                print("No group memberships found for user ID: \(userId)")
+                return []
+            }
+
+            let groupIDs = groupMembers.compactMap { groupMember in
+                groupMember.group_id.uuidString
+            }
+
+            // Debugging: Print group IDs to ensure they are valid
+            print("Group IDs to fetch: \(groupIDs)")
+
+            // Fetch the groups based on fetched group IDs
+            let fetchedGroups: [Group] = try await supabaseClient
                 .from("groups")
                 .select("*")
                 .in("id", values: groupIDs)
                 .execute()
                 .value
+
+            // Debugging: Print the fetched groups
+            print("Fetched groups: \(fetchedGroups)")
+
+            return fetchedGroups
 
         } catch let error as PostgrestError {
             print("Supabase error while fetching user groups: \(error.localizedDescription)")
@@ -76,9 +99,37 @@ class GroupService {
                 print("URLError: \(error.localizedDescription)")
             }
             throw error
+        } catch let error as DecodingError {
+            debugPrintDecodingError(error)
+            throw error
         } catch {
             print("Unexpected error while fetching user groups: \(error.localizedDescription)")
             throw error
+        }
+    }
+
+    /// Helper function to debug decoding errors
+    private func debugPrintDecodingError(_ error: DecodingError) {
+        switch error {
+        case .typeMismatch(let type, let context):
+            print("Type mismatch error: \(type), \(context.debugDescription)")
+            print("Coding path: \(context.codingPath)")
+        case .valueNotFound(let type, let context):
+            print("Value not found: \(type), \(context.debugDescription)")
+            print("Coding path: \(context.codingPath)")
+        case .keyNotFound(let key, let context):
+            print("Key not found: \(key), \(context.debugDescription)")
+            print("Coding path: \(context.codingPath)")
+            if let lastPath = context.codingPath.last {
+                print("Missing key: \(lastPath.stringValue)")
+            }
+            // Additional debugging for key not found
+            print("Debug context: \(context)")
+        case .dataCorrupted(let context):
+            print("Data corrupted: \(context.debugDescription)")
+            print("Coding path: \(context.codingPath)")
+        @unknown default:
+            print("Unknown decoding error: \(error)")
         }
     }
 }
