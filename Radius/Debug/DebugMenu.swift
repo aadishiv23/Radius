@@ -289,17 +289,23 @@ struct DebugMenuView: View {
     private func executeZoneExitAndHandleDaily() {
         Task {
             do {
-                // Use the constant zoneId and profileId you mentioned earlier
+                // Use the constant zoneId you mentioned earlier
+                guard let currentUser = friendsDataManager.currentUser else {
+                    alertMessage = "No current user available."
+                    showAlert = true
+                    return
+                }
+
+                let currentProfileId = currentUser.id
                 let constantZoneId = UUID(uuidString: "82e295db-7477-4de7-bb9d-bbb2fb430a3d")!
-                let constantProfileId = UUID(uuidString: "d933c6a3-db45-4ffb-99de-3b0ca876d668")!
 
                 // Execute zone exit
                 try await ZoneUpdateManager(supabaseClient: supabase)
-                    .uploadZoneExit(for: constantProfileId, zoneIds: [constantZoneId], at: Date())
+                    .uploadZoneExit(for: currentProfileId, zoneIds: [constantZoneId], at: Date())
 
                 // Handle daily zone exits
                 try await ZoneUpdateManager(supabaseClient: supabase)
-                    .handleDailyZoneExits(for: constantProfileId, zoneIds: [constantZoneId], at: Date())
+                    .handleDailyZoneExits(for: currentProfileId, zoneIds: [constantZoneId], at: Date())
 
                 // Success: Update the alert message
                 DispatchQueue.main.async {
