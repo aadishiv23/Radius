@@ -14,38 +14,141 @@ struct ProfileSetupView: View {
     @State private var username = ""
     @State private var fullName = ""
     @State private var isLoading = false
+    @State private var usernameError: String? = nil
+    @State private var isCheckingUsername = false
+    @Binding var showTutorial: Bool
+    
+    // Debounce timer for username validation
+    @State private var usernameCheckTimer: Timer?
+    
+    var isFormValid: Bool {
+        !username.isEmpty && !fullName.isEmpty && usernameError == nil && !isCheckingUsername
+    }
 
     var body: some View {
-        VStack(spacing: 20) {
-            TextField("Full Name", text: $fullName)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .padding(.horizontal)
+        VStack(spacing: 30) {
+            Spacer()
             
-            TextField("Username", text: $username)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .padding(.horizontal)
-            
-            Button("Save Profile") {
-                saveProfile()
+            // Header
+            VStack(spacing: 8) {
+                Text("Set Up Your Profile")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.blue)
+                
+                Text("Enter your details to complete your profile and get started.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
             }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding(.horizontal)
+            
+            // Text fields
+            VStack(spacing: 20) {
+                TextField("Enter your full name", text: $fullName)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    .textInputAutocapitalization(.words) // Keep this for names
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    TextField("Choose a username", text: $username)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                        .textInputAutocapitalization(.never) // Remove forced capitalization
+                        .onChange(of: username) { newValue in
+                            validateUsername()
+                        }
+                    
+                    if isCheckingUsername {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Checking username availability...")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    } else if let error = usernameError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding(.horizontal)
+            }
+            
+            // Save Button
+            Button(action: saveProfile) {
+                Text("Save Profile")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(isFormValid ? Color.blue : Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+            }
+            .disabled(!isFormValid)
             
             if isLoading {
                 ProgressView()
+                    .padding(.top, 20)
+            }
+            
+            Spacer()
+        }
+        .padding()
+        .background(Color.blue.opacity(0.15))
+        .navigationTitle("Profile Setup")
+    }
+    
+    private func validateUsername() {
+        // Cancel any existing timer
+        usernameCheckTimer?.invalidate()
+        
+        // Clear previous error if username is empty
+        if username.isEmpty {
+            usernameError = nil
+            return
+        }
+        
+        // Start checking indicator
+        isCheckingUsername = true
+        
+        // Create new timer with 0.5 second delay
+        usernameCheckTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+            Task {
+                do {
+                    let response = try await supabase
+                        .from("profiles")
+                        .select("username", count: .exact)
+                        .eq("username", value: username.lowercased())
+                        .execute()
+                    
+                    await MainActor.run {
+                        isCheckingUsername = false
+                        if let count = response.count, count > 0 {
+                            usernameError = "Username is already taken"
+                        } else {
+                            usernameError = nil
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        isCheckingUsername = false
+                        usernameError = "Error checking username"
+                        debugPrint(error)
+                    }
+                }
             }
         }
-        .navigationTitle("Setup Profile")
     }
-
+    
     private func saveProfile() {
+        guard isFormValid else { return }
+        
         isLoading = true
         Task {
             defer { isLoading = false }
@@ -53,21 +156,20 @@ struct ProfileSetupView: View {
                 let currentUser = try await supabase.auth.session.user
                 try await supabase
                     .from("profiles")
-                    .update(
-                        UpdateProfileParams(username: username, fullName: fullName)
-                    )
+                    .update(UpdateProfileParams(username: username.lowercased(), fullName: fullName))
                     .eq("id", value: currentUser.id)
                     .execute()
-                
+
                 await friendsDataManager.fetchCurrentUserProfile()
                 authViewModel.needsProfileSetup = false
+                showTutorial = true
             } catch {
-                // Handle error
                 debugPrint(error)
             }
         }
     }
 }
+
 
 struct ProfileSetupViewPreview: View {
     @State private var username = "SampleUser"
@@ -81,29 +183,29 @@ struct ProfileSetupViewPreview: View {
                 .fontWeight(.bold)
                 .padding(.top)
                 .visionGlass()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                  Text("Full Name")
-                      .font(.headline)
-                      .fontWeight(.bold)
 
-                  TextField("Enter your full name", text: $fullName)
-                      .padding()
-                      .background(Color(.systemGray6))
-                      .cornerRadius(10)
-              }
-              .padding(.horizontal)
-            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Full Name")
+                    .font(.headline)
+                    .fontWeight(.bold)
+
+                TextField("Enter your full name", text: $fullName)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+            }
+            .padding(.horizontal)
+
             // Username Section
             VStack(alignment: .leading, spacing: 8) {
-              Text("Username")
-                  .font(.headline)
-                  .fontWeight(.bold)
+                Text("Username")
+                    .font(.headline)
+                    .fontWeight(.bold)
 
-              TextField("Choose a username", text: $username)
-                  .padding()
-                  .background(Color(.systemGray6))
-                  .cornerRadius(10)
+                TextField("Choose a username", text: $username)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
             }
             .padding(.horizontal)
 
@@ -111,7 +213,7 @@ struct ProfileSetupViewPreview: View {
 
             // Save Profile Button
             Button("Save Profile") {
-              saveProfile()
+                saveProfile()
             }
             .padding()
             .background(Color.blue)
@@ -141,7 +243,7 @@ struct ProfileSetupViewPreview: View {
     }
 }
 
-// Preview for ProfileSetupViewPreview
+/// Preview for ProfileSetupViewPreview
 struct ProfileSetupViewPreview_Previews: PreviewProvider {
     static var previews: some View {
         ProfileSetupViewPreview()

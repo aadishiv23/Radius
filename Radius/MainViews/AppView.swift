@@ -18,12 +18,16 @@ struct AppView: View {
     @StateObject private var competitionsRepository = CompetitionsRepository(supabaseClient: supabase) // Initialize CompetitionsRepository
 
     @Environment(\.scenePhase) var scenePhase
+    
+    @State private var showTutorial = false
 
     var body: some View {
         NavigationStack {
             if authViewModel.isAuthenticated {
                 if authViewModel.needsProfileSetup {
-                    ProfileSetupView()
+                    ProfileSetupView(showTutorial: $showTutorial)
+                } else if showTutorial {
+                    TutorialView(showTutorial: $showTutorial)
                 } else {
                     MainTabView() // View for authenticated users
                         .onAppear {
@@ -50,7 +54,7 @@ struct AppView: View {
                         .environmentObject(competitionsRepository) // Provide CompetitionsRepository as EnvironmentObject
                 }
             } else {
-                AuthView()
+                SignInView(isSignUp: .constant(false))
             }
         }
     }
