@@ -92,13 +92,13 @@ struct MainTabView: View {
                     userId: userId
                 )
                 .tabItem {
-                    Label("Info", systemImage: "info.circle")
+                    Label("Social", systemImage: "figure.socialdance")
                 }
             } else {
                 // Handle the case where userId is not available
                 Text("Loading...")
                     .tabItem {
-                        Label("Info", systemImage: "info.circle")
+                        Label("Social", systemImage: "figure.socialdance")
                     }
             }
 

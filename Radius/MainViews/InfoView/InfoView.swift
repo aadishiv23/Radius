@@ -108,7 +108,7 @@ struct InfoView: View {
                 }
                 .padding(.top)
             }
-            .navigationTitle("Friends Info")
+            .navigationTitle("Social")
             .searchable(
                 text: $viewModel.searchText,
                 placement: .navigationBarDrawer(displayMode: .always),
