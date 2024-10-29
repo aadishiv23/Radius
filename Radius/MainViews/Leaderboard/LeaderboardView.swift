@@ -43,7 +43,7 @@ struct LeaderboardView: View {
                         .fontWeight(.heavy)
 
                     buttonsPicker
-                    
+
                     VStack {
                         Image(systemName: "hammer")
                             .font(.largeTitle)
@@ -53,7 +53,7 @@ struct LeaderboardView: View {
                             .foregroundColor(.secondary)
                     }
                     .applyRadiusGlassStyle()
-                    
+
                     Spacer()
                 }
             }
@@ -165,23 +165,28 @@ struct LeaderboardView: View {
             .padding(.horizontal)
 
             if selectedChartType == .bar {
-                // Bar Chart for today's points
-                Chart(viewModel.members.prefix(5)) { member in
-                    BarMark(
-                        x: .value("Name", member.name),
-                        y: .value("Points", member.points)
-                    )
-                    .foregroundStyle(Color.blue.gradient)
+                // Bar Chart for today's points only
+                if !viewModel.members.isEmpty {
+                    Chart(viewModel.members.prefix(5)) { member in
+                        BarMark(
+                            x: .value("Name", member.name),
+                            y: .value("Points", member.points)
+                        )
+                        .foregroundStyle(Color.blue.gradient)
+                    }
+                    .frame(height: 200)
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(15)
+                    .padding(.horizontal)
+                } else {
+                    ProgressView("Loading points...")
+                        .frame(height: 200)
                 }
-                .frame(height: 200)
-                .padding()
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(15)
-                .padding(.horizontal)
             } else if selectedChartType == .line {
-                // Line Chart for daily points over time
-                if !viewModel.combinedDailyPoints.isEmpty {
-                    Chart(viewModel.combinedDailyPoints) { dataPoint in
+                // Rest of the line chart code remains the same...
+                if !viewModel.cumulativePoints.isEmpty {
+                    Chart(viewModel.cumulativePoints) { dataPoint in
                         LineMark(
                             x: .value("Date", dataPoint.date),
                             y: .value("Points", dataPoint.points)
@@ -206,7 +211,7 @@ struct LeaderboardView: View {
                     .cornerRadius(15)
                     .padding(.horizontal)
                 } else {
-                    ProgressView("Loading daily points...")
+                    ProgressView("Loading points...")
                         .frame(height: 200)
                 }
             }
@@ -215,7 +220,7 @@ struct LeaderboardView: View {
 
     private var leaderboardList: some View {
         List {
-            ForEach(Array(viewModel.members.enumerated()), id: \.element.id) { index, member in
+            ForEach(Array(sortedMembers.enumerated()), id: \.element.id) { index, member in
                 HStack {
                     Text("\(index + 1)")
                         .font(.headline)
@@ -239,14 +244,38 @@ struct LeaderboardView: View {
 
                     Spacer()
 
-                    Text("\(member.points) pts")
-                        .font(.headline)
-                        .foregroundColor(.blue)
+                    Text(
+                        "\(selectedChartType == .bar ? member.points : (getCumulativePoints(for: member.name) ?? 0)) pts"
+                    )
+                    .font(.headline)
+                    .foregroundColor(.blue)
                 }
                 .padding(.vertical, 8)
             }
         }
         .background(Color.white)
+    }
+
+    /// Helper function to get cumulative points for a member
+    private func getCumulativePoints(for memberName: String) -> Int? {
+        viewModel.cumulativePoints
+            .filter { $0.memberName == memberName }
+            .max { $0.date < $1.date }?
+            .points
+    }
+
+    private var sortedMembers: [LeaderboardMember] {
+        if selectedChartType == .bar {
+            // Sort by daily points
+            viewModel.members
+        } else {
+            // Sort by cumulative points
+            viewModel.members.sorted { member1, member2 in
+                let points1 = getCumulativePoints(for: member1.name) ?? 0
+                let points2 = getCumulativePoints(for: member2.name) ?? 0
+                return points1 > points2
+            }
+        }
     }
 
     private func medalColor(for index: Int) -> Color {
@@ -258,7 +287,6 @@ struct LeaderboardView: View {
         }
     }
 }
-
 
 struct MemberDailyPoints: Identifiable {
     let id = UUID()

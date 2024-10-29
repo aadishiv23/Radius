@@ -914,36 +914,6 @@
             endingLineNumber = "144"
             landmarkName = "handleDailyZoneExits(for:zoneIds:at:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "DCBDA74D-85D0-48BF-9BDD-9ACEC1AED128 - 1a2682c1ae0d9c1b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(9) suspend resume partial function for Radius.ZoneUpdateManager.handleDailyZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async throws -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "144"
-                  endingLineNumber = "144">
-               </Location>
-               <Location
-                  uuid = "DCBDA74D-85D0-48BF-9BDD-9ACEC1AED128 - 42be49442f7dd86"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(16) suspend resume partial function for Radius.ZoneUpdateManager.handleDailyZoneExits(for: Foundation.UUID, zoneIds: Swift.Array&lt;Foundation.UUID&gt;, at: Foundation.Date) async throws -&gt; ()"
-                  moduleName = "Radius.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/Managers/ZoneUpdateManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "144"
-                  endingLineNumber = "144">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

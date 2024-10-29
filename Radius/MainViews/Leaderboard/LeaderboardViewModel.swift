@@ -14,9 +14,11 @@ class LeaderboardViewModel: ObservableObject {
     @Published var selectedCompetition: GroupCompetition?
     @Published var members: [LeaderboardMember] = []
     @Published var memberDailyPoints: [UUID: [DailyPoint]] = [:]
+    @Published var combinedDailyPoints: [CombinedDailyPoint] = []
+    @Published var cumulativePoints: [CumulativeDailyPoint] = []
     
     // New Published Property for Combined Daily Points
-    @Published var combinedDailyPoints: [CombinedDailyPoint] = []
+    //@Published var combinedDailyPoints: [CombinedDailyPoint] = []
     
     var friendsDataManager: FriendsDataManager
     let competitionManager: CompetitionManager
@@ -147,12 +149,41 @@ class LeaderboardViewModel: ObservableObject {
     }
     
     // New Method to Aggregate Daily Points
+//    private func aggregateDailyPoints() {
+//        let topMembers = members.prefix(5)
+//        var combinedPoints: [CombinedDailyPoint] = []
+//        
+//        for member in topMembers {
+//            if let dailyPoints = memberDailyPoints[member.id] {
+//                for point in dailyPoints {
+//                    combinedPoints.append(
+//                        CombinedDailyPoint(
+//                            memberName: member.name,
+//                            date: point.date,
+//                            points: point.points
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//        
+//        // Sort the combined points by date
+//        combinedPoints.sort { $0.date < $1.date }
+//        
+//        DispatchQueue.main.async {
+//            self.combinedDailyPoints = combinedPoints
+//        }
+//    }
+    
     private func aggregateDailyPoints() {
         let topMembers = members.prefix(5)
         var combinedPoints: [CombinedDailyPoint] = []
+        var cumulativePointsMap: [String: [CumulativeDailyPoint]] = [:]
         
+        // Process daily points for each member
         for member in topMembers {
-            if let dailyPoints = memberDailyPoints[member.id] {
+            if let dailyPoints = memberDailyPoints[member.id]?.sorted(by: { $0.date < $1.date }) {
+                // Add daily points to combined points
                 for point in dailyPoints {
                     combinedPoints.append(
                         CombinedDailyPoint(
@@ -162,14 +193,32 @@ class LeaderboardViewModel: ObservableObject {
                         )
                     )
                 }
+                
+                // Calculate cumulative points
+                var runningTotal = 0
+                var memberCumulativePoints: [CumulativeDailyPoint] = []
+                
+                for point in dailyPoints {
+                    runningTotal += point.points
+                    memberCumulativePoints.append(
+                        CumulativeDailyPoint(
+                            memberName: member.name,
+                            date: point.date,
+                            points: runningTotal
+                        )
+                    )
+                }
+                
+                cumulativePointsMap[member.name] = memberCumulativePoints
             }
         }
         
-        // Sort the combined points by date
-        combinedPoints.sort { $0.date < $1.date }
+        // Flatten cumulative points map into array
+        let allCumulativePoints = cumulativePointsMap.values.flatMap { $0 }
         
         DispatchQueue.main.async {
-            self.combinedDailyPoints = combinedPoints
+            self.combinedDailyPoints = combinedPoints.sorted { $0.date < $1.date }
+            self.cumulativePoints = allCumulativePoints.sorted { $0.date < $1.date }
         }
     }
 }
@@ -177,4 +226,12 @@ class LeaderboardViewModel: ObservableObject {
 enum LeaderboardCategory: String, CaseIterable {
     case groups = "Groups"
     case competitions = "Competitions"
+}
+
+// Add new struct for cumulative points
+struct CumulativeDailyPoint: Identifiable {
+    let id = UUID()
+    let memberName: String
+    let date: Date
+    let points: Int
 }
