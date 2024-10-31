@@ -11,7 +11,7 @@ import Supabase
 // TODO: make published
 class GroupsRepository: ObservableObject {
     @Published var groups: [Group] = []
-     private var cache: [UUID: CachedData<[Group]>] = [:] // In-memory cache for groups
+     private var cache: [String: CachedData<[Group]>] = [:] // In-memory cache for groups
     private var cacheExpiration: TimeInterval = 300 // 5 minutes
     private let groupService: GroupService
 
@@ -21,19 +21,21 @@ class GroupsRepository: ObservableObject {
 
     /// Fetch groups from cache or Supabase
     func fetchGroups(for userId: UUID) async throws -> [Group] {
+        let userIdString = userId.uuidString // Convert UUID to String for cache key
+        
         do {
-            if let cachedData = cache[userId], !isCacheExpired(cachedData.timestamp) {
+            if let cachedData = cache[userIdString], !isCacheExpired(cachedData.timestamp) {
                 return cachedData.data
             }
-
+            
             let fetchedGroups = try await groupService.fetchUserGroups(for: userId)
-            cache[userId] = CachedData(data: fetchedGroups, timestamp: Date())
-
+            cache[userIdString] = CachedData(data: fetchedGroups, timestamp: Date())
+            
             DispatchQueue.main.async {
                 self.groups = fetchedGroups
             }
             return fetchedGroups
-
+            
         } catch let error as PostgrestError {
             print("Supabase error while fetching groups: \(error.localizedDescription)")
             throw error
@@ -52,23 +54,22 @@ class GroupsRepository: ObservableObject {
             throw error
         }
     }
-
+    
     /// Invalidate cache for groups
     func invalidateGroupsCache(for userId: UUID) {
-        cache.removeValue(forKey: userId)
+        cache.removeValue(forKey: userId.uuidString)
     }
-
+    
     /// Invalidate all cache (for example, on logout)
     func invalidateAllGroupsCache() {
         cache.removeAll()
     }
-
+    
     /// Check if cache is expired
     private func isCacheExpired(_ timestamp: Date) -> Bool {
         return Date().timeIntervalSince(timestamp) > cacheExpiration
-        //return false
     }
-
+    
     /// Helper function to debug decoding errors
     private func debugPrintDecodingError(_ error: DecodingError) {
         switch error {
@@ -84,7 +85,6 @@ class GroupsRepository: ObservableObject {
             if let lastPath = context.codingPath.last {
                 print("Missing key: \(lastPath.stringValue)")
             }
-            // Additional debugging for key not found
             print("Debug context: \(context)")
         case .dataCorrupted(let context):
             print("Data corrupted: \(context.debugDescription)")

@@ -110,6 +110,15 @@ struct Group: Codable, Identifiable, Hashable {
     var description: String?
     var password: String
     var plain_password: String?
+    
+    // Implement Hashable manually to ensure proper dictionary key handling
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Group, rhs: Group) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 struct Group2: Codable, Identifiable {

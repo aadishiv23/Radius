@@ -33,6 +33,7 @@ struct RadiusApp: App {
                 .environment(\.managedObjectContext, dataController.container.viewContext)
                 .environmentObject(friendsDataManager)
                 .environmentObject(authViewModel)
+                .environmentObject(locationManager)
         }
     }
 }

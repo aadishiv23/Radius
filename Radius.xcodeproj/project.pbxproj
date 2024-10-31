@@ -72,6 +72,7 @@
 		ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */; };
 		ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFE2C193F8500E12E0B /* GroupView.swift */; };
 		ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */; };
+		ACBE26A62CD2BEE600492322 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBE26A52CD2BEE100492322 /* NotificationManager.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
 		ACCC57342CCECA100048A186 /* ChangeProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */; };
 		ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */; };
@@ -152,6 +153,7 @@
 		ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGroupView.swift; sourceTree = "<group>"; };
 		ACAEFDFE2C193F8500E12E0B /* GroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupView.swift; sourceTree = "<group>"; };
 		ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeManager.swift; sourceTree = "<group>"; };
+		ACBE26A52CD2BEE100492322 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
 		ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeProfileView.swift; sourceTree = "<group>"; };
 		ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
@@ -310,6 +312,7 @@
 		AC79CDA12BE0B60400B49E90 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				ACBE26A52CD2BEE100492322 /* NotificationManager.swift */,
 				AC9BD1B52BE2E9E600D23123 /* FriendsDataManager.swift */,
 				ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */,
 				AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */,
@@ -575,6 +578,7 @@
 				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
 				AC36A7382C928B7700840DDD /* CompetitionsRepository.swift in Sources */,
 				AC3989562C705637002F84E6 /* DataController.swift in Sources */,
+				ACBE26A62CD2BEE600492322 /* NotificationManager.swift in Sources */,
 				AC9BD1B82BE2F51600D23123 /* ColorTransformer.swift in Sources */,
 				AC84CE132CAA071100368A5E /* FogOfWarManager.swift in Sources */,
 				AC5DB4DA2C7D800E00A1019E /* CompetitionManagerViewModel.swift in Sources */,

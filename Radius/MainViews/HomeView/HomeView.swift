@@ -298,6 +298,7 @@ struct HomeView: View {
             await refreshData()
         }
         .onAppear {
+            NotificationManager.shared.requestAuthorization()
             fetchUserPoints()
             locationManager.checkIfLocationServicesIsEnabled()
             locationManager.plsInitiateLocationUpdates()
