@@ -23,6 +23,7 @@ struct DebugMenuView: View {
     @State private var isZonesExitsSectionExpanded = false
     @State private var monitoredZones: [(UUID, Bool)] = []
     @State private var isLoadingMonitoredZones = false
+    @State private var selectedZoneForDeletion: UUID?
 
     @State private var monitorEvents: [CLMonitor.Event] = []
     @State private var monitorRecords: [(zoneId: UUID, record: CLMonitor.Record)] = []
@@ -84,6 +85,29 @@ struct DebugMenuView: View {
 //                    }
 //                }
 //            }
+
+            Section(header: Text("Monitored Zones")) {
+                if isLoadingMonitoredZones {
+                    ProgressView()
+                } else if monitoredZones.isEmpty {
+                    Text("No zones are being monitored")
+                } else {
+                    ForEach(monitoredZones, id: \.0) { zone in
+                        VStack(alignment: .leading) {
+                            Text("Zone ID: \(zone.0.uuidString)")
+                            Text("Status: \(zone.1 ? "Monitored" : "Not Monitored")")
+                            Button(action: {
+                                selectedZoneForDeletion = zone.0
+                            }) {
+                                Text("Remove from Monitoring")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+
             Section(header: Text("Zone Exits")) {
                 DisclosureGroup("Zones", isExpanded: $isZonesExitsSectionExpanded) {
                     if isLoading {
@@ -198,6 +222,20 @@ struct DebugMenuView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        .alert(isPresented: .constant(selectedZoneForDeletion != nil)) {
+            Alert(
+                title: Text("Confirm Removal"),
+                message: Text("Are you sure you want to remove this zone from monitoring?"),
+                primaryButton: .destructive(Text("Remove")) {
+                    if let zoneId = selectedZoneForDeletion {
+                        removeZoneFromMonitoring(zoneId)
+                    }
+                },
+                secondaryButton: .cancel {
+                    selectedZoneForDeletion = nil
+                }
+            )
+        }
     }
 
     private func fetchAllZones() {
@@ -248,15 +286,24 @@ struct DebugMenuView: View {
     }
 
     private func fetchMonitoredZones() {
-//        isLoadingMonitoredZones = true
-//
-//        Task {
-//            let monitoredZonesResult = await LocationManager.shared.getMonitoredZones()
-//            DispatchQueue.main.async {
-//                monitoredZones = monitoredZonesResult
-//                isLoadingMonitoredZones = false
-//            }
-//        }
+        isLoadingMonitoredZones = true
+
+        Task {
+            let monitoredZonesResult = await LocationManager.shared.getMonitoredZones()
+            DispatchQueue.main.async {
+                monitoredZones = monitoredZonesResult
+                isLoadingMonitoredZones = false
+            }
+        }
+    }
+
+
+    private func removeZoneFromMonitoring(_ zoneId: UUID) {
+        Task {
+            await LocationManager.shared.removeMonitoredZone(byId: zoneId)
+            fetchMonitoredZones() // Refresh the list after removal
+            selectedZoneForDeletion = nil
+        }
     }
 
     private func fetchMonitorEvents() {

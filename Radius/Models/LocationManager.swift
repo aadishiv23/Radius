@@ -352,7 +352,8 @@ class LocationManager: NSObject, ObservableObject {
                 guard let userId = UUID(uuidString: failedExit["userId"] ?? ""),
                       let zoneId = UUID(uuidString: failedExit["zoneId"] ?? ""),
                       let dateString = failedExit["date"],
-                      let date = ISO8601DateFormatter().date(from: dateString) else {
+                      let date = ISO8601DateFormatter().date(from: dateString)
+                else {
                     continue
                 }
 
@@ -374,6 +375,11 @@ class LocationManager: NSObject, ObservableObject {
             // Update UserDefaults with only the remaining failed exits
             UserDefaults.standard.set(updatedFailedExits, forKey: "FailedZoneExits")
         }
+    }
+
+    func removeMonitoredZone(byId zoneId: UUID) async {
+        await monitor?.remove(zoneId.uuidString)
+        print("Removed monitored zone with ID: \(zoneId)")
     }
 
     // MARK: - Location Services

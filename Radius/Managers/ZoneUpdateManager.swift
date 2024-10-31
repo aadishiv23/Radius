@@ -36,7 +36,24 @@ final class ZoneUpdateManager {
         // Create a DateFormatter for UTC
         let exitTimeUTC = ISO8601DateFormatter.shared.string(from: time)
 
+      
         for zoneId in zoneIds {
+            // Step 1: Check if the zone_id exists
+            let zoneExists = try await supabaseClient
+                .from("zones")
+                .select()
+                .eq("id", value: zoneId.uuidString)
+                .single()
+                .execute()
+                .value != nil
+
+            // Step 2: Proceed only if the zone_id exists
+            guard zoneExists else {
+                print("Zone ID \(zoneId) does not exist in zones table. Aborting insert.")
+                return
+            }
+
+            
             let zoneExit = [
                 "profile_id": profileId.uuidString,
                 "zone_id": zoneId.uuidString,
@@ -60,7 +77,6 @@ final class ZoneUpdateManager {
         }
     }
 
-
     func handleDailyZoneExits(for profileId: UUID, zoneIds: [UUID], at time: Date) async throws {
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // UTC
@@ -74,7 +90,7 @@ final class ZoneUpdateManager {
             for zoneId in zoneIds {
                 // Step 1: Fetch zone details to check its category
                 let zone: Zone = try await fetchZone(for: zoneId)
-                
+
                 // Step 2: Check if a `zone_exit` exists for our give zone (given zone
 //                let existingZoneExit: ZoneExit = try await supabaseClient
 //                    .from("zone_exits")
@@ -84,7 +100,7 @@ final class ZoneUpdateManager {
 //                    .limit(1)
 //                    .execute()
 //                    .value
-//                
+//
 //                // Step 3: Check if a daily zone exit already exists for the profile, zone, and date
 //                let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
 //                    .from("daily_zone_exits")
@@ -98,7 +114,8 @@ final class ZoneUpdateManager {
 //                // If there is already an exit for this profile, zone, and date, skip inserting
 //                guard existingDailyZoneExit.isEmpty else {
 //                    print(
-//                        "Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on \(currentDateString)"
+//                        "Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on
+//                        \(currentDateString)"
 //                    )
 //                    continue
 //                }

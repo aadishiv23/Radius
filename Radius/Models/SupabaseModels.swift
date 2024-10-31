@@ -523,3 +523,19 @@ struct DailyPoint: Identifiable, Codable {
         return dateFormatter.string(from: date)
     }
 }
+
+struct CompetitionRule: Identifiable, Codable {
+    var id: UUID
+    var competition_id: UUID
+    var count_zone_exits: Bool
+    var max_exits_allowed: Int
+    var allowed_zone_categories: [ZoneCategory]
+}
+
+struct GroupRule: Identifiable, Codable {
+    var id: UUID
+    var group_id: UUID
+    var count_zone_exits: Bool
+    var max_exits_allowed: Int
+    var allowed_zone_categories: [ZoneCategory]
+}
