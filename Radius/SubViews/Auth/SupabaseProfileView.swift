@@ -13,40 +13,63 @@ import SwiftUI
 
 struct SupabaseProfileView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
-
     @State private var username = ""
     @State private var fullName = ""
     @State private var website = ""
     @State private var isLoading = false
     @State private var currentUserZones: [Zone] = []
     @Environment(\.colorScheme) var colorScheme
-
+    
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    headerView
-                        .applyRadiusGlassStyle() // Apply glass style
-
-                    userInfoCard
-                        .applyRadiusGlassStyle() // Apply glass style
-
-                    zonesCard
-                        .applyRadiusGlassStyle() // Apply glass style
-
-                    actionButtons
-
-                    Spacer()
-
-                    versionInfo
+            ZStack {
+                // Animated gradient background
+                AnimatedGradientBackground()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Profile Header
+                        ProfileHeader(fullName: fullName, username: username)
+                            .padding(.top)
+                        
+                        // Stats View
+                        if let currentUser = friendsDataManager.currentUser {
+                            StatsView(user: currentUser)
+                        }
+                        
+                        // User Info Card
+                        UserInfoCard(currentUser: friendsDataManager.currentUser)
+                        
+                        // Zones Section
+                        ZonesSection(currentUser: friendsDataManager.currentUser)
+                        
+                        // Action Buttons
+                        ActionButtonsGroup(
+                            isLoading: $isLoading,
+                            updateProfile: updateProfileButtonTapped,
+                            signOut: signOut
+                        )
+                        
+                        // Version Info
+                        Text("Version 1.0")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                            .padding(.top, 8)
+                    }
+                    .padding()
                 }
-                .padding()
             }
-            .background(backgroundGradient)
-            // .navigationBarHidden(true)
+            //.background(backgroundGradient)
+            //.navigationBarHidden(true)
+            //             .navigationBarTitleDisplayMode(.inline)
+
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    gearButton
+                    NavigationLink(destination: LocationSettingsView()) {
+                        Image(systemName: "gear.badge")
+                            .font(.title3)
+                            .foregroundColor(.blue)
+                    }
                 }
             }
         }
@@ -54,239 +77,11 @@ struct SupabaseProfileView: View {
             await getInitialProfile()
         }
     }
-
-    // MARK: - Header View
-
-    private var headerView: some View {
-        ZStack(alignment: .bottomLeading) {
-//            // Profile Banner
-//            Image("profile-banner")
-//                .resizable()
-//                .scaledToFill()
-//                .frame(height: 150)
-//                .clipped()
-//                .background(Color(UIColor.secondarySystemBackground))
-//                .cornerRadius(15)
-//                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-
-            // Profile Picture and Username
-            HStack(alignment: .bottom, spacing: 16) {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 80, height: 80)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                    .shadow(radius: 5)
-                Spacer()
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(fullName)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-
-                    Text("@\(username)")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-            }
-            .padding([.bottom, .horizontal], 16)
-        }
-        .padding()
-        .cornerRadius(15)
-    }
-
-    // MARK: - User Info Card
-
-    private var userInfoCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            if let currentUser = friendsDataManager.currentUser {
-                HStack {
-                    Label("Name", systemImage: "person.fill")
-                        .font(.headline)
-                    Spacer()
-                    Text(currentUser.full_name.isEmpty ? "Unknown" : currentUser.full_name)
-                        .foregroundColor(.secondary)
-                }
-
-                HStack {
-                    Label("Username", systemImage: "at")
-                        .font(.headline)
-                    Spacer()
-                    Text(currentUser.username.isEmpty ? "Unavailable" : currentUser.username)
-                        .foregroundColor(.secondary)
-                }
-
-                HStack {
-                    Label("Coordinates", systemImage: "location.fill")
-                        .font(.headline)
-                    Spacer()
-                    Text(
-                        currentUser.latitude != 0
-                            ? "\(currentUser.latitude), \(currentUser.longitude)"
-                            : "No coordinates available"
-                    )
-                    .foregroundColor(.secondary)
-                }
-
-                HStack {
-                    Label("Zones", systemImage: "map")
-                        .font(.headline)
-                    Spacer()
-                    Text(currentUser.zones.isEmpty ? "No zones available" : "\(currentUser.zones.count)")
-                        .foregroundColor(.secondary)
-                }
-            } else {
-                HStack {
-                    ProgressView()
-                    Text("Loading user information...")
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-        .padding()
-        .cornerRadius(15)
-        //.shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-    }
-
-    // MARK: - Zones Card
-
-    private var zonesCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Zones")
-                    .font(.headline)
-                Spacer()
-                NavigationLink(destination: ZoneGridView()) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.blue)
-                }
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 20) {
-                    if let currentUser = friendsDataManager.currentUser {
-                        ForEach(currentUser.zones) { zone in
-                            ZoneCard(zone: zone)
-                                .frame(width: 180) // Ensure ZoneCard has a fixed width
-                        }
-                    } else {
-                        ProgressView()
-                    }
-                }
-                .padding(.vertical, 10)
-            }
-            .frame(minWidth: 0, maxWidth: .infinity) // Ensure ScrollView takes full width
-            .padding(.horizontal, -16) // Remove horizontal padding if necessary
-        }
-        .padding()
-        .cornerRadius(15)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-    }
-
-    // MARK: - Action Buttons
-
-    private var actionButtons: some View {
-        VStack(spacing: 15) {
-            updateProfileButton
-            myProfileButton
-            signOutButton
-        }
-    }
-
-    private var updateProfileButton: some View {
-        Button(action: updateProfileButtonTapped) {
-            HStack {
-                Text("Update Profile")
-                    .fontWeight(.semibold)
-                if isLoading {
-                    Spacer()
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(
-                Color.black.opacity(0.7)
-            )
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        }
-        .disabled(isLoading)
-    }
-
-    private var myProfileButton: some View {
-        NavigationLink(destination: MyProfileView()) {
-            Text("My Profile")
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    Color.black.opacity(0.7)
-                )
-                .foregroundColor(.white)
-                .cornerRadius(10)
-        }
-    }
-
-    private var signOutButton: some View {
-        Button(action: signOut) {
-            Text("Sign Out")
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    Color.red.opacity(0.5)
-                )
-                .foregroundColor(.white)
-                .cornerRadius(10)
-        }
-    }
-
-    private func signOut() {
-        Task {
-            try? await supabase.auth.signOut()
-        }
-    }
-
-    // MARK: - Version Info
-
-    private var versionInfo: some View {
-        Text("v1.0")
-            .font(.footnote)
-            .foregroundColor(.gray)
-            .padding(.top, 10)
-    }
-
-    // MARK: - Background Gradient
-
-    private var backgroundGradient: some View {
-        LinearGradient(
-            gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.yellow.opacity(0.7)]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
-    }
-
-    // MARK: - Gear Button
-
-    private var gearButton: some View {
-        NavigationLink(destination: LocationSettingsView()) {
-            Image(systemName: "gear.badge")
-                .foregroundColor(.primary)
-                .font(.title2)
-        }
-    }
-
-    // MARK: - Data Fetching
-
+    
+    // MARK: - Data Methods
     func getInitialProfile() async {
         do {
             let currentUser = try await supabase.auth.session.user
-
             let profile: Profile = try await supabase
                 .from("profiles")
                 .select()
@@ -294,31 +89,302 @@ struct SupabaseProfileView: View {
                 .single()
                 .execute()
                 .value
-
+            
             username = profile.username
             fullName = profile.full_name
-
         } catch {
             debugPrint(error)
         }
     }
-
+    
     func updateProfileButtonTapped() {
         Task {
             isLoading = true
             defer { isLoading = false }
             do {
                 let currentUser = try await supabase.auth.session.user
-
                 try await supabase
                     .from("profiles")
-                    .update(
-                        UpdateProfileParams(username: username, fullName: fullName)
-                    )
+                    .update(UpdateProfileParams(username: username, fullName: fullName))
                     .eq("id", value: currentUser.id)
                     .execute()
             } catch {
                 debugPrint(error)
+            }
+        }
+    }
+    
+    func signOut() {
+        Task {
+            try? await supabase.auth.signOut()
+        }
+    }
+}
+
+// MARK: - Supporting Views
+struct AnimatedGradientBackground: View {
+    @State private var animateGradient = false
+    
+    var body: some View {
+        LinearGradient(
+            colors: [
+                Color.blue.opacity(0.7),
+                Color.purple.opacity(0.5),
+                Color.orange.opacity(0.4)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .hueRotation(.degrees(animateGradient ? 45 : 0))
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
+                animateGradient.toggle()
+            }
+        }
+    }
+}
+
+struct ProfileHeader: View {
+    let fullName: String
+    let username: String
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            VStack(spacing: 16) {
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .foregroundColor(.white)
+                    .background(
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 110, height: 110)
+                    )
+                    .shadow(radius: 10)
+                
+                VStack(spacing: 8) {
+                    Text(fullName)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    Text("@\(username)")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            Spacer()
+        }
+        .padding(.vertical, 24)
+        .padding(.horizontal, 32)
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+struct StatsView: View {
+    let user: Profile
+    
+    var body: some View {
+        HStack(spacing: 20) {
+            ProfileStatItem(title: "Zones", value: "\(user.zones.count)", icon: "map.fill")
+            ProfileStatItem(title: "Friends", value: "0", icon: "person.2.fill")
+            ProfileStatItem(title: "Active", value: "Yes", icon: "circle.fill")
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+struct ProfileStatItem: View {
+    let title: String
+    let value: String
+    let icon: String
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(.white)
+            
+            Text(value)
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct UserInfoCard: View {
+    let currentUser: Profile?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if let user = currentUser {
+                InfoRow(title: "Name", value: user.full_name.isEmpty ? "Unknown" : user.full_name, icon: "person.fill")
+                InfoRow(title: "Username", value: user.username.isEmpty ? "Unavailable" : user.username, icon: "at")
+                InfoRow(title: "Location", value: user.latitude != 0 ? "\(user.latitude), \(user.longitude)" : "No location", icon: "location.fill")
+            } else {
+                HStack {
+                    ProgressView()
+                        .tint(.white)
+                    Text("Loading user information...")
+                        .foregroundColor(.white)
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+struct InfoRow: View {
+    let title: String
+    let value: String
+    let icon: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(.white)
+                .frame(width: 24)
+            
+            Text(title)
+                .foregroundColor(.white)
+            
+            Spacer()
+            
+            Text(value)
+                .foregroundColor(.white.opacity(0.8))
+        }
+    }
+}
+
+struct ZonesSection: View {
+    let currentUser: Profile?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Your Zones")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                NavigationLink(destination: ZoneGridView()) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+            }
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    if let user = currentUser {
+                        ForEach(user.zones) { zone in
+                            ZoneCard(zone: zone)
+                        }
+                    } else {
+                        ProgressView()
+                            .tint(.white)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+struct EnhancedZoneCard: View {
+    var zone: Zone
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            MapViewSnapshot(coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
+                .frame(width: 200, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(.white.opacity(0.3), lineWidth: 1)
+                )
+            
+            Text(zone.name)
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            HStack {
+                Label("\(Int(zone.radius))m", systemImage: "ruler")
+                Spacer()
+                Label("Active", systemImage: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            }
+            .font(.caption)
+            .foregroundColor(.white.opacity(0.8))
+        }
+        .padding()
+        .frame(width: 200)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+struct ActionButtonsGroup: View {
+    @Binding var isLoading: Bool
+    let updateProfile: () -> Void
+    let signOut: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Button(action: updateProfile) {
+                HStack {
+                    Text("Update Profile")
+                        .fontWeight(.semibold)
+                    if isLoading {
+                        Spacer()
+                        ProgressView()
+                            .tint(.white)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.ultraThinMaterial)
+                .foregroundColor(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .disabled(isLoading)
+            
+            NavigationLink(destination: MyProfileView()) {
+                Text("My Profile")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            
+            Button(action: signOut) {
+                Text("Sign Out")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.red.opacity(0.3))
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
