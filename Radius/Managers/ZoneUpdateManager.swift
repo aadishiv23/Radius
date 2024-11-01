@@ -36,7 +36,6 @@ final class ZoneUpdateManager {
         // Create a DateFormatter for UTC
         let exitTimeUTC = ISO8601DateFormatter.shared.string(from: time)
 
-      
         for zoneId in zoneIds {
             // Step 1: Check if the zone_id exists
             let zoneExists = try await supabaseClient
@@ -53,7 +52,6 @@ final class ZoneUpdateManager {
                 return
             }
 
-            
             let zoneExit = [
                 "profile_id": profileId.uuidString,
                 "zone_id": zoneId.uuidString,
@@ -372,6 +370,20 @@ extension ZoneUpdateManager {
 
         // If it's not a "home" zone, always return false
         return false
+    }
+
+    func checkIfZoneExitExists(for userId: UUID, zoneId: UUID, at date: Date) async throws -> Bool {
+        let dateString = ISO8601DateFormatter().string(from: date)
+
+        let result = try await supabase
+            .from("zone_exits")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .eq("zone_id", value: zoneId.uuidString)
+            .eq("date", value: dateString)
+            .single()
+
+        return result != nil
     }
 
 }

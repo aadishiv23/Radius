@@ -358,6 +358,23 @@ class LocationManager: NSObject, ObservableObject {
                 }
 
                 do {
+                    // Check if the zone exit already exists in the database
+                    let exitExists = try await zoneUpdateManager.checkIfZoneExitExists(
+                        for: userId,
+                        zoneId: zoneId,
+                        at: date
+                    )
+
+                    if exitExists {
+                        print(
+                            "Zone exit for user \(userId) and zone \(zoneId) at \(date) already exists. Skipping retry."
+                        )
+                        // Remove this exit from the retry list
+                        updatedFailedExits.removeAll { $0 == failedExit }
+                        UserDefaults.standard.set(updatedFailedExits, forKey: "FailedZoneExits")
+                        continue
+                    }
+
                     try await zoneUpdateManager.uploadZoneExit(for: userId, zoneIds: [zoneId], at: date)
                     try await zoneUpdateManager.handleDailyZoneExits(
                         for: userId,
