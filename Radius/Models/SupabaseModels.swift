@@ -110,12 +110,12 @@ struct Group: Codable, Identifiable, Hashable {
     var description: String?
     var password: String
     var plain_password: String?
-    
-    // Implement Hashable manually to ensure proper dictionary key handling
+
+    /// Implement Hashable manually to ensure proper dictionary key handling
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
+
     static func == (lhs: Group, rhs: Group) -> Bool {
         lhs.id == rhs.id
     }
@@ -246,10 +246,19 @@ struct UpdateProfileParams: Encodable {
 }
 
 struct GroupMember: Codable {
+    let id: UUID
     let group_id: UUID
     let profile_id: UUID
     let profile_name: String?
     let group_name: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case group_id
+        case profile_id
+        case profile_name
+        case group_name
+    }
 }
 
 struct GroupMemberWoBS: Codable {

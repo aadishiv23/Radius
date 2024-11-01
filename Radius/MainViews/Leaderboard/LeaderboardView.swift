@@ -19,20 +19,24 @@ enum ChartType: String, CaseIterable {
 /// Shows competition and group data in both chart and list formats
 struct LeaderboardView: View {
     // MARK: - Properties
+
     @StateObject private var viewModel: LeaderboardViewModel
     @State private var selectedChartType: ChartType = .bar
     @State private var selectedGroup: Group?
     @State private var isSheetPresented = false
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     // MARK: - Initialization
+
     init(friendsDataManager: FriendsDataManager, competitionManager: CompetitionManager) {
         _viewModel = StateObject(wrappedValue: LeaderboardViewModel(
             friendsDataManager: friendsDataManager,
             competitionManager: competitionManager
         ))
     }
-    
+
     // MARK: - Body
+
     var body: some View {
         NavigationView {
             mainContent
@@ -44,14 +48,14 @@ struct LeaderboardView: View {
             }
         }
     }
-    
+
     // MARK: - Private Views
-    
+
     /// Main content container with gradient background
     private var mainContent: some View {
         ZStack {
             backgroundGradient
-            
+
             VStack(spacing: 20) {
                 titleView
                 buttonsPicker
@@ -59,39 +63,42 @@ struct LeaderboardView: View {
             }
         }
     }
-    
+
     /// Background gradient for the view
     private var backgroundGradient: some View {
         LinearGradient(
-            gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.yellow.opacity(0.7)]),
+            gradient: Gradient(colors: [
+                Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.7),
+                Color.yellow.opacity(colorScheme == .dark ? 0.2 : 0.7)
+            ]),
             startPoint: .top,
             endPoint: .bottom
         )
         .edgesIgnoringSafeArea(.all)
     }
-    
-    /// Title view for the leaderboard
+
+    /// Rest of the view components remain similar, but with updated colors
     private var titleView: some View {
         Text("Leaderboard")
             .font(.system(.body, design: .rounded))
             .fontWeight(.heavy)
+            .foregroundColor(colorScheme == .dark ? .white : .primary)
     }
-    
+
     /// Main scrollable content area
     private var mainScrollView: some View {
         ZStack {
             Rectangle()
                 .cornerRadius(15, corners: [.topLeft, .topRight])
-                .foregroundColor(Color.white.opacity(0.7))
+                .foregroundColor(colorScheme == .dark ? Color.black.opacity(0.7) : Color.white.opacity(0.7))
                 .edgesIgnoringSafeArea(.bottom)
-            
+
             ScrollView {
                 VStack(spacing: 20) {
-                    Spacer()
-
                     if isSheetPresented {
                         categoryContentView
                         Divider()
+                            .background(colorScheme == .dark ? Color.white.opacity(0.3) : Color.black.opacity(0.3))
                         leaderboardChart
                         leaderboardList
                     } else {
@@ -103,7 +110,7 @@ struct LeaderboardView: View {
         }
         .padding(.top, 10)
     }
-    
+
     /// Content view based on selected category (groups or competitions)
     private var categoryContentView: some View {
         VStack {
@@ -114,7 +121,7 @@ struct LeaderboardView: View {
             }
         }
     }
-    
+
     /// Group picker view with selection handling
     private var groupPickerView: some View {
         LVCustomGroupPicker(
@@ -126,7 +133,7 @@ struct LeaderboardView: View {
             viewModel.fetchLeaderboardData()
         }
     }
-    
+
     /// Buttons for selecting between groups and competitions
     private var buttonsPicker: some View {
         HStack(spacing: 16) {
@@ -135,7 +142,7 @@ struct LeaderboardView: View {
         }
         .padding(.horizontal)
     }
-    
+
     /// Button for selecting groups view
     private var groupButton: some View {
         Button(action: {
@@ -149,7 +156,7 @@ struct LeaderboardView: View {
             )
         }
     }
-    
+
     /// Button for selecting competitions view
     private var competitionButton: some View {
         Button(action: {
@@ -163,7 +170,7 @@ struct LeaderboardView: View {
             )
         }
     }
-    
+
     /// Competition picker with available competitions
     private var competitionPicker: some View {
         Picker("Select a Competition", selection: $viewModel.selectedCompetition) {
@@ -174,7 +181,7 @@ struct LeaderboardView: View {
         }
         .pickerStyle(MenuPickerStyle())
     }
-    
+
     /// Chart view with type selection and data visualization
     private var leaderboardChart: some View {
         VStack {
@@ -182,7 +189,7 @@ struct LeaderboardView: View {
             selectedChartView
         }
     }
-    
+
     /// Picker for selecting chart type (bar or line)
     private var chartTypePicker: some View {
         Picker("Chart Type", selection: $selectedChartType) {
@@ -193,7 +200,7 @@ struct LeaderboardView: View {
         .pickerStyle(SegmentedPickerStyle())
         .padding(.horizontal)
     }
-    
+
     /// View that shows either bar or line chart based on selection
     private var selectedChartView: some View {
         VStack {
@@ -204,7 +211,7 @@ struct LeaderboardView: View {
             }
         }
     }
-    
+
     /// Bar chart visualization
     private var barChartView: some View {
         VStack {
@@ -224,7 +231,7 @@ struct LeaderboardView: View {
         }
         .chartContainer()
     }
-    
+
     /// Line chart visualization
     private var lineChartView: some View {
         VStack {
@@ -245,13 +252,13 @@ struct LeaderboardView: View {
         }
         .chartContainer()
     }
-    
+
     /// Loading view for charts
     private var loadingView: some View {
         ProgressView()
             .padding()
     }
-    
+
     /// List of leaderboard entries
     private var leaderboardList: some View {
         VStack(spacing: 12) {
@@ -264,12 +271,12 @@ struct LeaderboardView: View {
                 )
             }
         }
-        //.padding(.horizontal, 8) // Reduced horizontal padding
+        // .padding(.horizontal, 8) // Reduced horizontal padding
         .frame(maxWidth: .infinity)
     }
-    
+
     // MARK: - Helper Methods
-    
+
     /// Gets cumulative points for a specific member
     private func getCumulativePoints(for memberName: String) -> Int? {
         viewModel.cumulativePoints
@@ -277,13 +284,13 @@ struct LeaderboardView: View {
             .max { $0.date < $1.date }?
             .points
     }
-    
+
     /// Returns sorted members based on chart type
     private var sortedMembers: [LeaderboardMember] {
         if selectedChartType == .bar {
-            return viewModel.members
+            viewModel.members
         } else {
-            return viewModel.members.sorted { member1, member2 in
+            viewModel.members.sorted { member1, member2 in
                 let points1 = getCumulativePoints(for: member1.name) ?? 0
                 let points2 = getCumulativePoints(for: member2.name) ?? 0
                 return points1 > points2
@@ -299,7 +306,8 @@ private struct CategoryButtonContent: View {
     let imageName: String
     let title: String
     let isSelected: Bool
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         VStack(alignment: .leading) {
             Image(systemName: imageName)
@@ -311,9 +319,16 @@ private struct CategoryButtonContent: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color.blue)
+        .background(
+            colorScheme == .dark
+                ? Color.blue.opacity(0.6)
+                : Color.blue
+        )
         .cornerRadius(15)
-        .shadow(radius: 4)
+        .shadow(
+            color: colorScheme == .dark ? Color.black.opacity(0.3) : Color.blue.opacity(0.3),
+            radius: 4
+        )
         .scaleEffect(isSelected ? 0.9 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isSelected)
     }
@@ -322,7 +337,6 @@ private struct CategoryButtonContent: View {
 // MARK: - Chart Modifiers
 
 extension View {
-    /// Common chart configuration
     func chartConfiguration() -> some View {
         self
             .chartXAxis {
@@ -337,14 +351,18 @@ extension View {
             }
     }
     
-    /// Common chart container styling
     func chartContainer() -> some View {
         self
             .frame(height: 300)
             .padding()
-            .background(Color.white)
+            .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(15)
-            .shadow(color: Color.blue.opacity(0.3), radius: 4, x: 0, y: 2)
+            .shadow(
+                color: Color.primary.opacity(0.2),
+                radius: 4,
+                x: 0,
+                y: 2
+            )
     }
 }
 
@@ -416,7 +434,7 @@ struct LVCustomGroupPicker: View {
             }
             .padding()
             .frame(maxWidth: .infinity) // Makes the picker expand to fill the available space
-            .background(Color.white.opacity(0.8))
+            .background(Color(UIColor.systemBackground))
             .cornerRadius(10)
             .shadow(radius: 2)
         }
@@ -429,10 +447,11 @@ struct LeaderboardListItem: View {
     let member: LeaderboardMember
     @Binding var selectedChartType: ChartType
     let getCumulativePoints: (String) -> Int?
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         HStack(spacing: 16) {
-            // Fixed-width section for medal/rank
+            // Medal/rank section
             HStack {
                 if index < 3 {
                     Image(systemName: "medal.fill")
@@ -445,7 +464,7 @@ struct LeaderboardListItem: View {
                         .foregroundColor(.secondary)
                 }
             }
-            .frame(width: 30) // Fixed width for alignment
+            .frame(width: 30)
             
             // Name and group section
             VStack(alignment: .leading, spacing: 4) {
@@ -466,17 +485,21 @@ struct LeaderboardListItem: View {
             Text("\(pointsToDisplay) pts")
                 .font(.title3)
                 .fontWeight(.bold)
-                .foregroundColor(.blue)
+                .foregroundColor(colorScheme == .dark ? .blue.opacity(0.8) : .blue)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
-        .background(Color.white)
+        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(15)
-        .shadow(color: Color.blue.opacity(0.2), radius: 4, x: 0, y: 2)
+        .shadow(
+            color: colorScheme == .dark ? Color.black.opacity(0.2) : Color.blue.opacity(0.2),
+            radius: 4,
+            x: 0,
+            y: 2
+        )
     }
     
-    // Computed property for points display
     private var pointsToDisplay: Int {
         selectedChartType == .bar ?
             member.points :
@@ -485,16 +508,15 @@ struct LeaderboardListItem: View {
     
     private func medalColor(for index: Int) -> Color {
         switch index {
-        case 0: return .yellow
-        case 1: return .gray
-        case 2: return .brown
+        case 0: return colorScheme == .dark ? .yellow.opacity(0.8) : .yellow
+        case 1: return colorScheme == .dark ? .gray.opacity(0.8) : .gray
+        case 2: return colorScheme == .dark ? .brown.opacity(0.8) : .brown
         default: return .clear
         }
     }
 }
 
-
-//private var tabSelector: some View {
+// private var tabSelector: some View {
 //    HStack(spacing: 12) {
 //        LeaderboardTabButton(
 //            title: "Groups",
@@ -519,9 +541,9 @@ struct LeaderboardListItem: View {
 //        }
 //    }
 //    .padding(.horizontal)
-//}
+// }
 //
-//struct LeaderboardTabButton: View {
+// struct LeaderboardTabButton: View {
 //    let title: String
 //    let icon: String
 //    let isSelected: Bool
@@ -547,6 +569,6 @@ struct LeaderboardListItem: View {
 //            .animation(.spring(response: 0.3), value: isSelected)
 //        }
 //    }
-//}
+// }
 //
 //
