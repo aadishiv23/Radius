@@ -63,7 +63,7 @@ struct FriendProfileView: View {
                     self.zoneExits = Array(fetchedZoneExits.prefix(5))
 
                     // Step 2: Extract zone IDs from zone exits and fetch zones
-                    let zoneIds = fetchedZoneExits.map { $0.zone_id }
+                    let zoneIds = Array(Set(zoneExits.map { $0.zone_id }))
                     self.zones = try await friendsDataManager.fetchZonesDict(for: zoneIds)
                 } catch {
                     print("Failed to load zone exits and associated zones: \(error)")
