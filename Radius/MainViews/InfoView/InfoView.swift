@@ -61,52 +61,66 @@ struct InfoView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Friends Section
-                    CollapsibleSection(title: "Friends") {
-                        if $viewModel.filteredFriends.isEmpty, !viewModel.searchText.isEmpty {
-                            noResultsView(for: "Friends")
-                        } else {
-                            ForEach(viewModel.filteredFriends) { friend in
-                                NavigationLink(destination: FriendProfileView(friend: friend)) {
-                                    FriendRowView(friend: friend)
+            ZStack {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Friends Section
+                        CollapsibleSection(title: "Friends") {
+                            if $viewModel.filteredFriends.isEmpty, !viewModel.searchText.isEmpty {
+                                noResultsView(for: "Friends")
+                            } else {
+                                ForEach(viewModel.filteredFriends) { friend in
+                                    NavigationLink(destination: FriendProfileView(friend: friend)) {
+                                        FriendRowView(friend: friend)
+                                    }
                                 }
                             }
                         }
-                    }
-
-                    // Groups Section
-                    CollapsibleSection(title: "Groups") {
-                        if viewModel.filteredGroups.isEmpty, !viewModel.searchText.isEmpty {
-                            noResultsView(for: "Groups")
-                        } else if viewModel.filteredGroups.isEmpty {
-                            emptyGroupsView()
-                        } else {
-                            ForEach(viewModel.filteredGroups, id: \.id) { group in
-                                GroupView(group: group)
-                                    .frame(maxWidth: .infinity)
-                            }
-                        }
-                    }
-
-                    // Competitions Section
-                    CollapsibleSection(title: "Competitions") {
-                        if viewModel.filteredCompetitions.isEmpty, !viewModel.searchText.isEmpty {
-                            noResultsView(for: "Competitions")
-                        } else if viewModel.filteredCompetitions.isEmpty {
-                            emptyCompetitionsView()
-                        } else {
-                            LazyVStack {
-                                ForEach(viewModel.filteredCompetitions) { competition in
-                                    CompetitionCard(competition: competition)
+                        
+                        // Groups Section
+                        CollapsibleSection(title: "Groups") {
+                            if viewModel.filteredGroups.isEmpty, !viewModel.searchText.isEmpty {
+                                noResultsView(for: "Groups")
+                            } else if viewModel.filteredGroups.isEmpty {
+                                emptyGroupsView()
+                            } else {
+                                ForEach(viewModel.filteredGroups, id: \.id) { group in
+                                    GroupView(group: group)
                                         .frame(maxWidth: .infinity)
                                 }
                             }
                         }
+                        
+                        // Competitions Section
+                        CollapsibleSection(title: "Competitions") {
+                            if viewModel.filteredCompetitions.isEmpty, !viewModel.searchText.isEmpty {
+                                noResultsView(for: "Competitions")
+                            } else if viewModel.filteredCompetitions.isEmpty {
+                                emptyCompetitionsView()
+                            } else {
+                                LazyVStack {
+                                    ForEach(viewModel.filteredCompetitions) { competition in
+                                        CompetitionCard(competition: competition)
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    //Spacer()
+                                }
+                            }
+                        }
+                        Spacer()
+                            .frame(height: 100)
                     }
+                    .padding(.top)
                 }
-                .padding(.top)
+                
+                VStack {
+                    Spacer()
+                    
+                    VariableBlurView()
+                        .rotationEffect(.degrees(180))
+                        .frame(height: 40)
+                        .allowsHitTesting(false)
+                }
             }
             .navigationTitle("Social")
             .searchable(

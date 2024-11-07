@@ -45,7 +45,6 @@ struct HomeView: View {
     @State private var fogOfWarButtonOffset = CGSize.zero
     @State private var fogOfWarButtonScale: CGFloat = 0.0
 
-
     @Namespace private var zoomNamespace
 
     /// Initialization with repositories
@@ -61,11 +60,22 @@ struct HomeView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
+            ZStack {
+                ScrollView {
+                    VStack {
+                        mapSection
+                        Divider()
+                        friendListSection
+                    }
+                }
+
                 VStack {
-                    mapSection
-                    Divider()
-                    friendListSection
+                    Spacer()
+
+                    VariableBlurView()
+                        .rotationEffect(.degrees(180))
+                        .frame(height: 40)
+                        .allowsHitTesting(false)
                 }
             }
             .onAppear {
@@ -250,7 +260,6 @@ struct HomeView: View {
                             .offset(fogOfWarButtonOffset)
                             .scaleEffect(fogOfWarButtonScale)
                         }
-                        .padding()
                     }
                 }
             )
@@ -366,7 +375,7 @@ struct HomeView: View {
                 }
 
                 Spacer()
-                
+
                 if #available(iOS 18, *) {
                     Button(action: {
                         showFullScreenMap.toggle()
@@ -391,8 +400,6 @@ struct HomeView: View {
                     .padding(.trailing, 20)
                     .padding(.top, 20)
                 }
-
- 
             }
         }
         .fullScreenCover(isPresented: $showFullScreenMap) {
