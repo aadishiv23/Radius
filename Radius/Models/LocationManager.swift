@@ -49,6 +49,7 @@ class LocationManager: NSObject, ObservableObject {
 
     // Add these properties
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    private var activeBackgroundTasks: Set<UIBackgroundTaskIdentifier> = []
     private var isHandlingZoneExit = false
 
     @Published var userZones: [Zone] = []
@@ -126,7 +127,7 @@ class LocationManager: NSObject, ObservableObject {
     private func appMovedToForeground() {
         print("App moved to foreground")
         applicationWillEnterForeground()
-        retryFailedZoneExits()
+        // retryFailedZoneExits()
     }
 
     // MARK: - Location Updates
@@ -192,9 +193,18 @@ class LocationManager: NSObject, ObservableObject {
             for try await event in await monitor.events {
                 // Begin background task before handling event
                 await beginBackgroundTask()
+                defer {
+                    // await MainActor.run { [weak self] in
+                        self.endBackgroundTask()
+                   // }
+                }
                 handleMonitorEvent(event)
             }
         }
+    }
+
+    deinit {
+        endBackgroundTask()
     }
 
     // MARK: - Temporary Zone Management
@@ -248,13 +258,6 @@ class LocationManager: NSObject, ObservableObject {
     private func handleMonitorEvent(_ event: CLMonitor.Event) {
         print("[handleMonitorEvent] Event received: \(event.state.rawValue) for identifier: \(event.identifier)")
 
-//        guard !isHandlingZoneExit else {
-//            print("[handleMonitorEvent] Already handling a zone exit. Skipping.")
-//            return
-//        }
-//
-//        isHandlingZoneExit = true
-
         if event.state == .unsatisfied {
             Task {
                 do {
@@ -274,49 +277,20 @@ class LocationManager: NSObject, ObservableObject {
                         return
                     }
 
-                    // Retry logic for zone exit upload
-                    var retryCount = 0
-                    var success = false
+                    let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
+                    try await zoneUpdateManager.uploadZoneExit(
+                        for: currentUserId,
+                        zoneIds: [zoneId],
+                        at: event.date
+                    )
+                    try await zoneUpdateManager.handleDailyZoneExits(
+                        for: currentUserId,
+                        zoneIds: [zoneId],
+                        at: event.date
+                    )
 
-                    while !success, retryCount < 3 {
-                        do {
-                            let zone: Zone = try await zoneUpdateManager.fetchZone(for: zoneId)
-                            try await zoneUpdateManager.uploadZoneExit(
-                                for: currentUserId,
-                                zoneIds: [zoneId],
-                                at: event.date
-                            )
-                            try await zoneUpdateManager.handleDailyZoneExits(
-                                for: currentUserId,
-                                zoneIds: [zoneId],
-                                at: event.date
-                            )
-                            success = true
-                        } catch {
-                            retryCount += 1
-                            print("[handleMonitorEvent] Attempt \(retryCount) failed: \(error)")
-                            if retryCount < 3 {
-                                try await Task
-                                    .sleep(nanoseconds: UInt64(1_000_000_000 * retryCount)) // Exponential backoff
-                            }
-                        }
-                    }
-
-                    if !success {
-                        print("[handleMonitorEvent] Failed all retry attempts")
-                        // Store failed event for later retry
-                        storeFailedZoneExit(userId: currentUserId, zoneId: zoneId, date: event.date)
-                    }
                 } catch {
                     print("[handleMonitorEvent] Failed to handle monitor event: \(error)")
-                    // Store failed event
-                    if let currentUserId = fdm.currentUser?.id {
-                        storeFailedZoneExit(
-                            userId: currentUserId,
-                            zoneId: UUID(uuidString: event.identifier)!,
-                            date: event.date
-                        )
-                    }
                 }
 
                 isHandlingZoneExit = false
@@ -501,17 +475,30 @@ class LocationManager: NSObject, ObservableObject {
     /// Modified background task management for SwiftUI
     private func beginBackgroundTask() async {
         await MainActor.run {
-            backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
-                self?.endBackgroundTask()
+            let newTask = UIApplication.shared.beginBackgroundTask { [weak self] in
+                // This closure is called shortly before the background task will be terminated
+                guard let self else {
+                    return
+                }
+                // End all active background tasks
+                for task in activeBackgroundTasks {
+                    UIApplication.shared.endBackgroundTask(task)
+                }
+                activeBackgroundTasks.removeAll()
+            }
+
+            if newTask != .invalid {
+                activeBackgroundTasks.insert(newTask)
             }
         }
     }
 
     private func endBackgroundTask() {
-        if backgroundTask != .invalid {
-            UIApplication.shared.endBackgroundTask(backgroundTask)
-            backgroundTask = .invalid
+        // End all active background tasks
+        for task in activeBackgroundTasks {
+            UIApplication.shared.endBackgroundTask(task)
         }
+        activeBackgroundTasks.removeAll()
     }
 
     // MARK: - Public Methods
@@ -550,6 +537,7 @@ class LocationManager: NSObject, ObservableObject {
     }
 
     func applicationWillEnterForeground() {
+        locationManager.startUpdatingLocation()
         if let tempId = temporaryZoneId {
             Task {
                 await removeGeographicCondition(for: tempId)
