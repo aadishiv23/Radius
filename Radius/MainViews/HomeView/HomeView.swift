@@ -68,15 +68,6 @@ struct HomeView: View {
                         friendListSection
                     }
                 }
-
-                VStack {
-                    Spacer()
-
-                    VariableBlurView()
-                        .rotationEffect(.degrees(180))
-                        .frame(height: 40)
-                        .allowsHitTesting(false)
-                }
             }
             .onAppear {
                 Task {
@@ -116,11 +107,6 @@ struct HomeView: View {
                         Image(systemName: "ladybug")
                     }
                 }
-
-                // Points pill to show next to the plus button
-//                ToolbarItem(placement: .topBarTrailing) {
-//                    PointsPillView(points: userPoints)  // Reuse the PointsPillView created earlier
-//                }
             }
             .overlay(
                 VStack {
@@ -261,6 +247,8 @@ struct HomeView: View {
                             .scaleEffect(fogOfWarButtonScale)
                         }
                     }
+                    .padding(.trailing, 10)
+                    .padding(.bottom, 5)
                 }
             )
             .actionSheet(isPresented: $showZoneExitActionSheet) {

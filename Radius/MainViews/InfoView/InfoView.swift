@@ -116,10 +116,10 @@ struct InfoView: View {
                 VStack {
                     Spacer()
                     
-                    VariableBlurView()
-                        .rotationEffect(.degrees(180))
-                        .frame(height: 40)
-                        .allowsHitTesting(false)
+//                    VariableBlurView()
+//                        .rotationEffect(.degrees(180))
+//                        .frame(height: 40)
+//                        .allowsHitTesting(false)
                 }
             }
             .navigationTitle("Social")
@@ -309,7 +309,8 @@ struct InfoView: View {
                             .scaleEffect(manageCompetitionsButtonScale)
                         }
                     }
-                    .padding()
+                    .padding(.trailing, 4)
+                    .padding(.bottom, 5)
                 }
             )
 
