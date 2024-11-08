@@ -36,6 +36,12 @@ struct DebugMenuView: View {
 
     var body: some View {
         List {
+//            Section(header: Text("UI Experiments")) {
+//                NavigationLink("Blur Scroll") {
+//                    ScrollTestView()
+//                }
+//            }
+
             Section(header: Text("Zone Management")) {
                 Button("Execute Zone Exit & Handle Daily Zone Exits") {
                     executeZoneExitAndHandleDaily()
@@ -71,20 +77,20 @@ struct DebugMenuView: View {
                     }
                 }
             }
-//            Section(header: Text("Local Zone Exits")) {
-//                if localZoneExits.isEmpty {
-//                    Text("No local zone exits recorded")
-//                } else {
-//                    ForEach(localZoneExits.reversed(), id: \.id) { exit in
-//                        VStack(alignment: .leading) {
-//                            Text("Zone: \(exit.zoneName)")
-//                            Text("Exit Time: \(formatDate(exit.exitTime))")
-//                            Text("Latitude: \(exit.latitude)")
-//                            Text("Longitude: \(exit.longitude)")
-//                        }
-//                    }
-//                }
-//            }
+            //            Section(header: Text("Local Zone Exits")) {
+            //                if localZoneExits.isEmpty {
+            //                    Text("No local zone exits recorded")
+            //                } else {
+            //                    ForEach(localZoneExits.reversed(), id: \.id) { exit in
+            //                        VStack(alignment: .leading) {
+            //                            Text("Zone: \(exit.zoneName)")
+            //                            Text("Exit Time: \(formatDate(exit.exitTime))")
+            //                            Text("Latitude: \(exit.latitude)")
+            //                            Text("Longitude: \(exit.longitude)")
+            //                        }
+            //                    }
+            //                }
+            //            }
 
             Section(header: Text("Monitored Zones")) {
                 if isLoadingMonitoredZones {
@@ -180,23 +186,24 @@ struct DebugMenuView: View {
                 }
             }
 
-//            Section(header: Text("Monitor Records")) {
-//                if isLoadingMonitorData {
-//                    ProgressView()
-//                } else if monitorRecords.isEmpty {
-//                    Text("No monitor records found")
-//                } else {
-//                    ForEach(monitorRecords, id: \.zoneId) { recordPair in
-//                        VStack(alignment: .leading) {
-//                            Text("Zone ID: \(recordPair.zoneId.uuidString)")  // Access zoneId correctly from the
-//                            tuple
-//                            Text("Record State: \(recordPair.record.state == .satisfied ? "Satisfied" :
-//                            "Unsatisfied")")
-//                        }
-//                        .padding(.vertical, 4)
-//                    }
-//                }
-//            }
+            //            Section(header: Text("Monitor Records")) {
+            //                if isLoadingMonitorData {
+            //                    ProgressView()
+            //                } else if monitorRecords.isEmpty {
+            //                    Text("No monitor records found")
+            //                } else {
+            //                    ForEach(monitorRecords, id: \.zoneId) { recordPair in
+            //                        VStack(alignment: .leading) {
+            //                            Text("Zone ID: \(recordPair.zoneId.uuidString)")  // Access zoneId correctly
+            //                            from the
+            //                            tuple
+            //                            Text("Record State: \(recordPair.record.state == .satisfied ? "Satisfied" :
+            //                            "Unsatisfied")")
+            //                        }
+            //                        .padding(.vertical, 4)
+            //                    }
+            //                }
+            //            }
         }
         .navigationTitle("Debug Menu")
         .onAppear {
@@ -296,7 +303,6 @@ struct DebugMenuView: View {
             }
         }
     }
-
 
     private func removeZoneFromMonitoring(_ zoneId: UUID) {
         Task {
