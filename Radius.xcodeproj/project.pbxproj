@@ -43,6 +43,9 @@
 		AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A552C2BD9A32F00706E01 /* Friends.swift */; };
 		AC84CE112CAA070000368A5E /* FogOfWarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC84CE102CAA070000368A5E /* FogOfWarView.swift */; };
 		AC84CE132CAA071100368A5E /* FogOfWarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC84CE122CAA071100368A5E /* FogOfWarManager.swift */; };
+		AC8830C62CD579A30093BFC1 /* ScrollTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8830C52CD579A30093BFC1 /* ScrollTestView.swift */; };
+		AC8F27662CDC6AEE0008AEEF /* ZoneEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8F27652CDC6AE80008AEEF /* ZoneEntity.swift */; };
+		AC8F27682CDC6B820008AEEF /* ZoneQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8F27672CDC6B800008AEEF /* ZoneQuery.swift */; };
 		AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140102C93C2CA000112D2 /* FriendService.swift */; };
 		AC9140132C93C31F000112D2 /* GroupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140122C93C31F000112D2 /* GroupService.swift */; };
 		AC9140152C93C51B000112D2 /* ZoneService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9140142C93C51B000112D2 /* ZoneService.swift */; };
@@ -73,12 +76,13 @@
 		ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFDFE2C193F8500E12E0B /* GroupView.swift */; };
 		ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */; };
 		ACBE26A62CD2BEE600492322 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBE26A52CD2BEE100492322 /* NotificationManager.swift */; };
+		ACBFFD1C2CDD9A6A003C3471 /* RecordZoneExitIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBFFD1B2CDD9A67003C3471 /* RecordZoneExitIntent.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
+		ACCAF8DE2CD969BD00577EE7 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */; };
 		ACCC57342CCECA100048A186 /* ChangeProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */; };
 		ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */; };
-		ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACD4812C2C326E98004653A1 /* CoreDataModel.xcdatamodeld */; };
 		ACDC65172CA237FE0087D8D3 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDC65162CA237FE0087D8D3 /* HomeViewModel.swift */; };
 		ACDC651A2CA23E6F0087D8D3 /* LeaderboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDC65192CA23E6F0087D8D3 /* LeaderboardViewModel.swift */; };
 		ACE5AEA72C8B8EB000DB562B /* LocationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */; };
@@ -86,7 +90,6 @@
 		ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */; };
 		ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */; };
 		ACED0C912C2534DD00D30D15 /* AddressEntryMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */; };
-		ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */; };
 		ACF5DA852C28DD5200123843 /* DebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF5DA842C28DD5200123843 /* DebugMenu.swift */; };
 /* End PBXBuildFile section */
 
@@ -128,6 +131,9 @@
 		AC6A552C2BD9A32F00706E01 /* Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friends.swift; sourceTree = "<group>"; };
 		AC84CE102CAA070000368A5E /* FogOfWarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FogOfWarView.swift; sourceTree = "<group>"; };
 		AC84CE122CAA071100368A5E /* FogOfWarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FogOfWarManager.swift; sourceTree = "<group>"; };
+		AC8830C52CD579A30093BFC1 /* ScrollTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollTestView.swift; sourceTree = "<group>"; };
+		AC8F27652CDC6AE80008AEEF /* ZoneEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEntity.swift; sourceTree = "<group>"; };
+		AC8F27672CDC6B800008AEEF /* ZoneQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneQuery.swift; sourceTree = "<group>"; };
 		AC9140102C93C2CA000112D2 /* FriendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendService.swift; sourceTree = "<group>"; };
 		AC9140122C93C31F000112D2 /* GroupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupService.swift; sourceTree = "<group>"; };
 		AC9140142C93C51B000112D2 /* ZoneService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneService.swift; sourceTree = "<group>"; };
@@ -154,13 +160,14 @@
 		ACAEFDFE2C193F8500E12E0B /* GroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupView.swift; sourceTree = "<group>"; };
 		ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeManager.swift; sourceTree = "<group>"; };
 		ACBE26A52CD2BEE100492322 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		ACBFFD1B2CDD9A67003C3471 /* RecordZoneExitIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordZoneExitIntent.swift; sourceTree = "<group>"; };
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
+		ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
 		ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeProfileView.swift; sourceTree = "<group>"; };
 		ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectedDebugView.swift; sourceTree = "<group>"; };
-		ACD4812D2C326E98004653A1 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
 		ACDC65162CA237FE0087D8D3 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		ACDC65192CA23E6F0087D8D3 /* LeaderboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewModel.swift; sourceTree = "<group>"; };
 		ACE5AEA62C8B8EB000DB562B /* LocationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSettingsView.swift; sourceTree = "<group>"; };
@@ -168,7 +175,6 @@
 		ACED0C8B2C2532A900D30D15 /* AddressResult+AnnotationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressResult+AnnotationItem.swift"; sourceTree = "<group>"; };
 		ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryViewModel.swift; sourceTree = "<group>"; };
 		ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressEntryMapViewModel.swift; sourceTree = "<group>"; };
-		ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneExitIntent.swift; sourceTree = "<group>"; };
 		ACF5DA842C28DD5200123843 /* DebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMenu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -331,6 +337,14 @@
 			path = MyProfile;
 			sourceTree = "<group>";
 		};
+		AC8830C42CD5799A0093BFC1 /* Experiments */ = {
+			isa = PBXGroup;
+			children = (
+				AC8830C52CD579A30093BFC1 /* ScrollTestView.swift */,
+			);
+			path = Experiments;
+			sourceTree = "<group>";
+		};
 		AC91400F2C93C2B9000112D2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -361,10 +375,10 @@
 		AC98ADFE2BC0872E00879A25 /* Radius */ = {
 			isa = PBXGroup;
 			children = (
+				AC8830C42CD5799A0093BFC1 /* Experiments */,
 				AC91400F2C93C2B9000112D2 /* Services */,
 				AC36A7302C92891600840DDD /* Repositories */,
 				AC1A99C72C8373AF00ED5D1B /* VIewModifier */,
-				ACD4812B2C326E74004653A1 /* CoreData */,
 				ACF5DA832C28DD4B00123843 /* Debug */,
 				ACF5DA802C27E89A00123843 /* AppIntents */,
 				AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */,
@@ -395,6 +409,7 @@
 		AC9BD1CA2BEB0E6B00D23123 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */,
 				AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */,
 				ACC5372F2BF3258300BECF8A /* Stuff.swift */,
 			);
@@ -426,14 +441,6 @@
 				AC501BAE2C9BC8770013FE16 /* AllZonesExitsView.swift */,
 			);
 			path = Friends;
-			sourceTree = "<group>";
-		};
-		ACD4812B2C326E74004653A1 /* CoreData */ = {
-			isa = PBXGroup;
-			children = (
-				ACD4812C2C326E98004653A1 /* CoreDataModel.xcdatamodeld */,
-			);
-			path = CoreData;
 			sourceTree = "<group>";
 		};
 		ACDC65152CA237F50087D8D3 /* HomeView */ = {
@@ -475,7 +482,9 @@
 		ACF5DA802C27E89A00123843 /* AppIntents */ = {
 			isa = PBXGroup;
 			children = (
-				ACF5DA812C27E8A600123843 /* ZoneExitIntent.swift */,
+				ACBFFD1B2CDD9A67003C3471 /* RecordZoneExitIntent.swift */,
+				AC8F27652CDC6AE80008AEEF /* ZoneEntity.swift */,
+				AC8F27672CDC6B800008AEEF /* ZoneQuery.swift */,
 			);
 			path = AppIntents;
 			sourceTree = "<group>";
@@ -573,6 +582,7 @@
 			files = (
 				ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */,
 				ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */,
+				ACCAF8DE2CD969BD00577EE7 /* VariableBlurView.swift in Sources */,
 				AC5856002BDF1925009C490B /* MapView.swift in Sources */,
 				AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */,
 				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
@@ -596,6 +606,7 @@
 				AC5DB4D82C7D7FF800A1019E /* CompetitionManagerView.swift in Sources */,
 				ACC537302BF3258300BECF8A /* Stuff.swift in Sources */,
 				AC36A7362C928B6300840DDD /* ZonesRepository.swift in Sources */,
+				ACBFFD1C2CDD9A6A003C3471 /* RecordZoneExitIntent.swift in Sources */,
 				AC36A73A2C928B8900840DDD /* GroupsRepository.swift in Sources */,
 				AC5B025E2CC3661B00BEF0D7 /* SignInView.swift in Sources */,
 				ACA85ABA2C87D3740086C484 /* RadiusGlass.swift in Sources */,
@@ -610,6 +621,7 @@
 				ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */,
 				AC501BAF2C9BC8770013FE16 /* AllZonesExitsView.swift in Sources */,
 				AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */,
+				AC8F27662CDC6AEE0008AEEF /* ZoneEntity.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
 				AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */,
@@ -622,11 +634,11 @@
 				AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */,
 				AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */,
 				ACDC651A2CA23E6F0087D8D3 /* LeaderboardViewModel.swift in Sources */,
-				ACF5DA822C27E8A600123843 /* ZoneExitIntent.swift in Sources */,
+				AC8830C62CD579A30093BFC1 /* ScrollTestView.swift in Sources */,
 				ACAEFDFD2C18138E00E12E0B /* JoinGroupView.swift in Sources */,
 				AC6A552B2BD99B1700706E01 /* InfoView.swift in Sources */,
 				AC36A7322C92892200840DDD /* ProfilesRepository.swift in Sources */,
-				ACD4812E2C326E98004653A1 /* CoreDataModel.xcdatamodeld in Sources */,
+				AC8F27682CDC6B820008AEEF /* ZoneQuery.swift in Sources */,
 				AC98AE0E2BC1CECD00879A25 /* MapViewModel.swift in Sources */,
 				AC9140152C93C51B000112D2 /* ZoneService.swift in Sources */,
 				AC84CE112CAA070000368A5E /* FogOfWarView.swift in Sources */,
@@ -782,10 +794,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Radius/Info.plist;
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones, even when the app is not active.";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "The app requires your location for its social feature";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "The app requires your location for its social features. Your location is used to identify when you have left your zones.";
 				INFOPLIST_KEY_NSLocationUsageDescription = "This apps needs your location to share it on the map";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones.";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Radius uses Siri to quickly check your zone status.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -819,10 +830,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Radius/Info.plist;
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones, even when the app is not active.";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "This apps needs your location to share it on the map";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "The app requires your location for its social feature";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "The app requires your location for its social features. Your location is used to identify when you have left your zones.";
 				INFOPLIST_KEY_NSLocationUsageDescription = "This apps needs your location to share it on the map";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Radius needs your location to check if you've left your defined zones.";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Radius uses Siri to quickly check your zone status.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -909,20 +919,6 @@
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
-
-/* Begin XCVersionGroup section */
-		ACD4812C2C326E98004653A1 /* CoreDataModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				ACD4812D2C326E98004653A1 /* CoreDataModel.xcdatamodel */,
-			);
-			currentVersion = ACD4812D2C326E98004653A1 /* CoreDataModel.xcdatamodel */;
-			name = CoreDataModel.xcdatamodeld;
-			path = /Users/aadishivmalhotra/Desktop/SwiftProjects/Radius/Radius/CoreData/CoreDataModel.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = AC98ADF42BC0872E00879A25 /* Project object */;
 }
