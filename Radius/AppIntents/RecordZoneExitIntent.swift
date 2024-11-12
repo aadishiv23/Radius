@@ -41,21 +41,15 @@ struct RecordZoneExitShortcut: AppShortcutsProvider {
 struct RecordZoneExitIntent: AppIntent {
     static var title: LocalizedStringResource = "Record Zone Exit"
     static var description = IntentDescription("Record that you've left a zone")
-
-    /// Ensure that the App Intent opens the app when run
-    /// This is needed since we require network operations to run upon succesful exit of a zone
-    static var openAppWhenRun = true
     
     static var parameterSummary: some ParameterSummary {
         Summary("Record zone exit for \(\.$selectedZone)")
     }
 
-    /// Add parameter for zone selection
     @Parameter(title: "Zone", optionsProvider: ZoneQuery())
     var selectedZone: ZoneEntity
 
-
-    func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
+    func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let locationManager = LocationManager.shared
         let zum = ZoneUpdateManager(supabaseClient: supabase)
 
@@ -70,18 +64,20 @@ struct RecordZoneExitIntent: AppIntent {
             throw AppIntentError.message("Location services are disabled. Enable location access in Settings.")
         }
 
-
         // Find the selected zone in the user's zones
         guard let zone = currentUser.zones.first(where: { $0.id == selectedZone.id }) else {
             throw AppIntentError.message("Couldn't find the selected zone.")
         }
-
+        
+        let zoneEntity = ZoneEntity(from: zone)
 
         // Check if we've already recorded an exit today
         if try await zum.hasAlreadyExitedToday(for: currentUser.id, zoneId: zone.id, category: zone.category) {
             return .result(
-                value: "Already recorded zone exit",
-                dialog: "You've already recorded an exit for \(zone.name) today."
+                dialog: """
+                You've already recorded an exit for \(zone.name) today.
+                """,
+                view: zoneExitSnippetView(zone: zoneEntity, status: .alreadyRecorded)
             )
         }
 
@@ -92,12 +88,39 @@ struct RecordZoneExitIntent: AppIntent {
             try await zum.handleDailyZoneExits(for: currentUser.id, zoneIds: [zone.id], at: now)
 
             return .result(
-                value: "Exit recorded",
-                dialog: "Successfully recorded your exit from \(zone.name)"
+                dialog: """
+                Successfully recorded your exit from \(zone.name) at \(now.formatted(date: .abbreviated, time: .shortened))
+                """,
+                view: zoneExitSnippetView(zone: zoneEntity, status: .success(timestamp: now))
             )
         } catch {
             throw AppIntentError
                 .message("Failed to record zone exit: \(error.localizedDescription)")
+        }
+    }
+}
+
+// Helper view and enums
+enum ZoneExitStatus {
+    case success(timestamp: Date)
+    case alreadyRecorded
+}
+
+func zoneExitSnippetView(zone: ZoneEntity, status: ZoneExitStatus) -> some View {
+    VStack(alignment: .leading, spacing: 4) {
+        Spacer()
+        Text(zone.name)
+            .font(.headline)
+        
+        switch status {
+        case .success(let timestamp):
+            Text("Exit recorded at \(timestamp.formatted(date: .abbreviated, time: .shortened))")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        case .alreadyRecorded:
+            Text("Already recorded today")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
         }
     }
 }
