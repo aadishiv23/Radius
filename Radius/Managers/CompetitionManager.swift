@@ -10,6 +10,7 @@ import Supabase
 
 class CompetitionManager {
     @Published var competitions: [GroupCompetition] = []
+    static let shared = CompetitionManager(supabaseClient: supabase)
 
     private let supabaseClient: SupabaseClient
 

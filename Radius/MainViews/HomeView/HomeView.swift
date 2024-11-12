@@ -50,7 +50,7 @@ struct HomeView: View {
     /// Initialization with repositories
     init(
         friendsRepository: FriendsRepository,
-        groupsRepository: GroupsRepository
+        groupsRepository: GroupsRepository = GroupsRepository.shared
     ) {
         _viewModel = StateObject(wrappedValue: HomeViewModel(
             friendsRepository: friendsRepository,

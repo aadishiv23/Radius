@@ -47,7 +47,7 @@ struct InfoView: View {
 
     init(
         friendsRepository: FriendsRepository,
-        groupsRepository: GroupsRepository,
+        groupsRepository: GroupsRepository = GroupsRepository.shared,
         competitionsRepository: CompetitionsRepository,
         userId: UUID
     ) {

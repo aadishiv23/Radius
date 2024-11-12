@@ -30,7 +30,7 @@ class HomeViewModel: ObservableObject {
 
     init(
         friendsRepository: FriendsRepository,
-        groupsRepository: GroupsRepository
+        groupsRepository: GroupsRepository = GroupsRepository.shared
     ) {
         self.friendsRepository = friendsRepository
         self.groupsRepository = groupsRepository

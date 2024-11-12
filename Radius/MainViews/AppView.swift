@@ -15,7 +15,7 @@ struct AppView: View {
 
     @StateObject private var friendsRepository =
         FriendsRepository(friendService: FriendService(supabaseClient: supabase))
-    @StateObject private var groupsRepository = GroupsRepository(groupService: GroupService(supabaseClient: supabase))
+    @StateObject private var groupsRepository = GroupsRepository.shared
     @StateObject private var zonesRepository = ZonesRepository(zoneService: ZoneService(supabaseClient: supabase))
     @StateObject private var competitionsRepository =
         CompetitionsRepository(supabaseClient: supabase) // Initialize CompetitionsRepository
