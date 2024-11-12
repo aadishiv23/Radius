@@ -27,7 +27,7 @@
 		AC36A73D2C928BC700840DDD /* InfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC36A73C2C928BC700840DDD /* InfoViewModel.swift */; };
 		AC36A7402C928C4100840DDD /* CachedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC36A73F2C928C4100840DDD /* CachedData.swift */; };
 		AC3989562C705637002F84E6 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989552C705637002F84E6 /* DataController.swift */; };
-		AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupViewModel.swift */; };
+		AC39895C2C70592C002F84E6 /* GroupDetailView+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC39895B2C70592C002F84E6 /* GroupDetailView+ViewModel.swift */; };
 		AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */; };
 		AC39896A2C758E3D002F84E6 /* FriendsRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */; };
 		AC501BAF2C9BC8770013FE16 /* AllZonesExitsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC501BAE2C9BC8770013FE16 /* AllZonesExitsView.swift */; };
@@ -77,6 +77,7 @@
 		ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */; };
 		ACBE26A62CD2BEE600492322 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBE26A52CD2BEE100492322 /* NotificationManager.swift */; };
 		ACBFFD1C2CDD9A6A003C3471 /* RecordZoneExitIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBFFD1B2CDD9A67003C3471 /* RecordZoneExitIntent.swift */; };
+		ACBFFD1F2CDDA914003C3471 /* GroupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBFFD1E2CDDA90F003C3471 /* GroupDetailView.swift */; };
 		ACC537302BF3258300BECF8A /* Stuff.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC5372F2BF3258300BECF8A /* Stuff.swift */; };
 		ACCAF8DE2CD969BD00577EE7 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */; };
 		ACCC57342CCECA100048A186 /* ChangeProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */; };
@@ -114,7 +115,7 @@
 		AC36A73C2C928BC700840DDD /* InfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewModel.swift; sourceTree = "<group>"; };
 		AC36A73F2C928C4100840DDD /* CachedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedData.swift; sourceTree = "<group>"; };
 		AC3989552C705637002F84E6 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
-		AC39895B2C70592C002F84E6 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
+		AC39895B2C70592C002F84E6 /* GroupDetailView+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroupDetailView+ViewModel.swift"; sourceTree = "<group>"; };
 		AC3989672C7440C9002F84E6 /* ZoneUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneUpdateManager.swift; sourceTree = "<group>"; };
 		AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsRequestsView.swift; sourceTree = "<group>"; };
 		AC501BAE2C9BC8770013FE16 /* AllZonesExitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllZonesExitsView.swift; sourceTree = "<group>"; };
@@ -161,6 +162,7 @@
 		ACAEFE002C1EAAF500E12E0B /* RealtimeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeManager.swift; sourceTree = "<group>"; };
 		ACBE26A52CD2BEE100492322 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		ACBFFD1B2CDD9A67003C3471 /* RecordZoneExitIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordZoneExitIntent.swift; sourceTree = "<group>"; };
+		ACBFFD1E2CDDA90F003C3471 /* GroupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDetailView.swift; sourceTree = "<group>"; };
 		ACC5372F2BF3258300BECF8A /* Stuff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stuff.swift; sourceTree = "<group>"; };
 		ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
 		ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeProfileView.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 		AC0AC6FE2BDB0EE4000418B8 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				ACBFFD1D2CDDA8F2003C3471 /* Group */,
 				AC84CE0F2CAA06F300368A5E /* MyProfile */,
 				ACA5B2872C9B2C3100EA4695 /* Friends */,
 				AC1A99C42C8371CC00ED5D1B /* Auth */,
@@ -222,10 +225,6 @@
 				AC5855FD2BDF1705009C490B /* ZoneEditorView.swift */,
 				AC5855FF2BDF1925009C490B /* MapView.swift */,
 				AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */,
-				ACEB24E92C11698800D9693F /* AddGroupView.swift */,
-				ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */,
-				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
-				ACAEFDFE2C193F8500E12E0B /* GroupView.swift */,
 				AC3989692C758E3D002F84E6 /* FriendsRequestsView.swift */,
 			);
 			path = SubViews;
@@ -443,6 +442,19 @@
 			path = Friends;
 			sourceTree = "<group>";
 		};
+		ACBFFD1D2CDDA8F2003C3471 /* Group */ = {
+			isa = PBXGroup;
+			children = (
+				ACEB24E92C11698800D9693F /* AddGroupView.swift */,
+				ACAEFDFA2C18132700E12E0B /* CreateGroupView.swift */,
+				ACAEFDFC2C18138E00E12E0B /* JoinGroupView.swift */,
+				ACAEFDFE2C193F8500E12E0B /* GroupView.swift */,
+				ACBFFD1E2CDDA90F003C3471 /* GroupDetailView.swift */,
+				AC39895B2C70592C002F84E6 /* GroupDetailView+ViewModel.swift */,
+			);
+			path = Group;
+			sourceTree = "<group>";
+		};
 		ACDC65152CA237F50087D8D3 /* HomeView */ = {
 			isa = PBXGroup;
 			children = (
@@ -474,7 +486,6 @@
 			children = (
 				ACED0C8E2C25333400D30D15 /* AddressEntryViewModel.swift */,
 				ACED0C902C2534DD00D30D15 /* AddressEntryMapViewModel.swift */,
-				AC39895B2C70592C002F84E6 /* GroupViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -620,7 +631,7 @@
 				ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */,
 				ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */,
 				AC501BAF2C9BC8770013FE16 /* AllZonesExitsView.swift in Sources */,
-				AC39895C2C70592C002F84E6 /* GroupViewModel.swift in Sources */,
+				AC39895C2C70592C002F84E6 /* GroupDetailView+ViewModel.swift in Sources */,
 				AC8F27662CDC6AEE0008AEEF /* ZoneEntity.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
@@ -632,6 +643,7 @@
 				ACED0C8F2C25333400D30D15 /* AddressEntryViewModel.swift in Sources */,
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
 				AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */,
+				ACBFFD1F2CDDA914003C3471 /* GroupDetailView.swift in Sources */,
 				AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */,
 				ACDC651A2CA23E6F0087D8D3 /* LeaderboardViewModel.swift in Sources */,
 				AC8830C62CD579A30093BFC1 /* ScrollTestView.swift in Sources */,

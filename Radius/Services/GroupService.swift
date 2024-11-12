@@ -108,16 +108,106 @@ class GroupService {
         }
     }
 
+    func createGroupRules(groupId: String, groupRule: GroupRule) async throws {
+        do {
+            // Check if the group exists first
+            let groupExists: Group? = try await supabaseClient
+                .from("groups")
+                .select("*")
+                .eq("id", value: groupId)
+                .single()
+                .execute()
+                .value
+            if let groupExists {
+                // Convert allowed zone categories to an array of raw values
+                let categoriesArray = "{" + groupRule.allowed_zone_categories
+                    .map(\.rawValue)
+                    .joined(separator: ",") + "}"
+                // let allowedZoneCategoriesString = String(data: categoriesArray, encoding: .utf8)
+                // Insert the group rules with values converted to strings where necessary
+                try await supabaseClient
+                    .from("group_rule")
+                    .insert([
+                        "id": groupRule.id.uuidString,
+                        "group_id": groupId,
+                        "count_zone_exits": String(groupRule.count_zone_exits), // Convert Bool to String
+                        "max_exits_allowed": String(groupRule.max_exits_allowed), // Convert Int to String
+                        "allowed_zone_categories": categoriesArray
+                    ])
+                    .execute()
+
+                print("[Group Service] - Group rules created successfully for group: \(groupId)")
+            } else {
+                print("[Group Service] - Group \(groupId) not found")
+            }
+        } catch let error as PostgrestError {
+            print("Supabase error while creating group rules: \(error.localizedDescription)")
+            throw error
+        } catch {
+            print("Unexpected error while creating group rules: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+    func fetchGroupRules(for groupId: String) async throws -> GroupRule {
+        do {
+            let rules: GroupRule = try await supabaseClient
+                .from("group_rule")
+                .select("*")
+                .eq("group_id", value: groupId)
+                .single()
+                .execute()
+                .value
+
+            print("[GroupService] - Successfully fetched rules for group: \(groupId)")
+            return rules
+        } catch let error as PostgrestError {
+            print("[GroupService] - Supabase error while fetching group rules: \(error.localizedDescription)")
+            throw error
+        } catch {
+            print("[GroupService] - Unexpected error while fetching group rules: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+    func updateGroupRules(groupId: String, groupRule: GroupRule) async throws {
+        do {
+            // Convert allowed zone categories to array string
+            let categoriesArray = "{" + groupRule.allowed_zone_categories
+                .map(\.rawValue)
+                .joined(separator: ",") + "}"
+
+            // Update the existing group rules
+            try await supabaseClient
+                .from("group_rule")
+                .update([
+                    "count_zone_exits": String(groupRule.count_zone_exits),
+                    "max_exits_allowed": String(groupRule.max_exits_allowed),
+                    "allowed_zone_categories": categoriesArray
+                ])
+                .eq("group_id", value: groupId)
+                .execute()
+
+            print("[Group Service] - Group rules updated successfully for group: \(groupId)")
+        } catch let error as PostgrestError {
+            print("Supabase error while updating group rules: \(error.localizedDescription)")
+            throw error
+        } catch {
+            print("Unexpected error while updating group rules: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
     /// Helper function to debug decoding errors
     private func debugPrintDecodingError(_ error: DecodingError) {
         switch error {
-        case .typeMismatch(let type, let context):
+        case let .typeMismatch(type, context):
             print("Type mismatch error: \(type), \(context.debugDescription)")
             print("Coding path: \(context.codingPath)")
-        case .valueNotFound(let type, let context):
+        case let .valueNotFound(type, context):
             print("Value not found: \(type), \(context.debugDescription)")
             print("Coding path: \(context.codingPath)")
-        case .keyNotFound(let key, let context):
+        case let .keyNotFound(key, context):
             print("Key not found: \(key), \(context.debugDescription)")
             print("Coding path: \(context.codingPath)")
             if let lastPath = context.codingPath.last {
@@ -125,7 +215,7 @@ class GroupService {
             }
             // Additional debugging for key not found
             print("Debug context: \(context)")
-        case .dataCorrupted(let context):
+        case let .dataCorrupted(context):
             print("Data corrupted: \(context.debugDescription)")
             print("Coding path: \(context.codingPath)")
         @unknown default:
