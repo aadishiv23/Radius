@@ -541,10 +541,44 @@ struct CompetitionRule: Identifiable, Codable {
     var allowed_zone_categories: [ZoneCategory]
 }
 
-struct GroupRule: Identifiable, Codable {
+struct GroupRule: Identifiable, Codable, Equatable {
     var id: UUID
     var group_id: UUID
     var count_zone_exits: Bool
     var max_exits_allowed: Int
     var allowed_zone_categories: [ZoneCategory]
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case group_id
+        case count_zone_exits
+        case max_exits_allowed
+        case allowed_zone_categories
+    }
+
+    init(id: UUID, groupId: UUID, countZoneExits: Bool, maxExitsAllowed: Int, allowedZoneCategories: [ZoneCategory]) {
+        self.id = id // Generate a new UUID for the rule
+        self.group_id = groupId
+        self.count_zone_exits = countZoneExits
+        self.max_exits_allowed = maxExitsAllowed
+        self.allowed_zone_categories = allowedZoneCategories
+    }
+
+    init(groupId: UUID, countZoneExits: Bool, maxExitsAllowed: Int, allowedZoneCategories: [ZoneCategory]) {
+        self.id = UUID() // Generate a new UUID for the rule
+        self.group_id = groupId
+        self.count_zone_exits = countZoneExits
+        self.max_exits_allowed = maxExitsAllowed
+        self.allowed_zone_categories = allowedZoneCategories
+    }
+
+    /// Custom initializer for decoding
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.group_id = try container.decode(UUID.self, forKey: .group_id)
+        self.count_zone_exits = try container.decode(Bool.self, forKey: .count_zone_exits)
+        self.max_exits_allowed = try container.decode(Int.self, forKey: .max_exits_allowed)
+        self.allowed_zone_categories = try container.decode([ZoneCategory].self, forKey: .allowed_zone_categories)
+    }
 }
