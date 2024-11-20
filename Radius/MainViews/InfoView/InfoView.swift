@@ -591,7 +591,7 @@ struct CollapsibleSection<Content: View>: View {
     var body: some View {
         VStack {
             Button(action: {
-                withAnimation(.none) {
+                withAnimation(.spring) {
                     isExpanded.toggle()
                 }
             }) {
@@ -601,8 +601,10 @@ struct CollapsibleSection<Content: View>: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)
                     Spacer()
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: "chevron.up")
                         .foregroundColor(.gray)
+                        .rotationEffect(.degrees(isExpanded ? 0 : 180))
+                        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: isExpanded)
                 }
                 .padding()
                 .background(
@@ -619,7 +621,13 @@ struct CollapsibleSection<Content: View>: View {
 
             if isExpanded {
                 content
-                    .transition(.opacity)
+                    .transition(
+                        AnyTransition
+                            .move(edge: .top)
+                            .combined(with: .opacity)
+                            .animation(.easeInOut(duration: 0.7))
+                            .combined(with: .opacity.animation(.easeOut(duration: 0.2)))
+                    )
                     .animation(.easeInOut(duration: 1.0), value: isExpanded)
                     .padding(.top, 5)
                     .frame(maxWidth: .infinity) // Ensure the content takes full width
