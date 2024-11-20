@@ -85,61 +85,46 @@ final class ZoneUpdateManager {
         let userGroups = try await fetchUserGroupsZum(for: profileId)
 
         for group in userGroups {
+            // Step 1: Fetch the group rules
+            guard let groupRule = try await fetchGroupRule(for: group.group_id) else {
+                print("No rules defined for group \(group.group_id). Skipping.")
+                continue
+            }
+
             for zoneId in zoneIds {
-                // Step 1: Fetch zone details to check its category
+                // Step 2: Fetch zone details
                 let zone: Zone = try await fetchZone(for: zoneId)
 
-                // Step 2: Check if a `zone_exit` exists for our give zone (given zone
-//                let existingZoneExit: ZoneExit = try await supabaseClient
-//                    .from("zone_exits")
-//                    .select("*")
-//                    .eq("zone_id", value: zoneId.uuidString)
-//                    .order("exit_time", ascending: false)
-//                    .limit(1)
-//                    .execute()
-//                    .value
-//
-//                // Step 3: Check if a daily zone exit already exists for the profile, zone, and date
-//                let existingDailyZoneExit: [DailyZoneExit] = try await supabaseClient
-//                    .from("daily_zone_exits")
-//                    .select("*")
-//                    .eq("profile_id", value: profileId.uuidString)
-//                    .eq("zone_exit_id", value: existingZoneExit.id)
-//                    .eq("date", value: currentDateString)
-//                    .execute()
-//                    .value
-//
-//                // If there is already an exit for this profile, zone, and date, skip inserting
-//                guard existingDailyZoneExit.isEmpty else {
-//                    print(
-//                        "Daily zone exit already exists for profile \(profileId) and zone \(zoneId) on
-//                        \(currentDateString)"
-//                    )
-//                    continue
-//                }
-
-                // Step 3: If the zone is of category "home", ensure only one exit per day is counted
-                if zone.category == .home {
-                    let hasExitedToday = try await hasAlreadyExitedToday(
-                        for: profileId,
-                        zoneId: zoneId,
-                        category: zone.category
+                // Step 3: Check if the zone category is allowed
+                guard groupRule.allowed_zone_categories.contains(zone.category) else {
+                    print(
+                        "Zone \(zoneId) category \(zone.category.rawValue) is not allowed for group \(group.group_id)."
                     )
-                    if hasExitedToday {
+                    continue
+                }
+
+                // Step 4: Check if exits should be counted and max exits are not exceeded
+                if groupRule.count_zone_exits {
+                    let exitCountToday = try await fetchDailyZoneExitCount(
+                        for: profileId,
+                        groupId: group.group_id,
+                        date: currentDateString
+                    )
+                    if exitCountToday >= groupRule.max_exits_allowed {
                         print(
-                            "User \(profileId) has already exited home zone \(zoneId) today. Skipping further exits."
+                            "User \(profileId) has exceeded max exits (\(groupRule.max_exits_allowed)) for group \(group.group_id)."
                         )
                         continue
                     }
                 }
 
-                // Step 24: Fetch the most recent zone_exit_id for the profile and zone
+                // Step 5: Fetch the most recent zone_exit_id for the profile and zone
                 guard let zoneExitId = try await fetchLatestZoneExitId(for: profileId, zoneId: zoneId) else {
-                    print("No zone exit found for profile \(profileId) and zone \(zoneId)")
+                    print("No zone exit found for profile \(profileId) and zone \(zoneId).")
                     continue
                 }
 
-                // Step 5: Prepare parameters for the RPC function
+                // Step 6: Prepare parameters for the RPC function
                 let params: [String: String] = [
                     "p_profile_id": profileId.uuidString,
                     "p_zone_exit_id": zoneExitId.uuidString,
@@ -149,19 +134,19 @@ final class ZoneUpdateManager {
                 ]
 
                 do {
-                    // Step 6: Call the RPC function
+                    // Step 7: Call the RPC function
                     _ = try await supabaseClient
                         .rpc("insert_daily_zone_exit", params: params)
                         .execute()
 
-                    print("Successfully inserted daily zone exit for profile \(profileId) and zone \(zoneId)")
+                    print("Successfully inserted daily zone exit for profile \(profileId) and zone \(zoneId).")
                 } catch {
                     print("Error inserting daily zone exit: \(error)")
                     throw error
                 }
             }
         }
-        print("Daily zone exit recorded successfully.")
+        print("Daily zone exits recorded successfully.")
     }
 
     private func fetchLatestZoneExitId(for profileId: UUID, zoneId: UUID) async throws -> UUID? {
@@ -325,6 +310,30 @@ final class ZoneUpdateManager {
 
     private func calculatePoints(for exitOrder: Int, totalUsers: Int) -> Int {
         max(totalUsers - exitOrder, 0)
+    }
+
+    private func fetchGroupRule(for groupId: UUID) async throws -> GroupRule? {
+        let groupRule: [GroupRule] = try await supabaseClient
+            .from("group_rule")
+            .select("*")
+            .eq("group_id", value: groupId.uuidString)
+            .execute()
+            .value
+
+        return groupRule.first
+    }
+
+    func fetchDailyZoneExitCount(for profileId: UUID, groupId: UUID, date: String) async throws -> Int {
+        let dailyZoneExits: [DailyZoneExit] = try await supabaseClient
+            .from("daily_zone_exits")
+            .select("*")
+            .eq("profile_id", value: profileId.uuidString)
+            .eq("group_id", value: groupId.uuidString)
+            .eq("date", value: date)
+            .execute()
+            .value
+
+        return dailyZoneExits.count
     }
 }
 

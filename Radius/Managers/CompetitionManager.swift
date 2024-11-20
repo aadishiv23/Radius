@@ -147,7 +147,7 @@ class CompetitionManager {
     func fetchCompetitors(for competitionId: UUID) async throws -> [GroupMember] {
         let groupCompetitionLinks: [GroupCompetitionLink] = try await supabaseClient
             .from("group_competition_links")
-            .select("group_id")
+            .select("*")
             .eq("competition_id", value: competitionId.uuidString)
             .execute()
             .value
