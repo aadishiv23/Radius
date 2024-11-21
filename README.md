@@ -3,6 +3,9 @@
 ## Overview
 Radius is an innovative mobile app designed to empower users by enabling the creation and sharing of customized zones, helping them stay connected with friends and their surroundings. Built with the latest in geolocation and real-time data synchronization technology, Radius offers a seamless experience for defining, managing, and interacting within personal zones.
 
+## Support
+For any questions, feedback, or support, feel free to contact us at [aadishiv@umich.edu](mailto:aadishiv@umich.edu). Include "Radius Support" in the subject line for a quicker response.
+
 ## Key Features
 
 - **Zone Creation**  
