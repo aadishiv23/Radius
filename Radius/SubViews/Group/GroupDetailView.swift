@@ -20,6 +20,7 @@ struct GroupDetailView: View {
     @State private var countZoneExit = false
     @State private var maxExitsAllowed = 1
     @State private var selectedCategories: Set<ZoneCategory> = []
+    @State private var areRulesExpanded = false
 
     init(group: Group) {
         self.group = group
@@ -209,13 +210,19 @@ struct GroupDetailView: View {
 
     private var groupRulesContent: some View {
         VStack(spacing: 16) {
-            // Current Rules Button
-            Button(action: { isShowingGroupRules = true }) {
+            // Toggle Button
+            Button(action: {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    areRulesExpanded.toggle()
+                }
+            }) {
                 HStack {
-                    Image(systemName: "doc.text.fill")
-                    Text("View Current Rules")
+                    Text(areRulesExpanded ? "Hide Rules" : "View Current Rules")
+                        .font(.headline)
                     Spacer()
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "chevron.up")
+                        .rotationEffect(.degrees(areRulesExpanded ? 0 : 180))
+                        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: areRulesExpanded)
                 }
                 .padding()
                 .background(Color.blue.opacity(0.1))
@@ -223,80 +230,127 @@ struct GroupDetailView: View {
                 .cornerRadius(12)
             }
 
-            // Rules Form
-            VStack(alignment: .leading, spacing: 20) {
-                // Zone Exits Toggle
-                Toggle("Count Zone Exits", isOn: $countZoneExit)
-                    .tint(.blue)
+            // Rules Form (Shown Only If Expanded)
+            if areRulesExpanded {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Zone Exits Toggle
+                    Toggle("Count Zone Exits", isOn: $countZoneExit)
+                        .tint(.blue)
 
-                if countZoneExit {
-                    // Max Exits Stepper
-                    HStack {
-                        Text("Max Exits:")
-                        Spacer()
+                    if countZoneExit {
+                        // Max Exits Stepper
                         HStack {
-                            Button(action: { if maxExitsAllowed > 1 {
-                                maxExitsAllowed -= 1
-                                generateHapticFeedback()
-                            } }) {
-                                Image(systemName: "minus.circle.fill")
-                                    .foregroundColor(maxExitsAllowed > 1 ? .blue : .gray)
-                            }
-                            .disabled(maxExitsAllowed <= 1)
-                            
-                            Text("\(maxExitsAllowed)")
-                                .contentTransition(.numericText(value: Double(maxExitsAllowed)))
-                                .frame(minWidth: 40)
-                            Button(action: { if maxExitsAllowed < 10 {
-                                maxExitsAllowed += 1
-                                generateHapticFeedback()
-                            } }) {
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(maxExitsAllowed < 10 ? .blue : .gray)
-                            }
-                            .disabled(maxExitsAllowed >= 10)
-                        }
-                        .foregroundColor(.blue)
-                    }
-                }
+                            Text("Max Exits:")
+                            Spacer()
+                            HStack {
+                                Button(action: { if maxExitsAllowed > 1 {
+                                    maxExitsAllowed -= 1
+                                } }) {
+                                    Image(systemName: "minus.circle.fill")
+                                        .foregroundColor(maxExitsAllowed > 1 ? .blue : .gray)
+                                }
+                                .disabled(maxExitsAllowed <= 1)
 
-                // Zone Categories
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Allowed Zones")
-                        .font(.headline)
-
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        ForEach(ZoneCategory.allCases, id: \.self) { category in
-                            categoryToggle(category)
+                                Text("\(maxExitsAllowed)")
+                                    .frame(minWidth: 40)
+                                Button(action: { if maxExitsAllowed < 10 {
+                                    maxExitsAllowed += 1
+                                } }) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .foregroundColor(maxExitsAllowed < 10 ? .blue : .gray)
+                                }
+                                .disabled(maxExitsAllowed >= 10)
+                            }
+                            .foregroundColor(.blue)
                         }
                     }
-                }
 
-                // Save Button
-                Button(action: {
-                    viewModel.saveGroupRules(
-                        countZoneExit: countZoneExit,
-                        maxExitsAllowed: maxExitsAllowed,
-                        allowedZoneCategories: Array(selectedCategories)
-                    )
-                }) {
-                    Text(viewModel.currentRules != nil ? "Update Rules" : "Create Rules")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                    // Allowed Zones Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Allowed Zones")
+                            .font(.headline)
+
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                            ForEach(ZoneCategory.allCases, id: \.self) { category in
+                                categoryToggle(category)
+                            }
+                        }
+                    }
+
+                    // Update Rules Button
+                    Button(action: {
+                        viewModel.saveGroupRules(
+                            countZoneExit: countZoneExit,
+                            maxExitsAllowed: maxExitsAllowed,
+                            allowedZoneCategories: Array(selectedCategories)
+                        )
+                    }) {
+                        Text(viewModel.currentRules != nil ? "Update Rules" : "Create Rules")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
                 }
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(16)
+                .opacity(areRulesExpanded ? 1 : 0) // Fade in content
+                .animation(.easeInOut(duration: 0.3), value: areRulesExpanded)
+                .transition(
+                    areRulesExpanded ? .move(edge: .top).combined(with: .opacity) : .opacity
+                )
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(16)
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .shadow(radius: 2)
         .padding(.horizontal)
+    }
+
+    private var rulesDetails: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            // Zone Exits Section
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: countZoneExit ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(countZoneExit ? .green : .secondary)
+                    Text("Zone Exits Tracking")
+                        .font(.headline)
+                }
+
+                if countZoneExit {
+                    HStack(spacing: 4) {
+                        Text("Maximum")
+                        Text("\(maxExitsAllowed)")
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                        Text("exits allowed")
+                    }
+                    .padding(.leading)
+                }
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+
+            // Allowed Zones Section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Allowed Zone Categories")
+                    .font(.headline)
+
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    ForEach(Array(selectedCategories), id: \.self) { category in
+                        categoryToggle(category)
+                    }
+                }
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+        }
     }
 
     private func categoryToggle(_ category: ZoneCategory) -> some View {
@@ -329,11 +383,11 @@ struct GroupDetailView: View {
             settingsButton(title: "Share Group", icon: "square.and.arrow.up") {
                 // TODO: Share functionality
             }
-            
+
             settingsButton(title: "Invite Friend(s)", icon: "person.2.badge.plus.fill", color: .green) {
                 // TODO: Invite Friend(s) functionality
             }
-            
+
             settingsButton(title: "Kick Friend(s)", icon: "door.left.hand.open", color: .red) {
                 // TODO: Kick Friend(s) functionality
             }
@@ -341,7 +395,6 @@ struct GroupDetailView: View {
             settingsButton(title: "Leave Group", icon: "rectangle.portrait.and.arrow.right", color: .red) {
                 // TODO: Leave group functionality
             }
-            
         }
         .padding(.horizontal)
     }
