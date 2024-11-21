@@ -76,6 +76,7 @@ struct AppView: View {
                 SignInView(isSignUp: .constant(false))
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
