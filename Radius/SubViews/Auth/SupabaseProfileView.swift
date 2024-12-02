@@ -15,43 +15,78 @@ struct SupabaseProfileView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var username = ""
     @State private var fullName = ""
-    @State private var website = ""
+    @State private var isEditing = false
+    @State private var usernameError: String? = nil
+    @State private var isCheckingUsername = false
     @State private var isLoading = false
     @State private var currentUserZones: [Zone] = []
     @Environment(\.colorScheme) var colorScheme
     
+    // Debounce timer for username validation
+    @State private var usernameCheckTimer: Timer?
+    
+    var isFormValid: Bool {
+       !username.isEmpty && !fullName.isEmpty && usernameError == nil && !isCheckingUsername
+   }
+
     var body: some View {
         NavigationView {
             ZStack {
                 // Animated gradient background
                 AnimatedGradientBackground()
-                
+
                 ScrollView {
                     VStack(spacing: 24) {
                         // Profile Header
                         ProfileHeader(fullName: fullName, username: username)
                             .padding(.top)
-                        
+
+                        // Edit Button
+                       if !isEditing {
+                           Button(action: { isEditing = true }) {
+                               Text("Edit Profile")
+                                   .font(.headline)
+                                   .padding()
+                                   .frame(maxWidth: .infinity)
+                                   .background(Color.blue)
+                                   .foregroundColor(.white)
+                                   .cornerRadius(12)
+                           }
+                           .padding(.horizontal)
+                       } else {
+                           EditProfileForm(
+                               username: $username,
+                               fullName: $fullName,
+                               usernameError: $usernameError,
+                               isCheckingUsername: $isCheckingUsername,
+                               isLoading: $isLoading,
+                               validateUsername: validateUsername,
+                               updateProfile: updateProfileButtonTapped,
+                               cancelEdit: { isEditing = false }
+                           )
+                       }
+
                         // Stats View
                         if let currentUser = friendsDataManager.currentUser {
                             StatsView(user: currentUser)
                         }
-                        
+
                         // User Info Card
                         UserInfoCard(currentUser: friendsDataManager.currentUser)
-                        
+
                         // Zones Section
                         ZonesSection(currentUser: friendsDataManager.currentUser)
-                        
+
                         // Action Buttons
                         ActionButtonsGroup(
                             isLoading: $isLoading,
                             updateProfile: updateProfileButtonTapped,
-                            signOut: signOut
+                            signOut: signOut,
+                            deleteAccount: deleteAccount
                         )
-                        
+
                         // Version Info
-                        Text("Version 1.0")
+                        Text("Version 1.01")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.7))
                             .padding(.top, 8)
@@ -59,8 +94,8 @@ struct SupabaseProfileView: View {
                     .padding()
                 }
             }
-            //.background(backgroundGradient)
-            //.navigationBarHidden(true)
+            // .background(backgroundGradient)
+            // .navigationBarHidden(true)
             //             .navigationBarTitleDisplayMode(.inline)
 
             .toolbar {
@@ -77,8 +112,9 @@ struct SupabaseProfileView: View {
             await getInitialProfile()
         }
     }
-    
+
     // MARK: - Data Methods
+
     func getInitialProfile() async {
         do {
             let currentUser = try await supabase.auth.session.user
@@ -89,66 +125,209 @@ struct SupabaseProfileView: View {
                 .single()
                 .execute()
                 .value
-            
+
             username = profile.username
             fullName = profile.full_name
         } catch {
             debugPrint(error)
         }
     }
-    
+
+    func validateUsername() {
+        usernameCheckTimer?.invalidate()
+
+        if username.isEmpty {
+            usernameError = nil
+            return
+        }
+
+        isCheckingUsername = true
+
+        usernameCheckTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+            Task {
+                do {
+                    let response = try await supabase
+                        .from("profiles")
+                        .select("username", count: .exact)
+                        .eq("username", value: username.lowercased())
+                        .execute()
+
+                    await MainActor.run {
+                        isCheckingUsername = false
+                        if let count = response.count, count > 0 {
+                            usernameError = "Username is already taken"
+                        } else {
+                            usernameError = nil
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        isCheckingUsername = false
+                        usernameError = "Error checking username"
+                        debugPrint(error)
+                    }
+                }
+            }
+        }
+    }
+
     func updateProfileButtonTapped() {
+        guard isFormValid else { return }
+
+        isLoading = true
         Task {
-            isLoading = true
             defer { isLoading = false }
             do {
                 let currentUser = try await supabase.auth.session.user
                 try await supabase
                     .from("profiles")
-                    .update(UpdateProfileParams(username: username, fullName: fullName))
+                    .update(UpdateProfileParamsWithFullName(username: username.lowercased(), fullName: fullName))
                     .eq("id", value: currentUser.id)
                     .execute()
+
+                await friendsDataManager.fetchCurrentUserProfile()
+                isEditing = false
             } catch {
                 debugPrint(error)
             }
         }
     }
-    
+
     func signOut() {
         Task {
             try? await supabase.auth.signOut()
         }
     }
+
+    func deleteAccount() {
+        Task {
+            do {
+                let currentUser = try await supabase.auth.session.user
+
+                // Delete user's data from Supabase
+                try await supabase
+                    .from("profiles")
+                    .delete()
+                    .eq("id", value: currentUser.id)
+                    .execute()
+
+                // Sign out the user
+                try await supabase.auth.signOut()
+            } catch {
+                debugPrint("Error deleting account: \(error)")
+            }
+        }
+    }
+
 }
 
 // MARK: - Supporting Views
+
+struct EditProfileForm: View {
+    @Binding var username: String
+    @Binding var fullName: String
+    @Binding var usernameError: String?
+    @Binding var isCheckingUsername: Bool
+    @Binding var isLoading: Bool
+
+    let validateUsername: () -> Void
+    let updateProfile: () -> Void
+    let cancelEdit: () -> Void
+
+    var isFormValid: Bool {
+        !username.isEmpty && !fullName.isEmpty && usernameError == nil && !isCheckingUsername
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            TextField("Full Name", text: $fullName)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+
+            VStack(alignment: .leading, spacing: 4) {
+                TextField("Username", text: $username)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    .textInputAutocapitalization(.never)
+                    .onChange(of: username) { _ in
+                        validateUsername()
+                    }
+
+                if isCheckingUsername {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Checking username availability...")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                } else if let error = usernameError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+            }
+
+            HStack(spacing: 16) {
+                Button(action: cancelEdit) {
+                    Text("Cancel")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+
+                Button(action: updateProfile) {
+                    Text("Save")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(isFormValid ? Color.blue : Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .disabled(!isFormValid)
+            }
+
+            if isLoading {
+                ProgressView()
+                    .padding(.top, 16)
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+
 struct AnimatedGradientBackground: View {
     @State private var animateGradient = false
-    
+
     var body: some View {
         LinearGradient(
             colors: [
                 Color.blue.opacity(0.7),
-                Color.purple.opacity(0.5),
-                Color.orange.opacity(0.4)
+                Color.yellow.opacity(0.7)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-        .hueRotation(.degrees(animateGradient ? 45 : 0))
+        //.hueRotation(.degrees(animateGradient ? 45 : 0))
         .ignoresSafeArea()
-        .onAppear {
-            withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
-                animateGradient.toggle()
-            }
-        }
+//        .onAppear {
+//            withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
+//                animateGradient.toggle()
+//            }
+//        }
     }
 }
 
 struct ProfileHeader: View {
     let fullName: String
     let username: String
-    
+
     var body: some View {
         HStack {
             Spacer()
@@ -164,15 +343,16 @@ struct ProfileHeader: View {
                             .frame(width: 110, height: 110)
                     )
                     .shadow(radius: 10)
-                
+
                 VStack(spacing: 8) {
                     Text(fullName)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                    
+
                     Text("@\(username)")
                         .font(.subheadline)
+                        .fontWeight(.bold)
                         .foregroundColor(.white.opacity(0.8))
                 }
             }
@@ -181,14 +361,14 @@ struct ProfileHeader: View {
         .padding(.vertical, 24)
         .padding(.horizontal, 32)
         .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial)
+        .background(.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
 struct StatsView: View {
     let user: Profile
-    
+
     var body: some View {
         HStack(spacing: 20) {
             ProfileStatItem(title: "Zones", value: "\(user.zones.count)", icon: "map.fill")
@@ -196,7 +376,7 @@ struct StatsView: View {
             ProfileStatItem(title: "Active", value: "Yes", icon: "circle.fill")
         }
         .padding()
-        .background(.ultraThinMaterial)
+        .background(.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
@@ -205,18 +385,18 @@ struct ProfileStatItem: View {
     let title: String
     let value: String
     let icon: String
-    
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundColor(.white)
-            
+
             Text(value)
                 .font(.title3)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-            
+
             Text(title)
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.8))
@@ -227,13 +407,17 @@ struct ProfileStatItem: View {
 
 struct UserInfoCard: View {
     let currentUser: Profile?
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             if let user = currentUser {
                 InfoRow(title: "Name", value: user.full_name.isEmpty ? "Unknown" : user.full_name, icon: "person.fill")
                 InfoRow(title: "Username", value: user.username.isEmpty ? "Unavailable" : user.username, icon: "at")
-                InfoRow(title: "Location", value: user.latitude != 0 ? "\(user.latitude), \(user.longitude)" : "No location", icon: "location.fill")
+                InfoRow(
+                    title: "Location",
+                    value: user.latitude != 0 ? "\(user.latitude), \(user.longitude)" : "No location",
+                    icon: "location.fill"
+                )
             } else {
                 HStack {
                     ProgressView()
@@ -244,7 +428,7 @@ struct UserInfoCard: View {
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
+        .background(.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
@@ -253,18 +437,18 @@ struct InfoRow: View {
     let title: String
     let value: String
     let icon: String
-    
+
     var body: some View {
         HStack {
             Image(systemName: icon)
                 .foregroundColor(.white)
                 .frame(width: 24)
-            
+
             Text(title)
                 .foregroundColor(.white)
-            
+
             Spacer()
-            
+
             Text(value)
                 .foregroundColor(.white.opacity(0.8))
         }
@@ -273,23 +457,23 @@ struct InfoRow: View {
 
 struct ZonesSection: View {
     let currentUser: Profile?
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Your Zones")
                     .font(.headline)
                     .foregroundColor(.white)
-                
+
                 Spacer()
-                
+
                 NavigationLink(destination: ZoneGridView()) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title2)
                         .foregroundColor(.white)
                 }
             }
-            
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     if let user = currentUser {
@@ -304,28 +488,31 @@ struct ZonesSection: View {
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
+        .background(.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
 struct EnhancedZoneCard: View {
     var zone: Zone
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            MapViewSnapshot(coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude), radius: zone.radius)
-                .frame(width: 200, height: 120)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(.white.opacity(0.3), lineWidth: 1)
-                )
-            
+            MapViewSnapshot(
+                coordinate: CLLocationCoordinate2D(latitude: zone.latitude, longitude: zone.longitude),
+                radius: zone.radius
+            )
+            .frame(width: 200, height: 120)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(.white.opacity(0.3), lineWidth: 1)
+            )
+
             Text(zone.name)
                 .font(.headline)
                 .foregroundColor(.white)
-            
+
             HStack {
                 Label("\(Int(zone.radius))m", systemImage: "ruler")
                 Spacer()
@@ -337,7 +524,7 @@ struct EnhancedZoneCard: View {
         }
         .padding()
         .frame(width: 200)
-        .background(.ultraThinMaterial)
+        .background(.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -346,7 +533,8 @@ struct ActionButtonsGroup: View {
     @Binding var isLoading: Bool
     let updateProfile: () -> Void
     let signOut: () -> Void
-    
+    let deleteAccount: () -> Void // Pass the deleteAccount function
+
     var body: some View {
         VStack(spacing: 12) {
             Button(action: updateProfile) {
@@ -361,22 +549,22 @@ struct ActionButtonsGroup: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(.ultraThinMaterial)
+                .background(.gray.opacity(0.3))
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .disabled(isLoading)
-            
+
             NavigationLink(destination: MyProfileView()) {
                 Text("My Profile")
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(.ultraThinMaterial)
+                    .background(.gray.opacity(0.3))
                     .foregroundColor(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            
+
             Button(action: signOut) {
                 Text("Sign Out")
                     .fontWeight(.semibold)
@@ -386,6 +574,34 @@ struct ActionButtonsGroup: View {
                     .foregroundColor(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+
+            Button(action: showDeleteAccountConfirmation) { // Show confirmation alert
+                Text("Delete Account")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.red.opacity(0.6))
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+    }
+
+    private func showDeleteAccountConfirmation() {
+        let alert = UIAlertController(
+            title: "Delete Account",
+            message: "Are you sure you want to delete your account? This action cannot be undone.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
+            deleteAccount()
+        })
+
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController
+        {
+            rootVC.present(alert, animated: true)
         }
     }
 }

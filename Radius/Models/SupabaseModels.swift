@@ -237,6 +237,16 @@ struct Profile: Codable, Identifiable {
 
 struct UpdateProfileParams: Encodable {
     let username: String
+    //let fullName: String
+
+    enum CodingKeys: String, CodingKey {
+        case username
+        //case fullName = "full_name"
+    }
+}
+
+struct UpdateProfileParamsWithFullName: Encodable {
+    let username: String
     let fullName: String
 
     enum CodingKeys: String, CodingKey {

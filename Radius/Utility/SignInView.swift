@@ -154,9 +154,28 @@ struct SignInView: View {
                                 else {
                                     return
                                 }
+                                
+                                // Extract full name
+                                let fullName = [
+                                    credential.fullName?.givenName,
+                                    credential.fullName?.familyName
+                                ]
+                                .compactMap { $0 }
+                                .joined(separator: "")
+                                
                                 try await supabase.auth.signInWithIdToken(
                                     credentials: .init(provider: .apple, idToken: idToken)
                                 )
+                                
+                                // Update full name in Supabase if available
+                                if !fullName.isEmpty {
+                                    let currentUser = try await supabase.auth.session.user
+                                    try await supabase
+                                       .from("profiles")
+                                       .update(["full_name": fullName])
+                                       .eq("id", value: currentUser.id)
+                                       .execute()
+                                }
                             } catch {
                                 dump(error)
                             }

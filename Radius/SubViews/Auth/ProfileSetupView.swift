@@ -12,7 +12,6 @@ struct ProfileSetupView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var username = ""
-    @State private var fullName = ""
     @State private var isLoading = false
     @State private var usernameError: String? = nil
     @State private var isCheckingUsername = false
@@ -22,7 +21,7 @@ struct ProfileSetupView: View {
     @State private var usernameCheckTimer: Timer?
     
     var isFormValid: Bool {
-        !username.isEmpty && !fullName.isEmpty && usernameError == nil && !isCheckingUsername
+        !username.isEmpty && usernameError == nil && !isCheckingUsername
     }
 
     var body: some View {
@@ -36,7 +35,7 @@ struct ProfileSetupView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.blue)
                 
-                Text("Enter your details to complete your profile and get started.")
+                Text("Choose a username to complete your profile and get started.")
                     .font(.body)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -45,13 +44,6 @@ struct ProfileSetupView: View {
             
             // Text fields
             VStack(spacing: 20) {
-                TextField("Enter your full name", text: $fullName)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                    .textInputAutocapitalization(.words) // Keep this for names
-                
                 VStack(alignment: .leading, spacing: 4) {
                     TextField("Choose a username", text: $username)
                         .padding()
@@ -148,7 +140,7 @@ struct ProfileSetupView: View {
     
     private func saveProfile() {
         guard isFormValid else { return }
-        
+
         isLoading = true
         Task {
             defer { isLoading = false }
@@ -156,7 +148,7 @@ struct ProfileSetupView: View {
                 let currentUser = try await supabase.auth.session.user
                 try await supabase
                     .from("profiles")
-                    .update(UpdateProfileParams(username: username.lowercased(), fullName: fullName))
+                    .update(UpdateProfileParams(username: username.lowercased()))
                     .eq("id", value: currentUser.id)
                     .execute()
 

@@ -46,6 +46,8 @@ struct HomeView: View {
     @State private var fogOfWarButtonScale: CGFloat = 0.0
 
     @Namespace private var zoomNamespace
+    
+    @State private var isProfileIncomplete = false // New State
 
     /// Initialization with repositories
     init(
@@ -71,6 +73,7 @@ struct HomeView: View {
             }
             .onAppear {
                 Task {
+                    await checkUserProfile()
                     await viewModel.refreshAllData()
                 }
             }
@@ -284,6 +287,9 @@ struct HomeView: View {
                 FriendRequestsView()
                     .environmentObject(friendsDataManager)
             }
+            .sheet(isPresented: $isProfileIncomplete) {
+                HomeProfileSetupView(isProfileIncomplete: $isProfileIncomplete)
+            }
             .fullScreenCover(isPresented: $showFogOfWarMap) {
                 FogOfWarContainerView()
             }
@@ -313,6 +319,26 @@ struct HomeView: View {
             for friendsLocation in friendsDataManager.friends {
                 print(friendsLocation.full_name)
             }
+        }
+    }
+    
+    // MARK: - Check User Profile
+    private func checkUserProfile() async {
+        do {
+            let currentUser = try await supabase.auth.session.user
+            let profile: Profile = try await supabase
+                .from("profiles")
+                .select()
+                .eq("id", value: currentUser.id)
+                .single()
+                .execute()
+                .value
+
+            if profile.full_name.isEmpty || profile.username.isEmpty {
+                isProfileIncomplete = true
+            }
+        } catch {
+            debugPrint("Error checking user profile: \(error)")
         }
     }
 
@@ -600,5 +626,102 @@ struct GlassyButtonStyle: ButtonStyle {
                 .animation(.spring(), value: configuration.isPressed)
         }
         .frame(width: 60, height: 60)
+    }
+}
+
+struct HomeProfileSetupView: View {
+    @Binding var isProfileIncomplete: Bool
+    @State private var fullName = ""
+    @State private var username = ""
+    @State private var isLoading = false
+    @State private var usernameError: String?
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("Complete Your Profile")
+                    .font(.title)
+                    .fontWeight(.bold)
+
+                TextField("Full Name", text: $fullName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                VStack(alignment: .leading) {
+                    TextField("Username", text: $username)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
+                        .onChange(of: username) { _ in
+                            validateUsername()
+                        }
+
+                    if let error = usernameError {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                }
+
+                Button(action: saveProfile) {
+                    if isLoading {
+                        ProgressView()
+                    } else {
+                        Text("Save")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                }
+                .padding()
+                .disabled(fullName.isEmpty || username.isEmpty || isLoading)
+
+                Spacer()
+            }
+            .padding()
+        }
+    }
+
+    private func validateUsername() {
+        Task {
+            do {
+                let response = try await supabase
+                    .from("profiles")
+                    .select("username", count: .exact)
+                    .eq("username", value: username)
+                    .execute()
+
+                if let count = response.count, count > 0 {
+                    usernameError = "Username is already taken"
+                } else {
+                    usernameError = nil
+                }
+            } catch {
+                usernameError = "Error validating username"
+            }
+        }
+    }
+
+    private func saveProfile() {
+        isLoading = true
+        Task {
+            defer { isLoading = false }
+            do {
+                let currentUser = try await supabase.auth.session.user
+                try await supabase
+                    .from("profiles")
+                    .update([
+                        "full_name": fullName,
+                        "username": username
+                    ])
+                    .eq("id", value: currentUser.id)
+                    .execute()
+
+                isProfileIncomplete = false
+            } catch {
+                debugPrint("Error saving profile: \(error)")
+            }
+        }
     }
 }
