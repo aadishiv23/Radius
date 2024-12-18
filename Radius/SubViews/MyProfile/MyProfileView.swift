@@ -199,6 +199,8 @@ struct MyProfileView: View {
     }
 }
 
+// MARK: - ZoneGridView
+
 struct ZoneGridView: View {
     @EnvironmentObject var friendsDataManager: FriendsDataManager
     @State private var editing = false
