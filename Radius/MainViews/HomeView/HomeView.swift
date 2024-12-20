@@ -9,45 +9,59 @@ import Combine
 import MapKit
 import SwiftUI
 
+
+// MARK: - FriendListCell
+
+struct FriendListCell: View {
+    let friend: Profile
+
+    var body: some View {
+        VStack {
+            Image(systemName: "person.circle.fill")
+                .resizable()
+                .frame(width: 50, height: 50)
+                .foregroundColor(.accentColor)
+                .padding(1)
+                .overlay(
+                    Circle()
+                        .stroke(Color.accentColor, lineWidth: 1)
+                )
+
+            Text(friend.full_name)
+                .font(.caption)
+                .lineLimit(1)
+        }
+        .frame(width: 80)
+        .padding(5)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.accentColor.opacity(0.3), lineWidth: 1)
+                )
+        )
+    }
+}
+
+// MARK: - HomeView
+
 struct HomeView: View {
-    @EnvironmentObject var friendsDataManager: FriendsDataManager // Assuming this contains your friendsLocations
+    @EnvironmentObject var friendsDataManager: FriendsDataManager
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel: HomeViewModel
-    @ObservedObject private var locationManager = LocationManager.shared
-
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 42.278378215221565, longitude: -83.74388859636869),
-        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-    )
 
     @State private var selectedFriend: Profile?
-    @State private var showRecenterButton = false
     @State private var showFullScreenMap = false
     @State private var buttonScale: CGFloat = 1.0
     @State private var isPresentingZoneEditor = false
     @State private var isPresentingDebugMenu = false
     @State private var isPresentingFriendRequests = false
+    @State private var showFogOfWarMap = false
 
     @State private var userZones: [Zone] = []
-    private var checkDistanceTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
-
-    @State private var animateGradient = false
     @State private var showZoneExitActionSheet = false
-    @State private var userPoints: Int? = nil // To hold the user's points
-
-    // Updated State Variables
-    @State private var showFABMenu = false
-    @State private var addZoneButtonOffset = CGSize.zero
-    @State private var friendRequestButtonOffset = CGSize.zero
-    @State private var addZoneButtonScale: CGFloat = 0.0
-    @State private var friendRequestButtonScale: CGFloat = 0.0
-    @State private var showFogOfWarMap = false
-    @State private var fogOfWarButtonOffset = CGSize.zero
-    @State private var fogOfWarButtonScale: CGFloat = 0.0
-
     @Namespace private var zoomNamespace
-    
-    @State private var isProfileIncomplete = false // New State
 
     /// Initialization with repositories
     init(
@@ -67,13 +81,15 @@ struct HomeView: View {
                     VStack {
                         mapSection
                         Divider()
+                        actionScrollList
+                        Divider()
                         friendListSection
                     }
                 }
             }
             .onAppear {
+                NotificationManager.shared.requestAuthorization()
                 Task {
-                    await checkUserProfile()
                     await viewModel.refreshAllData()
                 }
             }
@@ -91,8 +107,6 @@ struct HomeView: View {
             )
             .navigationTitle("Home")
             .toolbar {
-                // Plus button with a dropdown menu
-
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
@@ -111,149 +125,6 @@ struct HomeView: View {
                     }
                 }
             }
-            .overlay(
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        ZStack {
-                            // Main FAB
-                            Button(action: {
-                                // Haptic Feedback
-                                let generator = UIImpactFeedbackGenerator(style: .medium)
-                                generator.impactOccurred()
-
-                                showFABMenu.toggle()
-
-                                if showFABMenu {
-                                    // Animate buttons appearing
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.05)) {
-                                        addZoneButtonOffset = CGSize(width: 0, height: -80)
-                                        addZoneButtonScale = 1.0
-                                    }
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.1)) {
-                                        friendRequestButtonOffset = CGSize(width: 0, height: -160)
-                                        friendRequestButtonScale = 1.0
-                                    }
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.15)) {
-                                        fogOfWarButtonOffset = CGSize(width: 0, height: -240)
-                                        fogOfWarButtonScale = 1.0
-                                    }
-                                } else {
-                                    // Animate buttons disappearing with a jump up before falling
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45)) {
-                                        fogOfWarButtonOffset = CGSize(width: 0, height: -260)
-                                        fogOfWarButtonScale = 0.0
-                                    }
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.1)) {
-                                        friendRequestButtonOffset = CGSize(width: 0, height: -180)
-                                        friendRequestButtonScale = 0.0
-                                    }
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.45).delay(0.2)) {
-                                        addZoneButtonOffset = CGSize(width: 0, height: -100)
-                                        addZoneButtonScale = 0.0
-                                    }
-                                    // Then animate buttons falling into FAB
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.3)) {
-                                        fogOfWarButtonOffset = .zero
-                                        friendRequestButtonOffset = .zero
-                                        addZoneButtonOffset = .zero
-                                    }
-                                }
-                            }) {
-                                Image(systemName: "plus")
-                                    .rotationEffect(Angle(degrees: showFABMenu ? 135 : 0))
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 24, weight: .bold))
-                                    .frame(width: 60, height: 60)
-                                    .background(Color.blue)
-                                    .clipShape(Circle())
-                                    .shadow(radius: 5)
-                            }
-
-                            // Add Zone Button
-                            Button(action: {
-                                isPresentingZoneEditor = true
-                            }) {
-                                Image(systemName: "mappin.and.ellipse")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.white)
-                                    .padding(24)
-                                    .background(
-                                        Circle()
-                                            .fill(.ultraThinMaterial)
-                                            .overlay(
-                                                Circle()
-                                                    .fill(Color.blue.opacity(0.4))
-                                            )
-                                    )
-                                    .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
-                                    )
-                                    .shadow(radius: 5)
-                            }
-                            .offset(addZoneButtonOffset)
-                            .scaleEffect(addZoneButtonScale)
-
-                            // Friend Request Button
-                            Button(action: {
-                                isPresentingFriendRequests = true
-                            }) {
-                                Image(systemName: "person.crop.circle.badge.plus")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.white)
-                                    .padding(24)
-                                    .background(
-                                        Circle()
-                                            .fill(.ultraThinMaterial)
-                                            .overlay(
-                                                Circle()
-                                                    .fill(Color.blue.opacity(0.4))
-                                            )
-                                    )
-                                    .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
-                                    )
-                                    .shadow(radius: 5)
-                            }
-                            .offset(friendRequestButtonOffset)
-                            .scaleEffect(friendRequestButtonScale)
-
-                            // Fog of War Button
-                            Button(action: {
-                                showFogOfWarMap = true
-                            }) {
-                                Image(systemName: "globe")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.white)
-                                    .padding(24)
-                                    .background(
-                                        Circle()
-                                            .fill(.ultraThinMaterial)
-                                            .overlay(
-                                                Circle()
-                                                    .fill(Color.blue.opacity(0.4))
-                                            )
-                                    )
-                                    .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
-                                    )
-                                    .shadow(radius: 5)
-                            }
-                            .offset(fogOfWarButtonOffset)
-                            .scaleEffect(fogOfWarButtonScale)
-                        }
-                    }
-                    .padding(.trailing, 10)
-                    .padding(.bottom, 5)
-                }
-            )
             .actionSheet(isPresented: $showZoneExitActionSheet) {
                 ActionSheet(
                     title: Text("Select Zone to Trigger Exit"),
@@ -287,58 +158,15 @@ struct HomeView: View {
                 FriendRequestsView()
                     .environmentObject(friendsDataManager)
             }
-            .sheet(isPresented: $isProfileIncomplete) {
-                HomeProfileSetupView(isProfileIncomplete: $isProfileIncomplete)
+            .sheet(isPresented: $viewModel.isProfileIncomplete) {
+                HomeProfileSetupView(isProfileIncomplete: $viewModel.isProfileIncomplete)
             }
-            .fullScreenCover(isPresented: $showFogOfWarMap) {
+            .fullScreenCover(isPresented: $showFullScreenMap) {
                 FogOfWarContainerView()
-            }
-            .onReceive(checkDistanceTimer) { _ in
-                checkDistance()
             }
         }
         .refreshable {
-            await refreshData()
-        }
-        .onAppear {
-            NotificationManager.shared.requestAuthorization()
-            fetchUserPoints()
-            locationManager.checkIfLocationServicesIsEnabled()
-            locationManager.plsInitiateLocationUpdates()
-            if let userLocation = locationManager.userLocation?.coordinate {
-                region.center = userLocation
-            }
-            Task {
-                if let userId = friendsDataManager.currentUser?.id {
-                    await friendsDataManager.fetchFriends(for: userId)
-                    print("Current user is: \(userId)")
-                } else {
-                    print("Current user id is nil")
-                }
-            }
-            for friendsLocation in friendsDataManager.friends {
-                print(friendsLocation.full_name)
-            }
-        }
-    }
-    
-    // MARK: - Check User Profile
-    private func checkUserProfile() async {
-        do {
-            let currentUser = try await supabase.auth.session.user
-            let profile: Profile = try await supabase
-                .from("profiles")
-                .select()
-                .eq("id", value: currentUser.id)
-                .single()
-                .execute()
-                .value
-
-            if profile.full_name.isEmpty || profile.username.isEmpty {
-                isProfileIncomplete = true
-            }
-        } catch {
-            debugPrint("Error checking user profile: \(error)")
+            await viewModel.refreshAllData()
         }
     }
 
@@ -350,18 +178,10 @@ struct HomeView: View {
         print("silly boy add thsi back")
     }
 
-    private func refreshData() async {
-        guard let userId = friendsDataManager.currentUser?.id else {
-            return
-        }
-        await friendsDataManager.fetchFriends(for: userId)
-        await friendsDataManager.fetchUserGroups()
-    }
-
     private var mapSection: some View {
         ZStack(alignment: .top) {
             Map(
-                coordinateRegion: $region,
+                coordinateRegion: $viewModel.region,
                 showsUserLocation: true,
                 annotationItems: friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
             ) { friendLocation in
@@ -377,8 +197,8 @@ struct HomeView: View {
             .padding()
 
             HStack {
-                if showRecenterButton {
-                    Button(action: recenterMap) {
+                if viewModel.showRecenterButton {
+                    Button(action: viewModel.recenterMap) {
                         Image(systemName: "arrow.circlepath")
                             .circularButtonStyle()
                             .scaleEffect(buttonScale)
@@ -422,15 +242,17 @@ struct HomeView: View {
                     .navigationTransition(.zoom(sourceID: "zoom", in: zoomNamespace))
                     .environmentObject(friendsDataManager)
             } else {
-                FullScreenMapView() // Fallback without transition for older iOS versions
+                FullScreenMapView()
                     .environmentObject(friendsDataManager)
             }
         }
     }
 
+    // MARK: - Friend List Section
+
     private var friendListSection: some View {
         VStack(alignment: .leading, spacing: 5) {
-            // Me Section
+            // "Me" Section
             Section(header: Text("Me").font(.headline).padding(.leading)) {
                 if let currentUser = friendsDataManager.currentUser {
                     friendRow(currentUser)
@@ -439,9 +261,9 @@ struct HomeView: View {
 
             Divider()
 
-            // Friends Section
+            // "Friends" Section
             Section(header: Text("Friends").font(.headline).padding(.leading)) {
-                let friends = friendsDataManager.friends.filter { $0.id != friendsDataManager.currentUser?.id }
+                let friends = viewModel.friends.filter { $0.id != friendsDataManager.currentUser?.id }
                 if friends.isEmpty {
                     noFriendsRow
                 } else {
@@ -506,7 +328,7 @@ struct HomeView: View {
         .onTapGesture {
             selectedFriend = friend
             let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred() // Add haptic feedback
+            generator.impactOccurred()
         }
     }
 
@@ -543,55 +365,24 @@ struct HomeView: View {
                 .stroke(Color.gray.opacity(0.2), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.03), radius: 3, x: 0, y: 1)
-        .padding(.horizontal)
-        .padding(.vertical, 4)
     }
 
-    private func checkDistance() {
-        guard let currentLocation = locationManager.userLocation else {
-            return
-        }
-        let initialLocation = CLLocation(
-            latitude: currentLocation.coordinate.latitude,
-            longitude: currentLocation.coordinate.longitude
-        )
-        let distance = initialLocation.distance(from: initialLocation)
-        showRecenterButton = distance > 500
-    }
-
-    private func recenterMap() {
-        if let userLocation = locationManager.userLocation {
-            region.center = userLocation.coordinate
-            region.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-            showRecenterButton = false
-        }
-    }
-
-    private func fetchUserPoints() {
-        // Fetch points logic (mocked here)
-        Task {
-            // Example logic to fetch user points, replace with actual data fetching
-            // userPoints = try await fetchPointsForCurrentUser()
-            userPoints = 500 // Mock value, replace with actual logic
-        }
+    private var actionScrollList: some View {
+        ActionScrollList(actions: [
+            (imageName: "mappin.and.ellipse", text: "Add Zone", action: {
+                isPresentingZoneEditor = true
+            }),
+            (imageName: "person.crop.circle.badge.plus", text: "Friend Requests", action: {
+                isPresentingFriendRequests = true
+            }),
+            (imageName: "ladybug", text: "Debug Menu", action: {
+                isPresentingDebugMenu = true
+            })
+        ])
     }
 }
 
-// MARK: - UINavigationController + UIGestureRecognizerDelegate
-
-// struct HomeView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        HomeView()
-//    }
-// }
-
-/// nic code to controll swiping navigation view back even when .navigationbar is hidden
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-}
+// MARK: - GlassyButtonStyle
 
 struct GlassyButtonStyle: ButtonStyle {
     var backgroundColor = Color.blue
@@ -600,7 +391,6 @@ struct GlassyButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
-            // Glassy Background
             RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(
                     LinearGradient(
@@ -618,7 +408,6 @@ struct GlassyButtonStyle: ButtonStyle {
                 )
                 .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
 
-            // Button Image
             Image(systemName: systemImage)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(foregroundColor)
@@ -628,6 +417,8 @@ struct GlassyButtonStyle: ButtonStyle {
         .frame(width: 60, height: 60)
     }
 }
+
+// MARK: - HomeProfileSetupView
 
 struct HomeProfileSetupView: View {
     @Binding var isProfileIncomplete: Bool
