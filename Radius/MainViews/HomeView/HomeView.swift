@@ -161,7 +161,7 @@ struct HomeView: View {
             .sheet(isPresented: $viewModel.isProfileIncomplete) {
                 HomeProfileSetupView(isProfileIncomplete: $viewModel.isProfileIncomplete)
             }
-            .fullScreenCover(isPresented: $showFullScreenMap) {
+            .fullScreenCover(isPresented: $showFogOfWarMap) {
                 FogOfWarContainerView()
             }
         }
@@ -374,6 +374,9 @@ struct HomeView: View {
             }),
             (imageName: "person.crop.circle.badge.plus", text: "Friend Requests", action: {
                 isPresentingFriendRequests = true
+            }),
+            (imageName: "globe", text: "World", action: {
+                showFogOfWarMap = true
             }),
             (imageName: "ladybug", text: "Debug Menu", action: {
                 isPresentingDebugMenu = true

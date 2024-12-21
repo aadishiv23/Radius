@@ -39,7 +39,7 @@ private struct ActionButton: View {
             )
         }
         .buttonStyle(PlainButtonStyle()) // Removes the default button highlight
-        .foregroundColor(.accentColor)
+        .foregroundColor(.primary)
     }
 }
 
@@ -68,5 +68,27 @@ struct ActionScrollList: View {
             .padding(.horizontal)
             .padding(.vertical, 10)
         }
+    }
+}
+
+// MARK: - Previews
+
+struct ActionScrollList_Previews: PreviewProvider {
+    static var previews: some View {
+        ActionScrollList(actions: [
+            (imageName: "star.fill", text: "Favorite", action: {}),
+            (imageName: "bell.fill", text: "Alerts", action: {}),
+            (imageName: "heart.fill", text: "Like", action: {})
+        ])
+        .preferredColorScheme(.light) // Light mode preview
+        .previewDisplayName("Light Mode")
+        
+        ActionScrollList(actions: [
+            (imageName: "star.fill", text: "Favorite", action: {}),
+            (imageName: "bell.fill", text: "Alerts", action: {}),
+            (imageName: "heart.fill", text: "Like", action: {})
+        ])
+        .preferredColorScheme(.dark) // Dark mode preview
+        .previewDisplayName("Dark Mode")
     }
 }
