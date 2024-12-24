@@ -9,7 +9,6 @@ import Combine
 import MapKit
 import SwiftUI
 
-
 // MARK: - FriendListCell
 
 struct FriendListCell: View {
@@ -85,6 +84,25 @@ struct HomeView: View {
                         Divider()
                         friendListSection
                     }
+                }
+            }
+            .onAppear {
+                NotificationManager.shared.requestAuthorization()
+                LocationManager.shared.checkIfLocationServicesIsEnabled()
+                LocationManager.shared.plsInitiateLocationUpdates()
+                if let userLocation = LocationManager.shared.userLocation?.coordinate {
+                    viewModel.region.center = userLocation
+                }
+                Task {
+                    if let userId = friendsDataManager.currentUser?.id {
+                        await friendsDataManager.fetchFriends(for: userId)
+                        print("Current user is: \(userId)")
+                    } else {
+                        print("Current user id is nil")
+                    }
+                }
+                for friendsLocation in friendsDataManager.friends {
+                    print(friendsLocation.full_name)
                 }
             }
             .onAppear {
