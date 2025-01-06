@@ -66,7 +66,6 @@
 		AC9BD1CC2BEB0E7100D23123 /* Supabase+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */; };
 		AC9BD1D12BEB0F6800D23123 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AC9BD1D02BEB0F6800D23123 /* Supabase */; };
 		AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D22BEB101B00D23123 /* AuthView.swift */; };
-		AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */; };
 		AC9BD1D72BEB3CF500D23123 /* SupabaseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D62BEB3CF500D23123 /* SupabaseModels.swift */; };
 		AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9BD1D82BEB3EB000D23123 /* AppView.swift */; };
 		ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0214A2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift */; };
@@ -83,6 +82,16 @@
 		ACCAF8DE2CD969BD00577EE7 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */; };
 		ACCC57342CCECA100048A186 /* ChangeProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */; };
 		ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */; };
+		ACCFA6D82D2C837B003AFF0C /* SupabaseProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6D72D2C837B003AFF0C /* SupabaseProfileView.swift */; };
+		ACCFA6DA2D2C83A5003AFF0C /* SupabaseProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6D92D2C83A5003AFF0C /* SupabaseProfileViewModel.swift */; };
+		ACCFA6DC2D2C841F003AFF0C /* SupabaseProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6DB2D2C841F003AFF0C /* SupabaseProfileHeaderView.swift */; };
+		ACCFA6DE2D2C8431003AFF0C /* SupabaseProfileEditForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6DD2D2C8431003AFF0C /* SupabaseProfileEditForm.swift */; };
+		ACCFA6E02D2C8441003AFF0C /* SupabaseProfileZoneSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6DF2D2C8441003AFF0C /* SupabaseProfileZoneSection.swift */; };
+		ACCFA6E22D2C844D003AFF0C /* SupabaseProfileStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6E12D2C844D003AFF0C /* SupabaseProfileStatsView.swift */; };
+		ACCFA6E52D2C8497003AFF0C /* SupabaseProfileActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6E42D2C8497003AFF0C /* SupabaseProfileActionButton.swift */; };
+		ACCFA6E72D2C84EE003AFF0C /* EnhancedZoneCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6E62D2C84E8003AFF0C /* EnhancedZoneCard.swift */; };
+		ACCFA6E92D2C84FC003AFF0C /* ProfileTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6E82D2C84FC003AFF0C /* ProfileTextField.swift */; };
+		ACCFA6EB2D2C8512003AFF0C /* MapViewSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFA6EA2D2C8512003AFF0C /* MapViewSnapshot.swift */; };
 		ACCFF2C62BC22AF400D9265B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFF2C52BC22AF400D9265B /* LocationManager.swift */; };
 		ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */; };
 		ACDC65172CA237FE0087D8D3 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDC65162CA237FE0087D8D3 /* HomeViewModel.swift */; };
@@ -151,7 +160,6 @@
 		AC9BD1BD2BE9954400D23123 /* CreateFriendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFriendView.swift; sourceTree = "<group>"; };
 		AC9BD1CB2BEB0E7100D23123 /* Supabase+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Supabase+Helpers.swift"; sourceTree = "<group>"; };
 		AC9BD1D22BEB101B00D23123 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
-		AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileView.swift; sourceTree = "<group>"; };
 		AC9BD1D62BEB3CF500D23123 /* SupabaseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseModels.swift; sourceTree = "<group>"; };
 		AC9BD1D82BEB3EB000D23123 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		AC9BD1DA2BEDD01700D23123 /* Radius.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Radius.entitlements; sourceTree = "<group>"; };
@@ -169,6 +177,16 @@
 		ACCAF8DD2CD969B800577EE7 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
 		ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeProfileView.swift; sourceTree = "<group>"; };
 		ACCE03C82C7940CA00BC6907 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
+		ACCFA6D72D2C837B003AFF0C /* SupabaseProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileView.swift; sourceTree = "<group>"; };
+		ACCFA6D92D2C83A5003AFF0C /* SupabaseProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileViewModel.swift; sourceTree = "<group>"; };
+		ACCFA6DB2D2C841F003AFF0C /* SupabaseProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileHeaderView.swift; sourceTree = "<group>"; };
+		ACCFA6DD2D2C8431003AFF0C /* SupabaseProfileEditForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileEditForm.swift; sourceTree = "<group>"; };
+		ACCFA6DF2D2C8441003AFF0C /* SupabaseProfileZoneSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileZoneSection.swift; sourceTree = "<group>"; };
+		ACCFA6E12D2C844D003AFF0C /* SupabaseProfileStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileStatsView.swift; sourceTree = "<group>"; };
+		ACCFA6E42D2C8497003AFF0C /* SupabaseProfileActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProfileActionButton.swift; sourceTree = "<group>"; };
+		ACCFA6E62D2C84E8003AFF0C /* EnhancedZoneCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedZoneCard.swift; sourceTree = "<group>"; };
+		ACCFA6E82D2C84FC003AFF0C /* ProfileTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTextField.swift; sourceTree = "<group>"; };
+		ACCFA6EA2D2C8512003AFF0C /* MapViewSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewSnapshot.swift; sourceTree = "<group>"; };
 		ACCFF2C52BC22AF400D9265B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ACCFF2C72BC22F9900D9265B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ACD481292C2A6FE4004653A1 /* PasswordProtectedDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectedDebugView.swift; sourceTree = "<group>"; };
@@ -202,6 +220,7 @@
 		AC0AC6FD2BDB0EB8000418B8 /* MainViews */ = {
 			isa = PBXGroup;
 			children = (
+				ACCFA6D62D2C8356003AFF0C /* ProfileView */,
 				ACDC65182CA23E640087D8D3 /* Leaderboard */,
 				ACDC65152CA237F50087D8D3 /* HomeView */,
 				AC36A73B2C928BBC00840DDD /* InfoView */,
@@ -261,7 +280,6 @@
 			children = (
 				AC9BD1D22BEB101B00D23123 /* AuthView.swift */,
 				ACCC57332CCECA0B0048A186 /* ChangeProfileView.swift */,
-				AC9BD1D42BEB3B3B00D23123 /* SupabaseProfileView.swift */,
 				AC1A99C52C8371E100ED5D1B /* ProfileSetupView.swift */,
 			);
 			path = Auth;
@@ -458,6 +476,31 @@
 			path = Group;
 			sourceTree = "<group>";
 		};
+		ACCFA6D62D2C8356003AFF0C /* ProfileView */ = {
+			isa = PBXGroup;
+			children = (
+				ACCFA6E32D2C846C003AFF0C /* Misc */,
+				ACCFA6E42D2C8497003AFF0C /* SupabaseProfileActionButton.swift */,
+				ACCFA6D72D2C837B003AFF0C /* SupabaseProfileView.swift */,
+				ACCFA6DB2D2C841F003AFF0C /* SupabaseProfileHeaderView.swift */,
+				ACCFA6DD2D2C8431003AFF0C /* SupabaseProfileEditForm.swift */,
+				ACCFA6DF2D2C8441003AFF0C /* SupabaseProfileZoneSection.swift */,
+				ACCFA6E12D2C844D003AFF0C /* SupabaseProfileStatsView.swift */,
+				ACCFA6D92D2C83A5003AFF0C /* SupabaseProfileViewModel.swift */,
+			);
+			path = ProfileView;
+			sourceTree = "<group>";
+		};
+		ACCFA6E32D2C846C003AFF0C /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				ACCFA6E62D2C84E8003AFF0C /* EnhancedZoneCard.swift */,
+				ACCFA6EA2D2C8512003AFF0C /* MapViewSnapshot.swift */,
+				ACCFA6E82D2C84FC003AFF0C /* ProfileTextField.swift */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
 		ACDC65152CA237F50087D8D3 /* HomeView */ = {
 			isa = PBXGroup;
 			children = (
@@ -598,9 +641,12 @@
 				ACA0214B2BE0B7D500E98DA4 /* CLLocationCoordinate2DTransformer.swift in Sources */,
 				ACCAF8DE2CD969BD00577EE7 /* VariableBlurView.swift in Sources */,
 				AC5856002BDF1925009C490B /* MapView.swift in Sources */,
+				ACCFA6E52D2C8497003AFF0C /* SupabaseProfileActionButton.swift in Sources */,
 				AC297D072D16104E00C46E59 /* ActionScrollList.swift in Sources */,
 				AC6A552D2BD9A32F00706E01 /* Friends.swift in Sources */,
 				AC98AE022BC0872E00879A25 /* ContentView.swift in Sources */,
+				ACCFA6DC2D2C841F003AFF0C /* SupabaseProfileHeaderView.swift in Sources */,
+				ACCFA6EB2D2C8512003AFF0C /* MapViewSnapshot.swift in Sources */,
 				AC36A7382C928B7700840DDD /* CompetitionsRepository.swift in Sources */,
 				AC3989562C705637002F84E6 /* DataController.swift in Sources */,
 				ACBE26A62CD2BEE600492322 /* NotificationManager.swift in Sources */,
@@ -627,15 +673,20 @@
 				ACA85ABA2C87D3740086C484 /* RadiusGlass.swift in Sources */,
 				ACAEFE012C1EAAF500E12E0B /* RealtimeManager.swift in Sources */,
 				ACCC57342CCECA100048A186 /* ChangeProfileView.swift in Sources */,
+				ACCFA6E92D2C84FC003AFF0C /* ProfileTextField.swift in Sources */,
 				AC9BD1D32BEB101B00D23123 /* AuthView.swift in Sources */,
 				AC36A73D2C928BC700840DDD /* InfoViewModel.swift in Sources */,
 				AC5855FE2BDF1705009C490B /* ZoneEditorView.swift in Sources */,
+				ACCFA6DE2D2C8431003AFF0C /* SupabaseProfileEditForm.swift in Sources */,
 				AC36A7402C928C4100840DDD /* CachedData.swift in Sources */,
 				AC36A7342C928A4500840DDD /* FriendsRepository.swift in Sources */,
 				ACAEFDFF2C193F8500E12E0B /* GroupView.swift in Sources */,
+				ACCFA6E02D2C8441003AFF0C /* SupabaseProfileZoneSection.swift in Sources */,
 				ACD4812A2C2A6FE4004653A1 /* PasswordProtectedDebugView.swift in Sources */,
 				AC501BAF2C9BC8770013FE16 /* AllZonesExitsView.swift in Sources */,
+				ACCFA6E22D2C844D003AFF0C /* SupabaseProfileStatsView.swift in Sources */,
 				AC39895C2C70592C002F84E6 /* GroupDetailView+ViewModel.swift in Sources */,
+				ACCFA6DA2D2C83A5003AFF0C /* SupabaseProfileViewModel.swift in Sources */,
 				AC8F27662CDC6AEE0008AEEF /* ZoneEntity.swift in Sources */,
 				AC9BD1D92BEB3EB000D23123 /* AppView.swift in Sources */,
 				AC0AC70C2BDB1FD0000418B8 /* FriendDetailMapView.swift in Sources */,
@@ -648,6 +699,8 @@
 				ACED0C8C2C2532A900D30D15 /* AddressResult+AnnotationItem.swift in Sources */,
 				AC9140112C93C2CA000112D2 /* FriendService.swift in Sources */,
 				ACBFFD1F2CDDA914003C3471 /* GroupDetailView.swift in Sources */,
+				ACCFA6D82D2C837B003AFF0C /* SupabaseProfileView.swift in Sources */,
+				ACCFA6E72D2C84EE003AFF0C /* EnhancedZoneCard.swift in Sources */,
 				AC245A7F2C9151F4009B7A0D /* MyProfileView.swift in Sources */,
 				ACDC651A2CA23E6F0087D8D3 /* LeaderboardViewModel.swift in Sources */,
 				AC8830C62CD579A30093BFC1 /* ScrollTestView.swift in Sources */,
@@ -667,7 +720,6 @@
 				AC1B00542BF4753C000BB30B /* AuthViewModel.swift in Sources */,
 				AC3989682C7440C9002F84E6 /* ZoneUpdateManager.swift in Sources */,
 				ACCE03C92C7940CA00BC6907 /* LeaderboardView.swift in Sources */,
-				AC9BD1D52BEB3B3B00D23123 /* SupabaseProfileView.swift in Sources */,
 				ACAEFDFB2C18132700E12E0B /* CreateGroupView.swift in Sources */,
 				AC5DB4D52C7D7F0100A1019E /* CompetitionManager.swift in Sources */,
 				AC1A99C62C8371E100ED5D1B /* ProfileSetupView.swift in Sources */,
