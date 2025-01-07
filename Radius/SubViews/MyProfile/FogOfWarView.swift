@@ -19,6 +19,14 @@ struct FogOfWarMapView: UIViewRepresentable {
         mapView.showsUserLocation = true
         mapView.userTrackingMode = .follow
 
+        // Set initial region to Ann Arbor
+        let annArborRegion = MKCoordinateRegion(
+            center: FogOfWarConstants.annArborCoordinate,
+            latitudinalMeters: FogOfWarConstants.radiusMeters * 2,
+            longitudinalMeters: FogOfWarConstants.radiusMeters * 2
+        )
+        mapView.setRegion(annArborRegion, animated: false)
+
         if let fogOverlay = fogOfWarManager.fogOverlay {
             mapView.addOverlay(fogOverlay)
         }
@@ -47,28 +55,51 @@ struct FogOfWarMapView: UIViewRepresentable {
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if let polygon = overlay as? MKPolygon {
                 let renderer = MKPolygonRenderer(polygon: polygon)
-                renderer.fillColor = UIColor.black.withAlphaComponent(0.5)
+                renderer.fillColor = UIColor.red.withAlphaComponent(0.7)
                 renderer.strokeColor = UIColor.white.withAlphaComponent(0.2)
+
+                // Create gradient effect using Core Graphics instead of CAGradientLayer
+                let gradientColors = [
+                    UIColor.black.withAlphaComponent(0.6),
+                    UIColor.black.withAlphaComponent(0.4)
+                ]
+
+                renderer.setNeedsDisplay()
+
                 return renderer
             }
             return MKOverlayRenderer()
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-            parent.fogOfWarManager.updateFogOverlay()
+            // if parent.fogOfWarManager.isWithinBoundary {
+            Task { @MainActor in
+                parent.fogOfWarManager.updateFogOverlay()
+            }
+            // }
         }
     }
 }
+
+// Preview for SwiftUI
+#if DEBUG
+struct FogOfWarMapView_Previews: PreviewProvider {
+    static var previews: some View {
+        FogOfWarMapView(fogOfWarManager: FogOfWarManager())
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+#endif
 
 //  FogOfWarContainerView.swift
 //  Radius
 //
 //  Created by Aadi Shiv Malhotra on 10/05/24.
 
+/// FogOfWarContainerView.swift
 struct FogOfWarContainerView: View {
-    @Environment(\.dismiss) var dismiss
     @StateObject var fogOfWarManager = FogOfWarManager()
-    @State private var isStatsExpanded = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
@@ -76,174 +107,124 @@ struct FogOfWarContainerView: View {
             FogOfWarMapView(fogOfWarManager: fogOfWarManager)
                 .edgesIgnoringSafeArea(.all)
 
-            // Top Bar with Close Button and Collapsible Stats
-            VStack(spacing: 0) {
-                HStack(alignment: .top) {
-                    // Collapsible Stats Panel
-                    StatsCard(
-                        fogOfWarManager: fogOfWarManager,
-                        isExpanded: $isStatsExpanded
-                    )
-
+            // Top and Bottom Overlays
+            VStack {
+                // Top Row with Dismiss Button
+                HStack {
                     Spacer()
-
-                    // Close Button
-                    Button(action: { dismiss() }) {
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            dismiss()
+                        }
+                    }) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 32))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(.white)
-                            .background(
-                                Circle()
-                                    .fill(.ultraThinMaterial)
-                                    .overlay {
-                                        Circle()
-                                            .fill(Color.red.opacity(0.7))
-                                    }
-                            )
+                            .font(.system(size: 30))
+                            .background(Color.black.opacity(0.2))
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
                     }
-                }
-                .padding([.horizontal, .top], 16)
-
-                // Unlock Message
-                if let message = fogOfWarManager.uncoverMessage {
-                    UnlockMessage(message: message)
                 }
 
                 Spacer()
+
+                // Stats Overlay
+                StatsOverlay(fogOfWarManager: fogOfWarManager)
+                    .padding()
+                    .animation(.easeInOut(duration: 0.3), value: UUID()) // Use UUID for animation independence
             }
         }
     }
 }
 
-private struct StatsCard: View {
-    @ObservedObject var fogOfWarManager: FogOfWarManager
-    @Binding var isExpanded: Bool
+struct OutOfBoundsView: View {
+    var body: some View {
+        Text("Outside Exploration Area")
+            .font(.headline)
+            .padding()
+            .background(.ultraThinMaterial)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.horizontal)
+    }
+}
 
-    var percentUnlocked: Double {
-        guard fogOfWarManager.totalTiles > 0 else {
-            return 0
-        }
+struct StatsOverlay: View {
+    @ObservedObject var fogOfWarManager: FogOfWarManager
+    @State private var isExpanded = false
+
+    var percentExplored: Double {
+        guard fogOfWarManager.totalTiles > 0 else { return 0 }
         return Double(fogOfWarManager.uncoveredTiles) / Double(fogOfWarManager.totalTiles) * 100
     }
 
-    private var springAnimation: Animation {
-        .spring(response: 0.4, dampingFraction: 0.65, blendDuration: 0.2)
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Header with stable layout
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("\(Int(percentUnlocked))% Explored")
-                    .font(.headline)
-                    .foregroundColor(.white)
-
-                Image(systemName: "chevron.down")
-                    .foregroundColor(.white)
-                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                    .animation(springAnimation, value: isExpanded)
-            }
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(.ultraThinMaterial)
-            .cornerRadius(8)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                withAnimation(springAnimation) {
-                    isExpanded.toggle()
+                VStack(alignment: .leading) {
+                    Text("\(Int(percentExplored))% Explored")
+                        .font(.headline)
+                    Text("Ann Arbor Region")
+                        .font(.subheadline)
                 }
-            }
-
-            // Expandable Stats - Modified layout
-            VStack(alignment: .leading, spacing: 16) { // Increased spacing
-                // Stack items vertically instead of horizontally
-                VStack(alignment: .leading, spacing: 16) { // Added vertical layout
-                    StatItem(
-                        title: "Uncovered",
-                        value: "\(fogOfWarManager.uncoveredTiles)",
-                        color: .green
-                    )
-
-                    StatItem(
-                        title: "Total",
-                        value: "\(fogOfWarManager.totalTiles)",
-                        color: .blue
-                    )
-                }
-
-                // Progress Bar
-                ProgressBar(progress: percentUnlocked / 100)
-            }
-            .padding(16) // Increased padding
-            .frame(width: 160) // Set explicit width
-            .background(.ultraThinMaterial)
-            .cornerRadius(8)
-            .frame(maxHeight: isExpanded ? .none : 0)
-            .opacity(isExpanded ? 1 : 0)
-            .animation(springAnimation, value: isExpanded)
-            .clipped()
-        }
-    }
-}
-
-private struct StatItem: View {
-    let title: String
-    let value: String
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.headline)
                 .foregroundColor(.white)
-                .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text(value)
-                .font(.headline)
-                .foregroundColor(color)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-}
+                Spacer()
 
-private struct ProgressBar: View {
-    let progress: Double
+                // Expand Button with Animation
+                Button {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                        isExpanded.toggle()
+                    }
+                } label: {
+                    Image(systemName: "chevron.up.circle.fill")
+                        .imageScale(.large)
+                        .foregroundColor(.white)
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .animation(.easeInOut(duration: 0.2), value: isExpanded)
+                }
+            }
 
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(Color.white.opacity(0.2))
+            // Expandable Stats Section
+            if isExpanded {
+                VStack(spacing: 8) {
+                    StatRow(
+                        title: "Tiles Uncovered",
+                        value: fogOfWarManager.uncoveredTiles,
+                        total: fogOfWarManager.totalTiles
+                    )
 
-                Rectangle()
-                    .fill(LinearGradient(
-                        gradient: Gradient(colors: [.blue, .green]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ))
-                    .frame(width: geometry.size.width * CGFloat(progress))
+                    ProgressView(value: percentExplored, total: 100)
+                        .tint(.blue)
+                        .progressViewStyle(.linear)
+                        .scaleEffect(1.05)
+                        .animation(.easeInOut(duration: 0.3), value: percentExplored)
+                }
+                .padding(.top, 8)
+                .transition(.opacity.combined(with: .scale))
             }
         }
-        .frame(height: 4)
-        .cornerRadius(2)
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(15)
+        .shadow(radius: 5)
     }
 }
 
-private struct UnlockMessage: View {
-    let message: String
+
+struct StatRow: View {
+    let title: String
+    let value: Int
+    let total: Int
 
     var body: some View {
-        Text(message)
-            .font(.subheadline)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.black.opacity(0.6))
-            .foregroundColor(.white)
-            .cornerRadius(8)
-            .padding(.top, 8)
-            .transition(.move(edge: .top).combined(with: .opacity))
-            .animation(.spring(), value: message)
+        HStack {
+            Text(title)
+                .foregroundColor(.white)
+            Spacer()
+            Text("\(value)/\(total)")
+                .foregroundColor(.white)
+                .fontWeight(.bold)
+        }
     }
 }
 
